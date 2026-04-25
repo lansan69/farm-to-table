@@ -1,2 +1,5 @@
 .htaccess
-.config.php
+
+# Enviroment y credenciales
+config/*
+!config/config.example.php
