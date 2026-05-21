@@ -1,15 +1,3 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-  font-family: 'Roboto Condensed', sans-serif;
-}
-
-body {
-  margin: 0;
-  padding-top: 64px;
-  background-color: var(--color-background);
-  color: var(--color-dark);
-}
-
 .ftt-navbar {
   position: fixed;
   top: 0;
@@ -43,7 +31,6 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1;
-  color: var(--color-dark);
 }
 
 .ftt-hamburger {
@@ -129,14 +116,15 @@ body {
   gap: 0.45rem;
   background-color: var(--color-primary-green);
   color: #ffffff;
-  border: none;
+  border: 2px solid transparent;
   border-radius: 50px;
   padding: 0.38rem 1.15rem 0.38rem 0.75rem;
   font-size: 1rem;
   font-weight: 600;
   font-family: 'Roboto Condensed', sans-serif;
   cursor: pointer;
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast), transform var(--transition-fast);
   text-decoration: none;
 }
 
@@ -152,15 +140,14 @@ body {
 .ftt-btn-login svg {
   width: 18px;
   height: 18px;
-  stroke: #ffffff;
+  stroke: currentColor;
   fill: none;
   stroke-width: 2;
   flex-shrink: 0;
 }
 
-.demo-note {
-  text-align: center;
-  margin-top: 3rem;
-  color: #888;
-  font-size: 0.9rem;
+.ftt-btn-login.active {
+  background-color: transparent;
+  color: var(--color-primary-green);
+  border-color: var(--color-primary-green);
 }

@@ -24,6 +24,16 @@ async function initApp() {
     await loadComponent('app', app);
 }
 
-export { loadComponent, BASE_PATH };
+async function unloadComponent(path) {
+    const name = path.replace(/\/$/, '').split('/').pop();
+    const link = document.querySelector(`link[data-component="${name}"]`);
+    if (link) link.remove();
+
+    const modulePath = `${BASE_PATH}/components/${path}/${name}.js`;
+    const module = await import(modulePath);
+    if (typeof module.cleanup === 'function') await module.cleanup();
+}
+
+export { loadComponent, unloadComponent, BASE_PATH };
 
 initApp();

@@ -1,42 +1,27 @@
-/* ========================================
-   Variables Globales de CSS
-   Define los colores y estilos base del sitio
-   ======================================== */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&family=Roboto+Condensed:wght@400;700&display=swap');
+
 :root {
-  /* Color verde primario para elementos principales */
   --color-primary-green: #1B853F;
-  /* Color azul-verde (teal) para acentos secundarios */
-  --color-teal: #00796B;
-  /* Color verde lima para elementos destacados */
-  --color-lime: #85B72C;
-  /* Color de fondo claro para toda la página */
-  --color-background: #F8F9FA;
-  /* Color oscuro para texto principal y elementos */
-  --color-dark: #1A1C1A;
+  --color-teal:          #00796B;
+  --color-lime:          #85B72C;
+  --color-background:    #F8F9FA;
+  --color-dark:          #1A1C1A;
 
-  --color-perfil-bg:    #B2D8D8;
-  --color-perfil-hover: #9ECECE;
-  --color-nav-border:   #E0E3E0;
-  --transition-fast:    0.18s ease;
+  --color-perfil-bg:     #B2D8D8;
+  --color-perfil-hover:  #9ECECE;
+  --color-nav-border:    #E0E3E0;
+  --transition-fast:     0.18s ease;
 }
 
-/* ========================================
-   Estilos Globales de Fuente y Colores
-   Configuración base para todo el documento
-   ======================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* Estilos del cuerpo del documento */
 body {
-  /* Utiliza la fuente Roboto Condensed como familia tipográfica principal */
   font-family: 'Roboto Condensed', sans-serif;
-  /* Aplica el color oscuro definido en variables para todo el texto */
   color: var(--color-dark);
-  /* Establece el fondo claro como color de fondo de la página */
   background-color: var(--color-background);
-}
-
-/* Selector universal para asegurar que todos los elementos usen Roboto Condensed */
-* {
-  /* Aplica Roboto Condensed a todos los elementos del documento */
-  font-family: 'Roboto Condensed', sans-serif;
+  padding-top: 64px;
 }

@@ -1,0 +1,8 @@
+#unlogged-main-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  background: #f2efe8;
+}
