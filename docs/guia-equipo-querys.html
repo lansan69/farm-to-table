@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Farm to Table — Guía del Equipo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:      #1e6b4a;
+      --green-dim:  #2d8a60;
+      --green-glow: #4ade8044;
+      --cream:      #f5f2eb;
+      --dark:       #0f1a14;
+      --card:       #1a2820;
+      --border:     #2a3d30;
+      --text:       #c8d8cc;
+      --muted:      #6a8a72;
+      --accent:     #f4a261;
+      --mono:       'IBM Plex Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0a1510 0%, #1a2820 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 64px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, #1e6b4a22, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--green-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      background: #1e6b4a18;
+      border: 1px solid #1e6b4a44;
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
+
+    .header-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    h1 span { color: #4ade80; }
+
+    .header-sub {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    /* ── Nav index ── */
+    .nav-index {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 20px 64px;
+      border-bottom: 1px solid var(--border);
+      background: #0f1a14;
+    }
+
+    .nav-index a {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-index a:hover {
+      color: #4ade80;
+      border-color: #4ade8044;
+      background: #4ade8011;
+    }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 32px 80px;
+    }
+
+    /* ── Section ── */
+    section {
+      margin-bottom: 64px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #4ade80;
+      background: #4ade8011;
+      border: 1px solid #4ade8033;
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    h3 {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: #4ade80;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 24px 0 10px;
+    }
+
+    p {
+      font-size: 0.92rem;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    /* ── Steps list ── */
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.9rem;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #4ade80;
+      background: #4ade8011;
+      border: 1px solid #4ade8033;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Credentials table ── */
+    .creds {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .creds thead {
+      background: #4ade8011;
+    }
+
+    .creds th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #4ade80;
+      font-weight: 500;
+    }
+
+    .creds td {
+      padding: 11px 16px;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .creds tr:hover td { background: #ffffff05; }
+
+    .creds .field-name { color: var(--muted); }
+
+    .creds .val {
+      color: #fff;
+      background: #0f1a14;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Code block ── */
+    .code-block {
+      background: #080f0b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      position: relative;
+      margin: 12px 0;
+    }
+
+    .code-block .comment { color: #4a6b52; }
+    .code-block .keyword { color: #4ade80; }
+    .code-block .string  { color: #f4a261; }
+    .code-block .name    { color: #7dd3fc; }
+
+    .code-label {
+      position: absolute;
+      top: 10px; right: 14px;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── File tree ── */
+    .file-tree {
+      background: #080f0b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+      line-height: 2;
+    }
+
+    .file-tree .dir  { color: #7dd3fc; }
+    .file-tree .file { color: var(--text); }
+    .file-tree .you  { color: #4ade80; }
+    .file-tree .note { color: var(--muted); font-size: 0.75rem; }
+
+    /* ── Callout ── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: #f4a26111;
+      border: 1px solid #f4a26133;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      color: #f4a261;
+      margin: 16px 0;
+    }
+
+    .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+
+    .callout.green {
+      background: #4ade8011;
+      border-color: #4ade8033;
+      color: #4ade80;
+    }
+
+    /* ── Download btn ── */
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--green);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      transition: background 0.2s, transform 0.1s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-download:hover  { background: var(--green-dim); }
+    .btn-download:active { transform: scale(0.98); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 32px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 32px 24px; }
+      .nav-index { padding: 16px 24px; }
+      main { padding: 40px 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Farm to Table · Equipo de desarrollo</div>
+  <h1>Guía para <span>consultas SQL</span></h1>
+  <p class="header-sub">Instrucciones para conectarte a la base de datos compartida, probar tus consultas y entregar tus vistas.</p>
+</header>
+
+<nav class="nav-index">
+  <a href="#instalar">01 · Instalar TablePlus</a>
+  <a href="#conectar">02 · Conectar la BD</a>
+  <a href="#consultas">03 · Hacer consultas</a>
+  <a href="#vistas">04 · Crear vistas</a>
+  <a href="#entregar">05 · Entregar</a>
+</nav>
+
+<main>
+
+  <!-- ── 01 Instalar ── -->
+  <section id="instalar">
+    <div class="section-header">
+      <span class="step-number">PASO 01</span>
+      <h2>Instalar TablePlus</h2>
+    </div>
+
+    <p>TablePlus es un cliente visual de bases de datos. Te permite conectarte a la BD del proyecto y ejecutar tus consultas sin necesitar XAMPP ni PHP.</p>
+
+    <a class="btn-download" href="https://tableplus.com/download" target="_blank">
+      ↓ Descargar TablePlus
+    </a>
+
+    <div class="callout" style="margin-top:20px;">
+      <span class="callout-icon">⚠</span>
+      <span>La versión gratuita tiene límite de 2 tabs abiertos — es más que suficiente para este proyecto. No necesitas pagar nada.</span>
+    </div>
+
+    <ol class="steps" style="margin-top:16px;">
+      <li>Descarga el instalador desde tableplus.com según tu sistema operativo (Windows / Mac / Linux)</li>
+      <li>Instala normalmente y abre la aplicación</li>
+      <li>En la pantalla de inicio haz clic en <strong>"Create a new connection"</strong></li>
+      <li>Selecciona <strong>MySQL</strong> como tipo de conexión</li>
+    </ol>
+  </section>
+
+  <!-- ── 02 Conectar ── -->
+  <section id="conectar">
+    <div class="section-header">
+      <span class="step-number">PASO 02</span>
+      <h2>Conectar la base de datos</h2>
+    </div>
+
+    <p>Llena cada campo con exactamente estos valores:</p>
+
+    <table class="creds">
+      <thead>
+        <tr>
+          <th>Campo en TablePlus</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="field-name">Name</td><td><span class="val">Farm to Table</span></td></tr>
+        <tr><td class="field-name">Host / IP</td><td><span class="val">kodama.proxy.rlwy.net</span></td></tr>
+        <tr><td class="field-name">Port</td><td><span class="val">31307</span></td></tr>
+        <tr><td class="field-name">User</td><td><span class="val">equipo_ftt</span></td></tr>
+        <tr><td class="field-name">Password</td><td><span class="val">FarmToTable2025!</span></td></tr>
+        <tr><td class="field-name">Database</td><td><span class="val">railway</span></td></tr>
+      </tbody>
+    </table>
+
+    <ol class="steps" style="margin-top:20px;">
+      <li>Llena todos los campos de la tabla de arriba</li>
+      <li>Haz clic en <strong>"Test"</strong> — debe aparecer un mensaje verde de conexión exitosa</li>
+      <li>Haz clic en <strong>"Connect"</strong></li>
+      <li>En el panel izquierdo verás todas las tablas del proyecto</li>
+    </ol>
+
+    <div class="callout green" style="margin-top:16px;">
+      <span class="callout-icon">✓</span>
+      <span>Tu usuario solo tiene permisos de SELECT, INSERT y UPDATE. No puedes borrar datos accidentalmente.</span>
+    </div>
+  </section>
+
+  <!-- ── 03 Consultas ── -->
+  <section id="consultas">
+    <div class="section-header">
+      <span class="step-number">PASO 03</span>
+      <h2>Hacer tus consultas</h2>
+    </div>
+
+    <p>Una vez conectado, abre el editor SQL:</p>
+
+    <ol class="steps">
+      <li>Haz clic en el ícono <strong>SQL</strong> en la barra superior (o presiona <strong>CMD/CTRL + T</strong>)</li>
+      <li>Escribe tu consulta en el editor</li>
+      <li>Presiona <strong>CMD/CTRL + Enter</strong> para ejecutar</li>
+      <li>Los resultados aparecen en la tabla debajo — puedes ver filas, columnas y errores claramente</li>
+    </ol>
+
+    <h3>Ejemplo de consulta</h3>
+    <div class="code-block">
+      <span class="code-label">SQL</span>
+<span class="comment">-- Ver todos los productos disponibles</span>
+<span class="keyword">SELECT</span>
+    cp.id,
+    cp.nombre_producto,
+    cp.precio_unitario,
+    cp.cantidad_disponible,
+    u.nombre <span class="keyword">AS</span> agricultor
+<span class="keyword">FROM</span> <span class="name">catalogo_productos</span> cp
+<span class="keyword">JOIN</span> <span class="name">usuarios</span> u <span class="keyword">ON</span> cp.usuario_id = u.id
+<span class="keyword">WHERE</span> cp.cantidad_disponible > <span class="string">0</span>
+<span class="keyword">ORDER BY</span> cp.nombre_producto;
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">⚠</span>
+      <span>Prueba siempre tu consulta con <strong>LIMIT 10</strong> primero para no traer miles de filas de golpe.</span>
+    </div>
+  </section>
+
+  <!-- ── 04 Vistas ── -->
+  <section id="vistas">
+    <div class="section-header">
+      <span class="step-number">PASO 04</span>
+      <h2>Transformar en vista</h2>
+    </div>
+
+    <p>Cuando tu consulta funcione correctamente, conviértela en un <code>CREATE VIEW</code>. Las vistas son las que el backend va a consumir en los modelos PHP.</p>
+
+    <h3>Estructura de una vista</h3>
+    <div class="code-block">
+      <span class="code-label">SQL</span>
+<span class="comment">-- Vista: productos disponibles por agricultor</span>
+<span class="comment">-- Devuelve: id, nombre, precio, stock, agricultor</span>
+<span class="comment">-- Autor: tu nombre</span>
+<span class="comment">-- Fecha: 2025-05-21</span>
+
+<span class="keyword">CREATE OR REPLACE VIEW</span> <span class="name">productos_disponibles</span> <span class="keyword">AS</span>
+<span class="keyword">SELECT</span>
+    cp.id,
+    cp.nombre_producto,
+    cp.precio_unitario,
+    cp.cantidad_disponible,
+    u.nombre <span class="keyword">AS</span> agricultor
+<span class="keyword">FROM</span> <span class="name">catalogo_productos</span> cp
+<span class="keyword">JOIN</span> <span class="name">usuarios</span> u <span class="keyword">ON</span> cp.usuario_id = u.id
+<span class="keyword">WHERE</span> cp.cantidad_disponible > <span class="string">0</span>;
+    </div>
+
+    <div class="callout green">
+      <span class="callout-icon">✓</span>
+      <span>Usa siempre <strong>CREATE OR REPLACE VIEW</strong> — así si necesitas corregirla no da error al volver a ejecutar.</span>
+    </div>
+  </section>
+
+  <!-- ── 05 Entregar ── -->
+  <section id="entregar">
+    <div class="section-header">
+      <span class="step-number">PASO 05</span>
+      <h2>Guardar y entregar</h2>
+    </div>
+
+    <p>Cada quien tiene su propia carpeta dentro de <code>querys/</code> en el repositorio. Guarda tus archivos ahí — uno por vista.</p>
+
+    <h3>Estructura del repositorio</h3>
+    <div class="file-tree">
+<span class="dir">querys/</span>
+├── <span class="dir">tu_nombre/</span>          <span class="note">← tu espacio, solo tú tocas esto</span>
+│   ├── <span class="you">productos-disponibles.sql</span>
+│   ├── <span class="you">historial-ordenes.sql</span>
+│   └── <span class="you">reputacion-agricultores.sql</span>
+├── <span class="dir">nombre_compañero/</span>
+│   └── <span class="file">vista-entregas.sql</span>
+└── <span class="dir">otro_compañero/</span>
+    └── <span class="file">zonas-activas.sql</span>
+    </div>
+
+    <h3>Nombre de los archivos</h3>
+    <p>Usa <code>kebab-case</code> describiendo lo que devuelve la vista:</p>
+
+    <div class="code-block">
+      <span class="code-label">Ejemplos</span>
+✅  productos-disponibles.sql
+✅  historial-ordenes-usuario.sql
+✅  agricultores-con-reputacion.sql
+
+❌  MiVista.sql
+❌  consulta1.sql
+❌  vista_productos.sql
+    </div>
+
+    <h3>Pasos para entregar</h3>
+    <ol class="steps">
+      <li>Copia tu <code>CREATE OR REPLACE VIEW</code> en un archivo <code>.sql</code> dentro de <code>querys/tu_nombre/</code></li>
+      <li>Asegúrate de que el archivo tenga el comentario de cabecera con qué devuelve, tu nombre y la fecha</li>
+      <li>Haz <strong>commit</strong> y <strong>push</strong> a tu rama</li>
+      <li>Abre un <strong>Pull Request</strong> a <code>main</code> — Alan lo revisa y hace el merge</li>
+    </ol>
+
+    <div class="callout">
+      <span class="callout-icon">⚠</span>
+      <span>No modifiques archivos fuera de tu carpeta <code>querys/tu_nombre/</code>. Nunca toques <code>schema.sql</code> ni <code>dump.sql</code>.</span>
+    </div>
+
+    <div class="callout green" style="margin-top:12px;">
+      <span class="callout-icon">✓</span>
+      <span>¿Dudas? Mándale mensaje a Alan antes de hacer el PR. Es más fácil corregir antes que después del merge.</span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Farm to Table · ESCOM · Mayo 2025 &nbsp;·&nbsp; Solo compartir internamente
+</footer>
+
+</body>
+</html>
