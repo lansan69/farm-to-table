@@ -8,8 +8,8 @@ define('DEBUG', ENV === 'development');
 define('DB_HOST', 'kodama.proxy.rlwy.net');
 define('DB_PORT', 31307);
 define('DB_NAME', 'railway');
-define('DB_USER', 'equipo_ftt');
-define('DB_PASS', 'FarmToTable2025!');
+define('DB_USER', 'root');
+define('DB_PASS', 'dPQpggvHVhjxfhpAsKapyfhPonDddLsb');
 define('DB_CHARSET', 'utf8mb4');
 
 // ─── Aplicación ────────────────────────────────────────────────────────────
