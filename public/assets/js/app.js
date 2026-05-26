@@ -17,6 +17,7 @@ const routes = [
     // TEMPORALMENTE SE PONEN TODAS COMO PUBLICAS PARA EDICIÓN
 
     // Rutas para usuarios autenticados
+  { path: '/usuario/landing-page',          shell: 'app/logged/user',   page: 'app/logged/user/main-content/landing-page',            auth: 'public' },
   { path: '/usuario/marketplace',           shell: 'app/logged/user',   page: 'app/logged/user/main-content/marketplace',             auth: 'public' },
   { path: '/usuario/informacion-producto',  shell: 'app/logged/user',   page: 'app/logged/user/main-content/informacion-producto',    auth: 'public' },
   { path: '/usuario/catalogo-vendedores',   shell: 'app/logged/user',   page: 'app/logged/user/main-content/catalogo-vendedores',     auth: 'public' },
@@ -29,6 +30,7 @@ const routes = [
 
 
   // Rutas para productores autenticados
+  { path: '/productor/landing-page',          shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/landing-page',            auth: 'public' },
   { path: '/productor/mis-lotes',             shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/lotes',                   auth: 'public' },
   { path: '/productor/publicar-lote',         shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/publicar-lote',          auth: 'public' },
   { path: '/productor/editar-lote',           shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/editar-lote',            auth: 'public' },
