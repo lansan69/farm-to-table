@@ -1,0 +1,23 @@
+/* Shell: logged/user */
+#logged-shell{
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Empuja el contenido por debajo de la navbar fija (64px) */
+#logged-shell #page-content {
+  flex: 1;
+  width: 100%;
+  padding-top: 64px;
+  display: flex;
+  flex-direction: column;
+}
+
+#page-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  background: #f2efe8;
+}
