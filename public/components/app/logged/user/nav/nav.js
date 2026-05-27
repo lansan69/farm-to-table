@@ -23,7 +23,7 @@ export function init(container) {
     if (!link) return;
     e.preventDefault();
     setActive(link.dataset.nav);
-    navigate(link.dataset.nav);
+    //navigate(link.dataset.nav);
   }
 
   // Set active on mount based on current URL
