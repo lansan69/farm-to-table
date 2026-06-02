@@ -89,6 +89,79 @@ Componente JS  →  services/*.js  →  api/*.php  →  domain/*.php  →  model
 
 ---
 
+## Modelos y Dominio
+
+### Cómo funcionan las capas
+
+Los **modelos** (`src/models/`) son la única puerta de entrada a la base de datos. Cada clase extiende `BaseModel`, que inyecta una conexión PDO compartida (singleton). Sus métodos solo ejecutan SQL y devuelven arrays o primitivos — ninguna lógica de negocio.
+
+Los **dominios** (`src/domain/`) orquestan uno o más modelos para implementar una operación de negocio completa. Reciben datos ya validados desde el endpoint, toman decisiones, y devuelven resultados listos para serializar. Nunca hablan con la base de datos directamente.
+
+```
+api/*.php  →  domain/*.php  →  models/*.php  →  PDO
+```
+
+---
+
+### Modelos disponibles
+
+| Clase | Tabla / Vista | Métodos principales |
+|---|---|---|
+| `UsuarioModel` | `usuarios` / `vw_usuarios_ubicacion` | `findById`, `findByTelefono`, `findByEmail`, `existeTelefono`, `existeEmail`, `create`, `update`, `getStatsComprador`, `getStatsProductor` |
+| `ZonaOperativaModel` | `zonas_operativas` | `findAllActivas`, `findById` |
+| `LoteExcedenteModel` | `lotes_excedentes` | `findAllDisponibles`, `findUrgentes`, `buscar`, `findByIdDetalle`, `findByProductor`, `create`, `updateEstado` |
+| `CatalogoProductoModel` | `catalogo_productos` | `findAll`, `findById`, `findByNombre` |
+| `CategoriaProductoModel` | `categorias_productos` | `findAll`, `findById` |
+| `EvidenciaFotograficaModel` | `evidencias_fotograficas` | `findByLote`, `create`, `delete` |
+| `HistorialTrazabilidadModel` | `historial_trazabilidad` | `findByLote`, `create` |
+| `NegociacionModel` | `negociaciones` | `findById`, `findByComprador`, `findByProductor`, `findHistorialComprador`, `findHistorialProductor`, `create`, `updateEstado` |
+| `DetalleOfertaModel` | `detalle_ofertas` | `findByNegociacion`, `create` |
+| `EntregaLogisticaModel` | `entregas_logisticas` | `findById`, `findByNegociacion`, `findByCodigoQR`, `create`, `updateEstado`, `registrarRecepcion` |
+| `FavoritoModel` | `favoritos` | `findByUsuario`, `existe`, `agregar`, `eliminar` |
+| `ValoracionReputacionModel` | `valoraciones_reputacion` | `findByEvaluado`, `getPromedio`, `create` |
+
+---
+
+### Dominios disponibles
+
+| Clase | Responsabilidad | Modelos que usa |
+|---|---|---|
+| `AuthDomain` | Login por teléfono o email con `password_verify`; registro con validación de unicidad de teléfono y email; listado de zonas para el formulario | `UsuarioModel`, `ZonaOperativaModel` |
+| `LoteDomain` | Publicar lotes (transacción: lote + trazabilidad + fotos), consultar catálogo y categorías, cambiar estado, detalle con fotos aplanadas | `LoteExcedenteModel`, `EvidenciaFotograficaModel`, `HistorialTrazabilidadModel`, `CategoriaProductoModel`, `CatalogoProductoModel` |
+| `MarketplaceDomain` | Listado y búsqueda de lotes disponibles, detalle de lote con fotos, favoritos con toggle | `LoteExcedenteModel`, `CategoriaProductoModel`, `FavoritoModel` |
+| `NegociacionDomain` | Iniciar negociación, enviar contraoferta, aceptar / rechazar, historial de hilo de ofertas | `NegociacionModel`, `DetalleOfertaModel` |
+| `EntregaDomain` | Verificar QR, confirmar recepción, actualizar estado logístico | `EntregaLogisticaModel` |
+| `PerfilDomain` | Perfil de comprador y productor (stats + valoraciones), registrar calificación, actualizar datos editables | `UsuarioModel`, `ValoracionReputacionModel`, `ZonaOperativaModel` |
+
+---
+
+### Uso desde un endpoint
+
+```php
+<?php
+// src/api/negociacion.php
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../domain/NegociacionDomain.php';
+
+$domain = new NegociacionDomain();
+
+// Iniciar negociación (POST)
+$body = json_decode(file_get_contents('php://input'), true);
+$result = $domain->iniciarNegociacion(
+    idLote:      (int)   $body['id_lote'],
+    idComprador: (int)   $body['id_comprador'],
+    monto:       (float) $body['monto'],
+    comentario:          $body['comentario'] ?? null
+);
+
+$result['success'] ? json_ok($result) : json_error($result['message']);
+```
+
+> El endpoint solo valida que los campos requeridos lleguen y delega toda la lógica al dominio. El dominio llama a los modelos. Los modelos ejecutan el SQL.
+
+---
+
 ## Añadir un módulo nuevo
 
 Sigue estos cinco pasos en orden. Usa `users` como referencia.

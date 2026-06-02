@@ -12,21 +12,13 @@ class UsuarioModel extends BaseModel
         return $stmt->fetch() ?: null;
     }
 
-    public function existeTelefono(string $telefono): bool
-    {
-        $stmt = $this->db->prepare('SELECT COUNT(*) FROM usuarios WHERE telefono_contacto = ?');
-        $stmt->execute([$telefono]);
-        return (int) $stmt->fetchColumn() > 0;
-    }
-
-    public function create(int $idZona, string $nombre, string $rol, string $telefono, string $hash): int
+    public function findByEmail(string $email): ?array
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO usuarios (id_zona, nombre_razon_social, rol_usuario, telefono_contacto, hash_contrasena)
-             VALUES (?, ?, ?, ?, ?)'
+            'SELECT id_usuario, rol_usuario, hash_contrasena FROM usuarios WHERE email = ?'
         );
-        $stmt->execute([$idZona, $nombre, $rol, $telefono, $hash]);
-        return (int) $this->db->lastInsertId();
+        $stmt->execute([$email]);
+        return $stmt->fetch() ?: null;
     }
 
     public function findById(int $id): ?array
@@ -36,12 +28,42 @@ class UsuarioModel extends BaseModel
         return $stmt->fetch() ?: null;
     }
 
-    public function update(int $id, string $nombre, string $telefono, int $idZona): bool
+    public function existeTelefono(string $telefono): bool
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM usuarios WHERE telefono_contacto = ?');
+        $stmt->execute([$telefono]);
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    public function existeEmail(string $email): bool
+    {
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM usuarios WHERE email = ?');
+        $stmt->execute([$email]);
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    public function create(
+        int     $idZona,
+        string  $nombre,
+        string  $rol,
+        string  $telefono,
+        string  $hash,
+        ?string $email = null
+    ): int {
+        $stmt = $this->db->prepare(
+            'INSERT INTO usuarios (id_zona, nombre_razon_social, rol_usuario, telefono_contacto, hash_contrasena, email)
+             VALUES (?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([$idZona, $nombre, $rol, $telefono, $hash, $email]);
+        return (int) $this->db->lastInsertId();
+    }
+
+    public function update(int $id, string $nombre, string $telefono, int $idZona, ?string $email = null): bool
     {
         $stmt = $this->db->prepare(
-            'UPDATE usuarios SET nombre_razon_social = ?, telefono_contacto = ?, id_zona = ? WHERE id_usuario = ?'
+            'UPDATE usuarios SET nombre_razon_social = ?, telefono_contacto = ?, id_zona = ?, email = ? WHERE id_usuario = ?'
         );
-        return $stmt->execute([$nombre, $telefono, $idZona, $id]);
+        return $stmt->execute([$nombre, $telefono, $idZona, $email, $id]);
     }
 
     public function getStatsComprador(int $id): ?array
