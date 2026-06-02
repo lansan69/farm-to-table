@@ -21,6 +21,7 @@
       --accent:      #f4a261;
       --red:         #f87171;
       --blue:        #7dd3fc;
+      --purple:      #c084fc;
       --mono:        'IBM Plex Mono', monospace;
     }
 
@@ -123,7 +124,7 @@
 
     /* ── Main ── */
     main {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 56px 32px 100px;
     }
@@ -199,24 +200,6 @@
     .n  { color: var(--blue); }
     .v  { color: #f9a8d4; }
     .p  { color: #e2e8f0; }
-    .m  { color: #c084fc; } /* method badge */
-
-    /* ── File tree ── */
-    .tree {
-      background: #060d09;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px 24px;
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      line-height: 2.1;
-    }
-
-    .tree .dir   { color: var(--blue); }
-    .tree .yours { color: var(--green-bright); font-weight: 500; }
-    .tree .dim   { color: var(--muted); font-size: 0.72rem; }
-    .tree .lock  { color: var(--red); }
-    .tree .api   { color: var(--accent); }
 
     /* ── Steps ── */
     .steps {
@@ -293,11 +276,7 @@
       gap: 12px;
       padding: 12px 18px;
       border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      user-select: none;
     }
-
-    .endpoint-header:hover { background: #ffffff04; }
 
     .method {
       font-family: var(--mono);
@@ -334,7 +313,6 @@
       font-size: 0.78rem;
       line-height: 1.8;
       color: var(--text);
-      border-top: 1px solid var(--border);
     }
 
     .param-key   { color: var(--blue); }
@@ -375,40 +353,254 @@
 
     .route-table tr:hover td { background: #ffffff04; }
 
-    /* ── Flow diagram ── */
-    .flow {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      background: #060d09;
+    /* ── Reference table (quick summary) ── */
+    .ref-table-wrap {
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px 24px;
-      overflow-x: auto;
-      margin: 12px 0;
-      flex-wrap: wrap;
-      gap: 8px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0;
     }
 
-    .flow-box {
+    .ref-table-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 14px 16px;
       background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .filter-btn {
       font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover { color: var(--text); border-color: #4ade8040; }
+
+    .filter-btn.active {
+      background: #4ade8015;
+      color: var(--green-bright);
+      border-color: #4ade8040;
+    }
+
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 0.78rem;
+      table-layout: fixed;
+    }
+
+    .ref-table thead { background: #060d09; }
+
+    .ref-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 500;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ref-table th:nth-child(1) { width: 8%; }
+    .ref-table th:nth-child(2) { width: 32%; }
+    .ref-table th:nth-child(3) { width: 28%; }
+    .ref-table th:nth-child(4) { width: 32%; }
+
+    .ref-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    .ref-table tr:last-child td { border-bottom: none; }
+    .ref-table tbody tr:hover td { background: #ffffff03; }
+    .ref-table tbody tr.hidden { display: none; }
+
+    .ref-table .url-col  { color: #e2e8f0; word-break: break-all; }
+    .ref-table .url-col .qp { color: var(--muted); }
+    .ref-table .path-col { color: var(--muted); word-break: break-all; }
+    .ref-table .path-col strong { color: var(--accent); font-weight: 500; }
+    .ref-table .fn-col   { color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; }
+
+    .ref-group td {
+      background: #060d09;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ref-group td span {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+    }
+
+    .rg-auth   span { background: #4ade8015; color: var(--green-bright); border: 1px solid #4ade8030; }
+    .rg-market span { background: #7dd3fc15; color: var(--blue); border: 1px solid #7dd3fc30; }
+    .rg-fav    span { background: #f4a26115; color: var(--accent); border: 1px solid #f4a26130; }
+    .rg-lotes  span { background: #c084fc15; color: var(--purple); border: 1px solid #c084fc30; }
+    .rg-neg    span { background: #f8717115; color: var(--red); border: 1px solid #f8717130; }
+    .rg-ent    span { background: #4ade8015; color: var(--green-bright); border: 1px solid #4ade8030; }
+    .rg-perf   span { background: #7dd3fc15; color: var(--blue); border: 1px solid #7dd3fc30; }
+    .rg-cat    span { background: #ffffff08; color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── Improved tree ── */
+    .tree-block {
+      background: #060d09;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .tree-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #0b1410;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tree-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .tree-dot-r { background: #f87171; }
+    .tree-dot-y { background: #f4a261; }
+    .tree-dot-g { background: #4ade80; }
+
+    .tree-titlebar span {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .tree-legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      background: #0b1410;
+    }
+
+    .tl-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .tl-dot {
+      width: 9px; height: 9px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .tree-body {
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1;
+    }
+
+    .tr { display: flex; align-items: flex-start; padding: 3px 0; }
+    .tr:hover { background: #ffffff04; border-radius: 4px; }
+
+    .ti { color: var(--border); user-select: none; white-space: pre; }
+
+    .tn { display: flex; align-items: center; gap: 8px; padding: 2px 4px; flex: 1; }
+
+    .td  { color: var(--blue); }
+    .ta  { color: var(--accent); }
+    .tdm { color: var(--purple); }
+    .tm  { color: var(--muted); }
+    .tc  { color: var(--blue); }
+
+    .tlabel {
+      font-size: 9px;
+      padding: 1px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      letter-spacing: 0.06em;
+    }
+
+    .lbl-api    { background: #f4a26115; color: var(--accent); border: 1px solid #f4a26130; }
+    .lbl-core   { background: #7dd3fc15; color: var(--blue); border: 1px solid #7dd3fc30; }
+    .lbl-domain { background: #c084fc15; color: var(--purple); border: 1px solid #c084fc30; }
+    .lbl-model  { background: #ffffff08; color: var(--muted); border: 1px solid var(--border); }
+
+    .tcomment {
+      font-size: 11px;
+      color: #3d5c44;
+      padding: 2px 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tcomment em { color: var(--muted); font-style: normal; }
+
+    .tree-spacer { height: 8px; }
+
+    .tree-flow {
+      border-top: 1px solid var(--border);
+      background: #0b1410;
+      padding: 14px 18px;
+    }
+
+    .tf-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .tf-boxes {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tf-box {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--card2);
       white-space: nowrap;
     }
 
-    .flow-box.highlight { border-color: #4ade8050; color: var(--green-bright); }
-    .flow-box.dim       { color: var(--muted); }
+    .tf-box.hi-api    { background: #f4a26110; border-color: #f4a26130; color: var(--accent); }
+    .tf-box.hi-domain { background: #c084fc10; border-color: #c084fc30; color: var(--purple); }
+    .tf-box.hi-model  { background: #ffffff08; border-color: var(--border); color: var(--muted); }
+    .tf-box.hi-json   { background: #4ade8010; border-color: #4ade8030; color: var(--green-bright); }
+    .tf-box.hi-dim    { color: var(--muted); }
 
-    .flow-arrow {
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--muted);
-      padding: 0 4px;
-    }
+    .tf-arrow { color: var(--border); font-size: 12px; }
 
     /* ── Footer ── */
     footer {
@@ -436,6 +628,8 @@
       main { padding: 40px 20px 60px; }
       .toc { padding: 0 16px; }
       .endpoint-header { flex-wrap: wrap; }
+      .ref-table th:nth-child(3),
+      .ref-table td:nth-child(3) { display: none; }
     }
   </style>
 </head>
@@ -450,8 +644,9 @@
 <nav class="toc">
   <a href="#probar">01 · Cómo probar</a>
   <a href="#estructura">02 · Estructura</a>
-  <a href="#endpoints">03 · Endpoints</a>
-  <a href="#pasos">04 · Próximos pasos</a>
+  <a href="#resumen">03 · Resumen rápido</a>
+  <a href="#endpoints">04 · Endpoints</a>
+  <a href="#pasos">05 · Próximos pasos</a>
 </nav>
 
 <main>
@@ -470,9 +665,7 @@
       <span>La URL base de todos los endpoints es: <strong>http://localhost/dashboard/farm-to-table/src/api/</strong> — guárdatela, la usarás en todos los ejemplos.</span>
     </div>
 
-    <!-- Navegador -->
     <h3>Opción A — Directo en el navegador (solo GET)</h3>
-
     <p>Para consultas de solo lectura, puedes pegar la URL directo en la barra del navegador y ver la respuesta JSON. Es la forma más rápida para verificar que un endpoint existe y responde.</p>
 
     <div class="code">
@@ -491,9 +684,7 @@ http://localhost/dashboard/farm-to-table/src/api/auth.php<span class="k">?zonas=
       <span>El navegador solo sirve para peticiones <strong>GET</strong>. Para POST, PUT y PATCH necesitas Postman o curl.</span>
     </div>
 
-    <!-- Postman -->
     <h3>Opción B — Postman (recomendado)</h3>
-
     <p>Postman te permite probar cualquier tipo de petición (GET, POST, PATCH, PUT) y ver la respuesta con formato. Si no lo tienes instalado, descárgalo en postman.com — es gratis.</p>
 
     <ol class="steps">
@@ -531,9 +722,7 @@ http://localhost/dashboard/farm-to-table/src/api/auth.php<span class="k">?zonas=
 <span class="p">}</span>
     </div>
 
-    <!-- curl -->
     <h3>Opción C — curl en la terminal</h3>
-
     <p>Si prefieres trabajar desde la terminal, curl hace lo mismo que Postman pero en línea de comandos.</p>
 
     <div class="code">
@@ -572,53 +761,108 @@ curl -X PATCH \
 
     <p>El backend se divide en tres capas. Cada capa tiene una sola responsabilidad. Si necesitas modificar algo, aquí encuentras dónde está:</p>
 
-    <div class="tree">
-<span class="dir">src/</span>
-│
-├── <span class="dir">core/</span>                          <span class="dim">← utilidades compartidas</span>
-│   ├── <span class="yours">Response.php</span>               <span class="dim">← genera json_ok() y json_error()</span>
-│   ├── <span class="yours">Router.php</span>                 <span class="dim">← lee método HTTP, body y parámetros</span>
-│   └── <span class="yours">Database.php</span>               <span class="dim">← conexión a la base de datos (PDO)</span>
-│
-├── <span class="api">api/</span>                           <span class="dim">← los endpoints que probamos en Postman</span>
-│   ├── <span class="api">auth.php</span>                   <span class="dim">← login y registro</span>
-│   ├── <span class="api">marketplace.php</span>            <span class="dim">← explorar lotes disponibles</span>
-│   ├── <span class="api">favoritos.php</span>              <span class="dim">← lista y toggle de favoritos</span>
-│   ├── <span class="api">lotes.php</span>                  <span class="dim">← panel del productor</span>
-│   ├── <span class="api">negociaciones.php</span>          <span class="dim">← contraofertas comprador ↔ productor</span>
-│   ├── <span class="api">entregas.php</span>               <span class="dim">← seguimiento de entrega y QR</span>
-│   ├── <span class="api">perfil.php</span>                 <span class="dim">← perfil y calificaciones</span>
-│   └── <span class="api">catalogo.php</span>               <span class="dim">← productos y categorías (formularios)</span>
-│
-├── <span class="dir">domain/</span>                        <span class="dim">← lógica de negocio, llamada desde api/</span>
-│   ├── AuthDomain.php
-│   ├── MarketplaceDomain.php
-│   ├── LoteDomain.php
-│   ├── NegociacionDomain.php
-│   ├── EntregaDomain.php
-│   └── PerfilDomain.php
-│
-└── <span class="dir">models/</span>                        <span class="dim">← consultas SQL, llamadas desde domain/</span>
-    ├── UsuarioModel.php
-    ├── LoteExcedenteModel.php
-    ├── NegociacionModel.php
-    └── <span class="dim">... (uno por tabla)</span>
-    </div>
+    <div class="tree-block">
+      <div class="tree-titlebar">
+        <div class="tree-dot tree-dot-r"></div>
+        <div class="tree-dot tree-dot-y"></div>
+        <div class="tree-dot tree-dot-g"></div>
+        <span>farm-to-table / src /</span>
+      </div>
+      <div class="tree-legend">
+        <div class="tl-item"><div class="tl-dot" style="background:#f4a26120; border:1px solid #f4a26150;"></div>api/ — endpoints HTTP</div>
+        <div class="tl-item"><div class="tl-dot" style="background:#7dd3fc20; border:1px solid #7dd3fc50;"></div>core/ — utilidades compartidas</div>
+        <div class="tl-item"><div class="tl-dot" style="background:#c084fc20; border:1px solid #c084fc50;"></div>domain/ — lógica de negocio</div>
+        <div class="tl-item"><div class="tl-dot" style="background:#ffffff10; border:1px solid #ffffff20;"></div>models/ — consultas SQL</div>
+      </div>
+      <div class="tree-body">
 
-    <p>El flujo de una petición siempre sigue el mismo camino de izquierda a derecha:</p>
+        <div class="tr"><div class="tn"><span class="td">src/</span></div></div>
+        <div class="tr"><div class="ti">│</div></div>
 
-    <div class="flow">
-      <div class="flow-box dim">Postman / JS</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box highlight">api/*.php</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box">domain/*.php</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box">models/*.php</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box dim">Base de datos</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-box highlight">JSON</div>
+        <!-- core -->
+        <div class="tr">
+          <div class="ti">├── </div>
+          <div class="tn"><span class="tc">core/</span><span class="tlabel lbl-core">utilidades</span></div>
+          <div class="tcomment">compartidas por toda la app</div>
+        </div>
+        <div class="tr">
+          <div class="ti">│   ├── </div>
+          <div class="tn"><span class="tc">Response.php</span></div>
+          <div class="tcomment">genera <em>json_ok()</em> y <em>json_error()</em></div>
+        </div>
+        <div class="tr">
+          <div class="ti">│   ├── </div>
+          <div class="tn"><span class="tc">Router.php</span></div>
+          <div class="tcomment">lee método HTTP, body y parámetros</div>
+        </div>
+        <div class="tr">
+          <div class="ti">│   └── </div>
+          <div class="tn"><span class="tc">Database.php</span></div>
+          <div class="tcomment">conexión PDO a la base de datos</div>
+        </div>
+
+        <div class="tree-spacer"></div>
+
+        <!-- api -->
+        <div class="tr">
+          <div class="ti">├── </div>
+          <div class="tn"><span class="ta">api/</span><span class="tlabel lbl-api">endpoints</span></div>
+          <div class="tcomment">los archivos que llamas desde Postman o JS</div>
+        </div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="ta">auth.php</span></div><div class="tcomment">login y registro</div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="ta">marketplace.php</span></div><div class="tcomment">explorar lotes disponibles</div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="ta">favoritos.php</span></div><div class="tcomment">lista y toggle de favoritos</div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="ta">lotes.php</span></div><div class="tcomment">panel del productor</div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="ta">negociaciones.php</span></div><div class="tcomment">contraofertas comprador ↔ productor</div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="ta">entregas.php</span></div><div class="tcomment">seguimiento de entrega y QR</div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="ta">perfil.php</span></div><div class="tcomment">perfil y calificaciones</div></div>
+        <div class="tr"><div class="ti">│   └── </div><div class="tn"><span class="ta">catalogo.php</span></div><div class="tcomment">productos y categorías (formularios)</div></div>
+
+        <div class="tree-spacer"></div>
+
+        <!-- domain -->
+        <div class="tr">
+          <div class="ti">├── </div>
+          <div class="tn"><span class="tdm">domain/</span><span class="tlabel lbl-domain">lógica</span></div>
+          <div class="tcomment">lógica de negocio — llamada desde api/</div>
+        </div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="tdm">AuthDomain.php</span></div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="tdm">MarketplaceDomain.php</span></div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="tdm">LoteDomain.php</span></div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="tdm">NegociacionDomain.php</span></div></div>
+        <div class="tr"><div class="ti">│   ├── </div><div class="tn"><span class="tdm">EntregaDomain.php</span></div></div>
+        <div class="tr"><div class="ti">│   └── </div><div class="tn"><span class="tdm">PerfilDomain.php</span></div></div>
+
+        <div class="tree-spacer"></div>
+
+        <!-- models -->
+        <div class="tr">
+          <div class="ti">└── </div>
+          <div class="tn"><span class="tm">models/</span><span class="tlabel lbl-model">SQL</span></div>
+          <div class="tcomment">consultas SQL — llamadas desde domain/</div>
+        </div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tm">UsuarioModel.php</span></div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tm">LoteExcedenteModel.php</span></div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tm">NegociacionModel.php</span></div></div>
+        <div class="tr"><div class="ti">    └── </div><div class="tn"><span style="color:#3d5c44; font-style:italic;">... (uno por tabla)</span></div></div>
+
+      </div>
+      <div class="tree-flow">
+        <div class="tf-label">Flujo de una petición</div>
+        <div class="tf-boxes">
+          <div class="tf-box hi-dim">Postman / JS</div>
+          <div class="tf-arrow">→</div>
+          <div class="tf-box hi-api">api/*.php</div>
+          <div class="tf-arrow">→</div>
+          <div class="tf-box hi-domain">domain/*.php</div>
+          <div class="tf-arrow">→</div>
+          <div class="tf-box hi-model">models/*.php</div>
+          <div class="tf-arrow">→</div>
+          <div class="tf-box hi-dim">Base de datos</div>
+          <div class="tf-arrow">→</div>
+          <div class="tf-box hi-json">JSON</div>
+        </div>
+      </div>
     </div>
 
     <div class="callout warn">
@@ -627,10 +871,203 @@ curl -X PATCH \
     </div>
   </section>
 
-  <!-- ── 03 Endpoints ── -->
-  <section id="endpoints">
+  <!-- ── 03 Resumen rápido ── -->
+  <section id="resumen">
     <div class="section-label">
       <span class="step-tag">03</span>
+      <h2>Resumen rápido de endpoints</h2>
+    </div>
+
+    <p>Referencia rápida de todos los endpoints. Usa los filtros para encontrar rápido lo que necesitas.</p>
+
+    <div class="ref-table-wrap">
+      <div class="ref-table-filters">
+        <button class="filter-btn active" data-filter="all">Todos (23)</button>
+        <button class="filter-btn" data-filter="get">GET</button>
+        <button class="filter-btn" data-filter="post">POST</button>
+        <button class="filter-btn" data-filter="patch">PATCH</button>
+        <button class="filter-btn" data-filter="put">PUT</button>
+      </div>
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th>Método</th>
+            <th>URL / parámetros</th>
+            <th>Archivo</th>
+            <th>Función</th>
+          </tr>
+        </thead>
+        <tbody id="ref-tbody">
+
+          <tr class="ref-group rg-auth"><td colspan="4"><span>auth.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/auth.php<span class="qp">?zonas=1</span></td>
+            <td class="path-col">src/api/<strong>auth.php</strong></td>
+            <td class="fn-col">Lista de zonas para el formulario de registro</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/auth.php <span class="qp">action: login</span></td>
+            <td class="path-col">src/api/<strong>auth.php</strong></td>
+            <td class="fn-col">Inicia sesión con teléfono o email</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/auth.php <span class="qp">action: register</span></td>
+            <td class="path-col">src/api/<strong>auth.php</strong></td>
+            <td class="fn-col">Registra un nuevo usuario</td>
+          </tr>
+
+          <tr class="ref-group rg-market"><td colspan="4"><span>marketplace.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/marketplace.php <span class="qp">[?nombre ?categoria ?zona]</span></td>
+            <td class="path-col">src/api/<strong>marketplace.php</strong></td>
+            <td class="fn-col">Todos los lotes disponibles, con filtros opcionales</td>
+          </tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/marketplace.php<span class="qp">?id=N</span></td>
+            <td class="path-col">src/api/<strong>marketplace.php</strong></td>
+            <td class="fn-col">Detalle completo de un lote con fotos</td>
+          </tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/marketplace.php<span class="qp">?categorias=1</span></td>
+            <td class="path-col">src/api/<strong>marketplace.php</strong></td>
+            <td class="fn-col">Lista de categorías para el selector de filtros</td>
+          </tr>
+
+          <tr class="ref-group rg-fav"><td colspan="4"><span>favoritos.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/favoritos.php<span class="qp">?id_usuario=N</span></td>
+            <td class="path-col">src/api/<strong>favoritos.php</strong></td>
+            <td class="fn-col">Lotes marcados como favoritos del usuario</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/favoritos.php</td>
+            <td class="path-col">src/api/<strong>favoritos.php</strong></td>
+            <td class="fn-col">Toggle favorito — agrega o quita automáticamente</td>
+          </tr>
+
+          <tr class="ref-group rg-lotes"><td colspan="4"><span>lotes.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/lotes.php<span class="qp">?id_productor=N</span></td>
+            <td class="path-col">src/api/<strong>lotes.php</strong></td>
+            <td class="fn-col">Lotes publicados por el productor</td>
+          </tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/lotes.php<span class="qp">?id_lote=N</span></td>
+            <td class="path-col">src/api/<strong>lotes.php</strong></td>
+            <td class="fn-col">Detalle de lote con fotos y trazabilidad</td>
+          </tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/lotes.php<span class="qp">?urgentes=1</span></td>
+            <td class="path-col">src/api/<strong>lotes.php</strong></td>
+            <td class="fn-col">Lotes con ≤ 3 días de vida útil restante</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/lotes.php</td>
+            <td class="path-col">src/api/<strong>lotes.php</strong></td>
+            <td class="fn-col">Publica un nuevo lote</td>
+          </tr>
+          <tr data-m="patch">
+            <td><span class="method patch">PATCH</span></td>
+            <td class="url-col">/lotes.php</td>
+            <td class="path-col">src/api/<strong>lotes.php</strong></td>
+            <td class="fn-col">Cambia el estado de un lote</td>
+          </tr>
+
+          <tr class="ref-group rg-neg"><td colspan="4"><span>negociaciones.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/negociaciones.php <span class="qp">[?id_comprador ?id_productor ?hilo ?historial_*]</span></td>
+            <td class="path-col">src/api/<strong>negociaciones.php</strong></td>
+            <td class="fn-col">Consulta negociaciones activas o historial</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/negociaciones.php <span class="qp">action: iniciar</span></td>
+            <td class="path-col">src/api/<strong>negociaciones.php</strong></td>
+            <td class="fn-col">Comprador abre negociación con primera oferta</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/negociaciones.php <span class="qp">action: contraoferta</span></td>
+            <td class="path-col">src/api/<strong>negociaciones.php</strong></td>
+            <td class="fn-col">Cualquiera de las partes envía una nueva ronda</td>
+          </tr>
+          <tr data-m="patch">
+            <td><span class="method patch">PATCH</span></td>
+            <td class="url-col">/negociaciones.php <span class="qp">action: aceptar|rechazar</span></td>
+            <td class="path-col">src/api/<strong>negociaciones.php</strong></td>
+            <td class="fn-col">Acepta o rechaza — crea entrega al aceptar</td>
+          </tr>
+
+          <tr class="ref-group rg-ent"><td colspan="4"><span>entregas.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/entregas.php <span class="qp">[?id_negociacion ?qr]</span></td>
+            <td class="path-col">src/api/<strong>entregas.php</strong></td>
+            <td class="fn-col">Consulta entrega por negociación o código QR</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/entregas.php <span class="qp">action: confirmar</span></td>
+            <td class="path-col">src/api/<strong>entregas.php</strong></td>
+            <td class="fn-col">Comprador confirma recepción del pedido</td>
+          </tr>
+          <tr data-m="patch">
+            <td><span class="method patch">PATCH</span></td>
+            <td class="url-col">/entregas.php <span class="qp">action: estado</span></td>
+            <td class="path-col">src/api/<strong>entregas.php</strong></td>
+            <td class="fn-col">Productor actualiza estado logístico</td>
+          </tr>
+
+          <tr class="ref-group rg-perf"><td colspan="4"><span>perfil.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/perfil.php<span class="qp">?id_usuario=N&amp;rol=X</span></td>
+            <td class="path-col">src/api/<strong>perfil.php</strong></td>
+            <td class="fn-col">Perfil completo con estadísticas y valoraciones</td>
+          </tr>
+          <tr data-m="put">
+            <td><span class="method put">PUT</span></td>
+            <td class="url-col">/perfil.php</td>
+            <td class="path-col">src/api/<strong>perfil.php</strong></td>
+            <td class="fn-col">Actualiza datos editables del perfil</td>
+          </tr>
+          <tr data-m="post">
+            <td><span class="method post">POST</span></td>
+            <td class="url-col">/perfil.php <span class="qp">action: valoracion</span></td>
+            <td class="path-col">src/api/<strong>perfil.php</strong></td>
+            <td class="fn-col">Registra calificación al finalizar entrega</td>
+          </tr>
+
+          <tr class="ref-group rg-cat"><td colspan="4"><span>catalogo.php</span></td></tr>
+          <tr data-m="get">
+            <td><span class="method get">GET</span></td>
+            <td class="url-col">/catalogo.php <span class="qp">[?q ?categorias]</span></td>
+            <td class="path-col">src/api/<strong>catalogo.php</strong></td>
+            <td class="fn-col">Catálogo completo, búsqueda por nombre o categorías</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── 04 Endpoints ── -->
+  <section id="endpoints">
+    <div class="section-label">
+      <span class="step-tag">04</span>
       <h2>Endpoints disponibles y parámetros</h2>
     </div>
 
@@ -638,9 +1075,7 @@ curl -X PATCH \
 
     <!-- auth.php -->
     <h3>auth.php — Acceso y registro</h3>
-
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -651,7 +1086,6 @@ curl -X PATCH \
           <span class="c"># Sin body. Devuelve un arreglo de zonas con id_zona, nombre_delegacion y codigo_postal.</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -666,7 +1100,6 @@ curl -X PATCH \
 <span class="p">}</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -690,7 +1123,6 @@ curl -X PATCH \
     <!-- marketplace.php -->
     <h3>marketplace.php — Explorar lotes</h3>
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -706,7 +1138,6 @@ curl -X PATCH \
 <span class="c"># Sin parámetros devuelve todos los lotes disponibles.</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -717,7 +1148,6 @@ curl -X PATCH \
 ?<span class="n">id</span>=3   <span class="param-req">requerido</span>  <span class="c">← id del lote</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -733,7 +1163,6 @@ curl -X PATCH \
     <!-- favoritos.php -->
     <h3>favoritos.php — Productos favoritos</h3>
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -744,7 +1173,6 @@ curl -X PATCH \
 ?<span class="n">id_usuario</span>=5   <span class="param-req">requerido</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -764,7 +1192,6 @@ curl -X PATCH \
     <!-- lotes.php -->
     <h3>lotes.php — Panel del productor</h3>
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -775,7 +1202,6 @@ curl -X PATCH \
 ?<span class="n">id_productor</span>=3   <span class="param-req">requerido</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -786,7 +1212,6 @@ curl -X PATCH \
 ?<span class="n">id_lote</span>=7   <span class="param-req">requerido</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -797,7 +1222,6 @@ curl -X PATCH \
           <span class="c"># Sin body adicional. Útil para mostrar alertas al usuario.</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -815,7 +1239,6 @@ curl -X PATCH \
 <span class="p">}</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method patch">PATCH</span>
@@ -836,7 +1259,6 @@ curl -X PATCH \
     <!-- negociaciones.php -->
     <h3>negociaciones.php — Contraofertas</h3>
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -851,7 +1273,6 @@ curl -X PATCH \
 ?<span class="n">historial_productor</span>=3  <span class="c">← todas las ventas completadas del productor</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -868,7 +1289,6 @@ curl -X PATCH \
 <span class="p">}</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -885,7 +1305,6 @@ curl -X PATCH \
 <span class="p">}</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method patch">PATCH</span>
@@ -905,7 +1324,6 @@ curl -X PATCH \
     <!-- entregas.php -->
     <h3>entregas.php — Seguimiento de entrega</h3>
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -917,7 +1335,6 @@ curl -X PATCH \
 ?<span class="n">qr</span>=ABC123XYZ        <span class="c">← busca por código QR antes de confirmar</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -931,7 +1348,6 @@ curl -X PATCH \
 <span class="p">}</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method patch">PATCH</span>
@@ -952,7 +1368,6 @@ curl -X PATCH \
     <!-- perfil.php -->
     <h3>perfil.php — Perfil y calificaciones</h3>
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -964,7 +1379,6 @@ curl -X PATCH \
 ?<span class="n">rol</span>=comprador          <span class="c">← comprador (default) | productor</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method put">PUT</span>
@@ -980,7 +1394,6 @@ curl -X PATCH \
 <span class="p">}</span>
         </div>
       </div>
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method post">POST</span>
@@ -1003,7 +1416,6 @@ curl -X PATCH \
     <!-- catalogo.php -->
     <h3>catalogo.php — Búsqueda de productos</h3>
     <div class="endpoint-group">
-
       <div class="endpoint-card">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -1019,18 +1431,16 @@ curl -X PATCH \
     </div>
   </section>
 
-  <!-- ── 04 Próximos pasos ── -->
+  <!-- ── 05 Próximos pasos ── -->
   <section id="pasos">
     <div class="section-label">
-      <span class="step-tag">04</span>
+      <span class="step-tag">05</span>
       <h2>Próximos pasos — conectar con las pantallas</h2>
     </div>
 
-    <p>Una vez que verificaste que los endpoints responden correctamente en Postman, el siguiente paso es consumirlos desde tus archivos <code>.js</code> dentro de cada pantalla. Así funciona la conexión completa:</p>
+    <p>Una vez que verificaste que los endpoints responden correctamente en Postman, el siguiente paso es consumirlos desde tus archivos <code>.js</code> dentro de cada pantalla.</p>
 
-    <!-- Paso 1 -->
     <h3>Paso 1 — Usar http.js para hacer la petición</h3>
-
     <p>El proyecto incluye un módulo <code>public/assets/js/http.js</code> que envuelve <code>fetch()</code>. Tu <code>.js</code> de pantalla nunca debe llamar a <code>fetch()</code> directamente — siempre pasa por este módulo.</p>
 
     <div class="code">
@@ -1039,10 +1449,8 @@ curl -X PATCH \
 <span class="k">import</span> <span class="p">{</span> <span class="n">Http</span> <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/http.js'</span><span class="p">;</span>
 
 <span class="k">export async function</span> <span class="n">init</span><span class="p">(</span>container<span class="p">) {</span>
-  <span class="c">// Llama al endpoint y recibe los datos</span>
   <span class="k">const</span> <span class="n">lotes</span> <span class="p">=</span> <span class="k">await</span> <span class="n">Http</span><span class="p">.</span>get<span class="p">(</span><span class="s">'marketplace.php'</span><span class="p">);</span>
 
-  <span class="c">// Inyecta los datos en el HTML</span>
   <span class="k">const</span> <span class="n">grid</span> <span class="p">=</span> container<span class="p">.</span>querySelector<span class="p">(</span><span class="s">'#productsGrid'</span><span class="p">);</span>
   grid<span class="p">.</span>innerHTML <span class="p">=</span> lotes<span class="p">.</span>map<span class="p">(</span><span class="n">lote</span> <span class="p">=></span> <span class="s">`
     &lt;article class="product-card"&gt;
@@ -1053,11 +1461,7 @@ curl -X PATCH \
 <span class="p">}</span>
     </div>
 
-    <!-- Paso 2 -->
     <h3>Paso 2 — Cada pantalla sabe qué endpoint le corresponde</h3>
-
-    <p>Esta es la relación entre las pantallas de la app y el endpoint que deben consumir:</p>
-
     <table class="route-table">
       <thead>
         <tr>
@@ -1081,21 +1485,15 @@ curl -X PATCH \
       </tbody>
     </table>
 
-    <!-- Paso 3 -->
     <h3>Paso 3 — Qué hacer cuando la respuesta llega</h3>
-
-    <p>La respuesta siempre llega dentro de <code>data</code>. Dependiendo del endpoint, <code>data</code> puede ser un objeto o un arreglo. Puedes verificarlo primero en Postman antes de escribir el código.</p>
 
     <div class="code">
       <span class="code-lang">JS — Manejo de respuesta y errores</span>
 <span class="k">export async function</span> <span class="n">init</span><span class="p">(</span>container<span class="p">) {</span>
   <span class="k">try</span> <span class="p">{</span>
     <span class="k">const</span> <span class="n">lotes</span> <span class="p">=</span> <span class="k">await</span> <span class="n">Http</span><span class="p">.</span>get<span class="p">(</span><span class="s">'marketplace.php?categorias=1'</span><span class="p">);</span>
-    <span class="c">// lotes es directamente el arreglo — Http.js extrae data por ti</span>
-
     renderCategorias<span class="p">(</span>container<span class="p">,</span> lotes<span class="p">);</span>
   <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span>err<span class="p">) {</span>
-    <span class="c">// Muestra un mensaje amigable en la pantalla, no un alert()</span>
     container<span class="p">.</span>querySelector<span class="p">(</span><span class="s">'#error-msg'</span><span class="p">).</span>textContent <span class="p">=</span>
       <span class="s">'No se pudo cargar la información. Intenta de nuevo.'</span><span class="p">;</span>
   <span class="p">}</span>
@@ -1123,6 +1521,21 @@ curl -X PATCH \
 <footer>
   Farm to Table · ESCOM · Junio 2026 &nbsp;·&nbsp; Solo uso interno del equipo
 </footer>
+
+<script>
+  const btns = document.querySelectorAll('.filter-btn');
+  const rows = document.querySelectorAll('#ref-tbody tr[data-m]');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      rows.forEach(r => {
+        r.classList.toggle('hidden', f !== 'all' && r.dataset.m !== f);
+      });
+    });
+  });
+</script>
 
 </body>
 </html>
