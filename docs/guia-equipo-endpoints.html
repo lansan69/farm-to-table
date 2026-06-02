@@ -599,6 +599,10 @@
     .tf-box.hi-model  { background: #ffffff08; border-color: var(--border); color: var(--muted); }
     .tf-box.hi-json   { background: #4ade8010; border-color: #4ade8030; color: var(--green-bright); }
     .tf-box.hi-dim    { color: var(--muted); }
+    .tf-box.hi-svc    { background: #c084fc10; border-color: #c084fc30; color: var(--purple); }
+    .tf-box.hi-cmp    { background: #4ade8010; border-color: #4ade8030; color: var(--green-bright); }
+
+    .lbl-svc { background: #c084fc15; color: var(--purple); border: 1px solid #c084fc30; }
 
     .tf-arrow { color: var(--border); font-size: 12px; }
 
@@ -646,7 +650,7 @@
   <a href="#estructura">02 · Estructura</a>
   <a href="#resumen">03 · Resumen rápido</a>
   <a href="#endpoints">04 · Endpoints</a>
-  <a href="#pasos">05 · Próximos pasos</a>
+  <a href="#pasos">05 · Servicios JS</a>
 </nav>
 
 <main>
@@ -848,9 +852,13 @@ curl -X PATCH \
 
       </div>
       <div class="tree-flow">
-        <div class="tf-label">Flujo de una petición</div>
+        <div class="tf-label">Flujo completo de una petición</div>
         <div class="tf-boxes">
-          <div class="tf-box hi-dim">Postman / JS</div>
+          <div class="tf-box hi-cmp">component.js</div>
+          <div class="tf-arrow">→</div>
+          <div class="tf-box hi-svc">services/*.js</div>
+          <div class="tf-arrow">→</div>
+          <div class="tf-box hi-dim">http.js</div>
           <div class="tf-arrow">→</div>
           <div class="tf-box hi-api">api/*.php</div>
           <div class="tf-arrow">→</div>
@@ -862,6 +870,50 @@ curl -X PATCH \
           <div class="tf-arrow">→</div>
           <div class="tf-box hi-json">JSON</div>
         </div>
+      </div>
+    </div>
+
+    <p>Del lado del cliente, los archivos que conectan tus pantallas con la API son:</p>
+
+    <div class="tree-block">
+      <div class="tree-titlebar">
+        <div class="tree-dot tree-dot-r"></div>
+        <div class="tree-dot tree-dot-y"></div>
+        <div class="tree-dot tree-dot-g"></div>
+        <span>farm-to-table / public / assets / js /</span>
+      </div>
+      <div class="tree-legend">
+        <div class="tl-item"><div class="tl-dot" style="background:#4ade8020; border:1px solid #4ade8050;"></div>app.js — enrutador SPA</div>
+        <div class="tl-item"><div class="tl-dot" style="background:#ffffff10; border:1px solid #ffffff20;"></div>http.js — wrapper de fetch (no editar)</div>
+        <div class="tl-item"><div class="tl-dot" style="background:#c084fc20; border:1px solid #c084fc50;"></div>services/ — una por entidad (aquí trabajas tú)</div>
+      </div>
+      <div class="tree-body">
+        <div class="tr"><div class="tn"><span class="td">assets/js/</span></div></div>
+        <div class="tr"><div class="ti">│</div></div>
+        <div class="tr">
+          <div class="ti">├── </div>
+          <div class="tn"><span class="k" style="color:var(--green-bright);">app.js</span></div>
+          <div class="tcomment">gestiona rutas y carga de pantallas</div>
+        </div>
+        <div class="tr">
+          <div class="ti">├── </div>
+          <div class="tn"><span style="color:var(--muted);">http.js</span></div>
+          <div class="tcomment">fetch() + manejo del envelope JSON — no editar</div>
+        </div>
+        <div class="tree-spacer"></div>
+        <div class="tr">
+          <div class="ti">└── </div>
+          <div class="tn"><span class="tdm">services/</span><span class="tlabel lbl-svc">servicios</span></div>
+          <div class="tcomment">una por entidad — aquí trabajas tú</div>
+        </div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tdm">auth.js</span></div><div class="tcomment">login, registro, zonas</div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tdm">marketplace.js</span></div><div class="tcomment">lotes disponibles, categorías, detalle</div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tdm">favoritos.js</span></div><div class="tcomment">lista y toggle</div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tdm">lotes.js</span></div><div class="tcomment">panel del productor, publicar</div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tdm">negociaciones.js</span></div><div class="tcomment">contraofertas, historial</div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tdm">entregas.js</span></div><div class="tcomment">QR, confirmación, estado logístico</div></div>
+        <div class="tr"><div class="ti">    ├── </div><div class="tn"><span class="tdm">perfil.js</span></div><div class="tcomment">datos de usuario, valoraciones</div></div>
+        <div class="tr"><div class="ti">    └── </div><div class="tn"><span class="tdm">catalogo.js</span></div><div class="tcomment">productos y categorías (formularios)</div></div>
       </div>
     </div>
 
@@ -1431,88 +1483,377 @@ curl -X PATCH \
     </div>
   </section>
 
-  <!-- ── 05 Próximos pasos ── -->
+  <!-- ── 05 Servicios JS ── -->
   <section id="pasos">
     <div class="section-label">
       <span class="step-tag">05</span>
-      <h2>Próximos pasos — conectar con las pantallas</h2>
+      <h2>Capa de servicios — conectar tus pantallas con el backend</h2>
     </div>
 
-    <p>Una vez que verificaste que los endpoints responden correctamente en Postman, el siguiente paso es consumirlos desde tus archivos <code>.js</code> dentro de cada pantalla.</p>
+    <p>Los archivos en <code>public/assets/js/services/</code> son el puente entre tus pantallas y la API. Hay uno por entidad. Ya están generados — solo tienes que importarlos en tu componente.</p>
 
-    <h3>Paso 1 — Usar http.js para hacer la petición</h3>
-    <p>El proyecto incluye un módulo <code>public/assets/js/http.js</code> que envuelve <code>fetch()</code>. Tu <code>.js</code> de pantalla nunca debe llamar a <code>fetch()</code> directamente — siempre pasa por este módulo.</p>
+    <div class="callout ok">
+      <span class="icon">✓</span>
+      <span>Regla principal: tu componente <strong>nunca</strong> llama a <code>Http</code> ni a <code>fetch()</code> directamente. Solo importa el servicio correspondiente y usa sus métodos. Esa separación hace que el código sea fácil de mantener.</span>
+    </div>
+
+    <h3>Cómo importar un servicio en tu componente</h3>
+    <p>Ajusta el número de <code>../</code> según la profundidad de tu componente dentro de <code>public/components/</code>.</p>
 
     <div class="code">
-      <span class="code-lang">JS — En tu archivo de pantalla</span>
-<span class="c">// marketplace.js</span>
-<span class="k">import</span> <span class="p">{</span> <span class="n">Http</span> <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/http.js'</span><span class="p">;</span>
+      <span class="code-lang">JS</span>
+<span class="k">import</span> <span class="p">{</span> <span class="n">MarketplaceService</span> <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/services/marketplace.js'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="n">FavoritosService</span>   <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/services/favoritos.js'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="n">HttpError</span>          <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/http.js'</span><span class="p">;</span>
+    </div>
+
+    <h3>Todos los servicios disponibles y sus métodos</h3>
+
+    <table class="route-table">
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Método</th>
+          <th>Parámetros</th>
+          <th>Para qué sirve</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr class="ref-group rg-auth"><td colspan="4"><span>AuthService — services/auth.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--green-bright);">AuthService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getZonas()</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">—</td>
+          <td style="font-size:.8rem;color:var(--text);">Lista de zonas para el form de registro</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">login(id, pass)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">identificador, contrasena</td>
+          <td style="font-size:.8rem;color:var(--text);">Inicia sesión por teléfono o email</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">register({...})</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id_zona, nombre, rol, telefono, contrasena, email?</td>
+          <td style="font-size:.8rem;color:var(--text);">Registra un nuevo usuario</td>
+        </tr>
+
+        <tr class="ref-group rg-market"><td colspan="4"><span>MarketplaceService — services/marketplace.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--blue);">MarketplaceService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getCategorias()</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">—</td>
+          <td style="font-size:.8rem;color:var(--text);">Categorías para los botones de filtro</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getLotes({...})</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">nombre?, categoria?, zona?</td>
+          <td style="font-size:.8rem;color:var(--text);">Listado de lotes disponibles con filtros opcionales</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getDetalleLote(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Detalle completo de un lote + fotos</td>
+        </tr>
+
+        <tr class="ref-group rg-fav"><td colspan="4"><span>FavoritosService — services/favoritos.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--accent);">FavoritosService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getFavoritos(idUsuario)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idUsuario: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Lotes marcados como favoritos del usuario</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">toggleFavorito(idUsuario, idLote)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idUsuario, idLote: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Agrega o quita favorito automáticamente</td>
+        </tr>
+
+        <tr class="ref-group rg-lotes"><td colspan="4"><span>LotesService — services/lotes.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--purple);">LotesService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getLotesProductor(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idProductor: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Mis lotes — panel del productor</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getDetalleLote(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idLote: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Detalle + fotos + trazabilidad del lote</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getLotesUrgentes()</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">—</td>
+          <td style="font-size:.8rem;color:var(--text);">Lotes con ≤ 3 días de vida útil restante</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">publicar({...})</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id_productor, id_producto, cantidad, fecha_cosecha, precio, fotos?</td>
+          <td style="font-size:.8rem;color:var(--text);">Publica un nuevo lote</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">cambiarEstado(id, idProductor, estado)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id, idProductor: number; estado: string</td>
+          <td style="font-size:.8rem;color:var(--text);">Actualiza el estado del lote</td>
+        </tr>
+
+        <tr class="ref-group rg-neg"><td colspan="4"><span>NegociacionesService — services/negociaciones.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--red);">NegociacionesService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getByComprador(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idComprador: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Negociaciones activas del comprador</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getByProductor(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idProductor: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Negociaciones activas del productor</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getHilo(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idNegociacion: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Historial de ofertas de la negociación ("chat")</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getHistorialComprador(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idComprador: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Todas las compras completadas</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getHistorialProductor(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idProductor: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Todas las ventas completadas</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">iniciar({...})</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id_lote, id_comprador, monto, comentario?</td>
+          <td style="font-size:.8rem;color:var(--text);">Abre negociación con primera oferta</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">contraoferta({...})</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id_negociacion, id_emisor, monto, comentario?</td>
+          <td style="font-size:.8rem;color:var(--text);">Envía nueva ronda de oferta</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">aceptar(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idNegociacion: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Acepta la última oferta (crea entrega automáticamente)</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">rechazar(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idNegociacion: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Rechaza y cierra la negociación</td>
+        </tr>
+
+        <tr class="ref-group rg-ent"><td colspan="4"><span>EntregasService — services/entregas.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--green-bright);">EntregasService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getByNegociacion(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idNegociacion: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Entrega ligada a una negociación</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getByQR(codigo)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">codigoQR: string</td>
+          <td style="font-size:.8rem;color:var(--text);">Busca entrega por código QR antes de confirmar</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">confirmar(codigo)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">codigoQR: string</td>
+          <td style="font-size:.8rem;color:var(--text);">Comprador confirma la recepción del pedido</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">actualizarEstado(id, estado)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idEntrega: number; estado: string</td>
+          <td style="font-size:.8rem;color:var(--text);">Productor cambia el estado logístico</td>
+        </tr>
+
+        <tr class="ref-group rg-perf"><td colspan="4"><span>PerfilService — services/perfil.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--blue);">PerfilService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getPerfilComprador(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idUsuario: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Perfil + estadísticas + valoraciones del comprador</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getPerfilProductor(id)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">idUsuario: number</td>
+          <td style="font-size:.8rem;color:var(--text);">Perfil + estadísticas + valoraciones del productor</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">update({...})</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id_usuario, nombre, telefono, id_zona, email?</td>
+          <td style="font-size:.8rem;color:var(--text);">Actualiza datos editables del perfil</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">registrarValoracion({...})</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">id_entrega, id_evaluador, id_evaluado, estrellas, comentarios?</td>
+          <td style="font-size:.8rem;color:var(--text);">Registra calificación al finalizar una entrega</td>
+        </tr>
+
+        <tr class="ref-group rg-cat"><td colspan="4"><span>CatalogoService — services/catalogo.js</span></td></tr>
+        <tr>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">CatalogoService</td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getCatalogo()</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">—</td>
+          <td style="font-size:.8rem;color:var(--text);">Lista completa de productos del catálogo</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">buscar(texto)</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">texto: string</td>
+          <td style="font-size:.8rem;color:var(--text);">Búsqueda parcial por nombre (para autocomplete)</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-family:var(--mono);font-size:.75rem;color:#e2e8f0;">getCategorias()</td>
+          <td style="font-family:var(--mono);font-size:.72rem;color:var(--muted);">—</td>
+          <td style="font-size:.8rem;color:var(--text);">Categorías para selectores de formularios</td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <h3>Ejemplo completo — pantalla del marketplace</h3>
+    <p>Así se ve un componente bien conectado a sus servicios, con manejo de errores incluido:</p>
+
+    <div class="code">
+      <span class="code-lang">JS — marketplace.js</span>
+<span class="k">import</span> <span class="p">{</span> <span class="n">MarketplaceService</span> <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/services/marketplace.js'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="n">FavoritosService</span>   <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/services/favoritos.js'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="n">HttpError</span>          <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/http.js'</span><span class="p">;</span>
 
 <span class="k">export async function</span> <span class="n">init</span><span class="p">(</span>container<span class="p">) {</span>
-  <span class="k">const</span> <span class="n">lotes</span> <span class="p">=</span> <span class="k">await</span> <span class="n">Http</span><span class="p">.</span>get<span class="p">(</span><span class="s">'marketplace.php'</span><span class="p">);</span>
+  <span class="k">const</span> grid <span class="p">=</span> container<span class="p">.</span>querySelector<span class="p">(</span><span class="s">'#productsGrid'</span><span class="p">);</span>
 
-  <span class="k">const</span> <span class="n">grid</span> <span class="p">=</span> container<span class="p">.</span>querySelector<span class="p">(</span><span class="s">'#productsGrid'</span><span class="p">);</span>
-  grid<span class="p">.</span>innerHTML <span class="p">=</span> lotes<span class="p">.</span>map<span class="p">(</span><span class="n">lote</span> <span class="p">=></span> <span class="s">`
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="c">// carga categorías y lotes al mismo tiempo</span>
+    <span class="k">const</span> <span class="p">[</span>categorias<span class="p">,</span> lotes<span class="p">]</span> <span class="p">=</span> <span class="k">await</span> Promise<span class="p">.</span>all<span class="p">([</span>
+      MarketplaceService<span class="p">.</span>getCategorias<span class="p">(),</span>
+      MarketplaceService<span class="p">.</span>getLotes<span class="p">(),</span>
+    <span class="p">]);</span>
+
+    renderFiltros<span class="p">(</span>container<span class="p">,</span> categorias<span class="p">);</span>
+    renderLotes<span class="p">(</span>grid<span class="p">,</span> lotes<span class="p">);</span>
+
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span>e<span class="p">) {</span>
+    <span class="k">const</span> msg <span class="p">=</span> e <span class="k">instanceof</span> HttpError
+      <span class="p">?</span> e<span class="p">.</span>message
+      <span class="p">:</span> <span class="s">'Error inesperado — intenta de nuevo.'</span><span class="p">;</span>
+    grid<span class="p">.</span>innerHTML <span class="p">=</span> <span class="s">`&lt;p class="error-msg"&gt;</span><span class="p">${</span>msg<span class="p">}</span><span class="s">&lt;/p&gt;`</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">export function</span> <span class="n">cleanup</span><span class="p">() {</span>
+  <span class="c">// limpia event listeners si los agregaste con addEventListener</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">renderFiltros</span><span class="p">(</span>container<span class="p">,</span> categorias<span class="p">) {</span>
+  <span class="k">const</span> wrap <span class="p">=</span> container<span class="p">.</span>querySelector<span class="p">(</span><span class="s">'.filters'</span><span class="p">);</span>
+  categorias<span class="p">.</span>forEach<span class="p">(</span>cat <span class="p">=></span> <span class="p">{</span>
+    <span class="k">const</span> btn <span class="p">=</span> document<span class="p">.</span>createElement<span class="p">(</span><span class="s">'button'</span><span class="p">);</span>
+    btn<span class="p">.</span>className <span class="p">=</span> <span class="s">'filter'</span><span class="p">;</span>
+    btn<span class="p">.</span>dataset<span class="p">.</span>category <span class="p">=</span> cat<span class="p">.</span>id_categoria<span class="p">;</span>
+    btn<span class="p">.</span>textContent <span class="p">=</span> cat<span class="p">.</span>nombre<span class="p">;</span>
+    wrap<span class="p">.</span>appendChild<span class="p">(</span>btn<span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">renderLotes</span><span class="p">(</span>grid<span class="p">,</span> lotes<span class="p">) {</span>
+  grid<span class="p">.</span>innerHTML <span class="p">=</span> lotes<span class="p">.</span>map<span class="p">(</span>l <span class="p">=></span> <span class="s">`
     &lt;article class="product-card"&gt;
-      &lt;h3&gt;</span><span class="p">${</span>lote<span class="p">.</span>nombre_producto<span class="p">}</span><span class="s">&lt;/h3&gt;
-      &lt;p&gt;</span><span class="p">${</span>lote<span class="p">.</span>precio_recuperacion_sugerido<span class="p">}</span><span class="s">&lt;/p&gt;
+      &lt;h3&gt;</span><span class="p">${</span>l<span class="p">.</span>nombre_producto<span class="p">}</span><span class="s">&lt;/h3&gt;
+      &lt;p&gt;$</span><span class="p">${</span>l<span class="p">.</span>precio_recuperacion_sugerido<span class="p">}</span><span class="s"> · </span><span class="p">${</span>l<span class="p">.</span>cantidad_kg<span class="p">}</span><span class="s"> kg&lt;/p&gt;
     &lt;/article&gt;
   `</span><span class="p">).</span>join<span class="p">(</span><span class="s">''</span><span class="p">);</span>
 <span class="p">}</span>
     </div>
 
-    <h3>Paso 2 — Cada pantalla sabe qué endpoint le corresponde</h3>
+    <h3>Qué pantalla usa qué servicio</h3>
     <table class="route-table">
       <thead>
         <tr>
           <th>Pantalla</th>
           <th>Ruta en el browser</th>
-          <th>Endpoint(s) que usa</th>
+          <th>Servicios a importar</th>
+          <th>Métodos clave</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Marketplace</td><td>/usuario/marketplace</td><td>marketplace.php · favoritos.php</td></tr>
-        <tr><td>Detalle de producto</td><td>/usuario/informacion-producto</td><td>marketplace.php?id=N</td></tr>
-        <tr><td>Productos favoritos</td><td>/usuario/productos-favoritos</td><td>favoritos.php</td></tr>
-        <tr><td>Contraofertas (usuario)</td><td>/usuario/contraofertas</td><td>negociaciones.php</td></tr>
-        <tr><td>Calificar producto</td><td>/usuario/calificar-producto</td><td>perfil.php (valoracion)</td></tr>
-        <tr><td>Perfil usuario</td><td>/usuario/perfil</td><td>perfil.php?rol=comprador</td></tr>
-        <tr><td>Mis lotes</td><td>/productor/mis-lotes</td><td>lotes.php?id_productor=N</td></tr>
-        <tr><td>Publicar lote</td><td>/productor/publicar-lote</td><td>lotes.php (POST) · catalogo.php</td></tr>
-        <tr><td>Editar lote</td><td>/productor/editar-lote</td><td>lotes.php (PATCH)</td></tr>
-        <tr><td>Contraofertas (productor)</td><td>/productor/contraofertas</td><td>negociaciones.php</td></tr>
-        <tr><td>Perfil productor</td><td>/productor/perfil</td><td>perfil.php?rol=productor</td></tr>
+        <tr><td>Marketplace</td><td>/usuario/marketplace</td><td>MarketplaceService · FavoritosService</td><td>getLotes(), getCategorias(), toggleFavorito()</td></tr>
+        <tr><td>Detalle de producto</td><td>/usuario/informacion-producto</td><td>MarketplaceService · NegociacionesService</td><td>getDetalleLote(id), iniciar()</td></tr>
+        <tr><td>Productos favoritos</td><td>/usuario/productos-favoritos</td><td>FavoritosService</td><td>getFavoritos(idUsuario)</td></tr>
+        <tr><td>Contraofertas (usuario)</td><td>/usuario/contraofertas</td><td>NegociacionesService</td><td>getByComprador(), getHilo(), aceptar(), rechazar()</td></tr>
+        <tr><td>Calificar producto</td><td>/usuario/calificar-producto</td><td>PerfilService</td><td>registrarValoracion()</td></tr>
+        <tr><td>Perfil usuario</td><td>/usuario/perfil</td><td>PerfilService</td><td>getPerfilComprador(), update()</td></tr>
+        <tr><td>Mis lotes</td><td>/productor/mis-lotes</td><td>LotesService</td><td>getLotesProductor(), cambiarEstado()</td></tr>
+        <tr><td>Publicar lote</td><td>/productor/publicar-lote</td><td>LotesService · CatalogoService</td><td>publicar(), getCatalogo(), buscar(texto)</td></tr>
+        <tr><td>Editar lote</td><td>/productor/editar-lote</td><td>LotesService · CatalogoService</td><td>getDetalleLote(), cambiarEstado(), getCategorias()</td></tr>
+        <tr><td>Contraofertas (productor)</td><td>/productor/contraofertas</td><td>NegociacionesService</td><td>getByProductor(), getHilo(), contraoferta()</td></tr>
+        <tr><td>Perfil productor</td><td>/productor/perfil</td><td>PerfilService</td><td>getPerfilProductor(), update()</td></tr>
+        <tr><td>Detalle de entrega</td><td>/productor/entrega</td><td>EntregasService</td><td>getByNegociacion(), actualizarEstado()</td></tr>
       </tbody>
     </table>
 
-    <h3>Paso 3 — Qué hacer cuando la respuesta llega</h3>
+    <h3>Manejo de errores</h3>
+    <p>Todos los métodos de servicio retornan promesas. Si algo falla — sin conexión, error del servidor, validación rechazada — lanzan un <code>HttpError</code>. Captúralos siempre con try/catch.</p>
 
     <div class="code">
-      <span class="code-lang">JS — Manejo de respuesta y errores</span>
-<span class="k">export async function</span> <span class="n">init</span><span class="p">(</span>container<span class="p">) {</span>
-  <span class="k">try</span> <span class="p">{</span>
-    <span class="k">const</span> <span class="n">lotes</span> <span class="p">=</span> <span class="k">await</span> <span class="n">Http</span><span class="p">.</span>get<span class="p">(</span><span class="s">'marketplace.php?categorias=1'</span><span class="p">);</span>
-    renderCategorias<span class="p">(</span>container<span class="p">,</span> lotes<span class="p">);</span>
-  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span>err<span class="p">) {</span>
-    container<span class="p">.</span>querySelector<span class="p">(</span><span class="s">'#error-msg'</span><span class="p">).</span>textContent <span class="p">=</span>
-      <span class="s">'No se pudo cargar la información. Intenta de nuevo.'</span><span class="p">;</span>
+      <span class="code-lang">JS — Patrón de manejo de errores</span>
+<span class="k">import</span> <span class="p">{</span> <span class="n">HttpError</span> <span class="p">}</span> <span class="k">from</span> <span class="s">'../../../../assets/js/http.js'</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+  <span class="k">const</span> data <span class="p">=</span> <span class="k">await</span> AlgunServicio<span class="p">.</span>metodo<span class="p">();</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span>e<span class="p">) {</span>
+  <span class="k">if</span> <span class="p">(</span>e <span class="k">instanceof</span> HttpError<span class="p">) {</span>
+    <span class="k">if</span> <span class="p">(</span>e<span class="p">.</span>httpStatus <span class="k">===</span> <span class="v">401</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c">// sesión expirada → redirigir al login</span>
+    <span class="p">}</span> <span class="k">else if</span> <span class="p">(</span>e<span class="p">.</span>httpStatus <span class="k">===</span> <span class="v">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c">// sin conexión</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="c">// otro error → mostrar e.message en la UI</span>
+      mostrarError<span class="p">(</span>container<span class="p">,</span> e<span class="p">.</span>message<span class="p">);</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
     </div>
 
     <div class="callout ok">
       <span class="icon">✓</span>
-      <span>Flujo recomendado: prueba el endpoint en Postman → verifica los campos que devuelve → úsalos en tu HTML. Si el campo no está en la respuesta, no lo inventes — avísale a Alan para ver si hay que agregar una columna en el modelo.</span>
+      <span>Flujo recomendado: prueba el endpoint en Postman → anota los campos que devuelve el JSON → importa el servicio → renderiza usando esos campos. Si un campo no aparece en la respuesta, no lo uses — avísale al equipo para agregarlo en el modelo correspondiente.</span>
     </div>
 
     <div class="callout warn">
       <span class="icon">⚠</span>
-      <span>No hardcodees datos en el HTML para simular la respuesta. Usa los datos reales del endpoint desde el primer momento — es más fácil detectar errores así que descubrir al final que los nombres de campos no coinciden.</span>
+      <span>Los campos del JSON usan <code>snake_case</code> — por ejemplo <code>nombre_producto</code>, <code>precio_recuperacion_sugerido</code>, <code>id_zona</code>. Si accedes a un campo con el nombre equivocado, obtendrás <code>undefined</code> sin ningún error visible hasta que estés en producción.</span>
     </div>
 
     <div class="callout err">
       <span class="icon">✕</span>
-      <span>Si el endpoint devuelve <code>"status":"error"</code> con código 500, el problema está en la base de datos o en el servidor. No es tu código JS. Revisa que XAMPP esté corriendo y que <code>config/config.php</code> tenga las credenciales correctas.</span>
+      <span>No importes <code>Http</code> directamente desde un componente de pantalla. Solo los archivos de <code>services/</code> pueden usar <code>Http</code>. Los componentes solo importan servicios. Si necesitas una llamada que ningún servicio cubre, agrégala al servicio correspondiente — no la pongas en el componente.</span>
     </div>
   </section>
 
