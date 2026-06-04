@@ -1,2 +1,12 @@
-<div id="unlogged-nav"></div>
-<div id="unlogged-main-content"></div>
+<!-- Shell: unlogged -->
+<!-- Holds the nav and the mount point for every unlogged page -->
+
+<div id="unlogged-shell" class="d-flex flex-column">
+
+  <!-- Nav is its own component, loaded by unlogged.js into this slot -->
+  <div id="nav-container"></div>
+
+  <!-- Router mounts the active page here -->
+  <main id="page-content"></main>
+
+</div>

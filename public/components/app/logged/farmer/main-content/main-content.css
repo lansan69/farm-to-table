@@ -1,0 +1,24 @@
+.main-content-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Slot divs: hidden by default, shown when active */
+#unlogged-main-content-inicio,
+#unlogged-main-content-login,
+#unlogged-main-content-contact {
+  display: none;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#unlogged-main-content-inicio.active,
+#unlogged-main-content-login.active,
+#unlogged-main-content-contact.active {
+  display: flex;
+}
