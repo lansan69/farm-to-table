@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Pruebas - Cliente</title>
+    
+    <!-- 1. Jalar el Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- 2. Jalar el CSS -->
+    <link rel="stylesheet" href="mis-contraofertas-cliente.css">
+</head>
+<body>
+
+    <!-- Simular el contenedor -->
+    <div id="main-content">
+        <div id="vista-inyectada"></div>
+    </div>
+
+    <!-- Script de Bootstrap para los modales interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Pegar archivo suelto aquí adentro -->
+    <script>
+        fetch('mis-contraofertas-cliente.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('vista-inyectada').innerHTML = data;
+            })
+            .catch(err => console.error("Error cargando tu HTML:", err));
+    </script>
+</body>
+</html>

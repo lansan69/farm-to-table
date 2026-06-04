@@ -1,5 +1,5 @@
-RewriteEngine On
-RewriteBase /dashboard/farm-to-table/
+RewriteEngine Off
+RewriteBase /farm-to-table/
 
 RewriteCond %{REQUEST_URI} !^/dashboard/farm-to-table/public/
 RewriteRule ^$ public/index.html [L]

@@ -1,7 +1,7 @@
 Options -Indexes
 RewriteEngine On
 
-RewriteBase /dashboard/farm-to-table/public/
+RewriteBase /farm-to-table/public/
 
 # Deja pasar archivos y carpetas reales (js, css, components, etc.)
 RewriteCond %{REQUEST_FILENAME} !-f
