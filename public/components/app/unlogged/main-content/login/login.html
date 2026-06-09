@@ -21,10 +21,12 @@
 
     <div class="divider">o</div>
 
-    <button type="button" class="btn-google">
-      <span class="google-icon">G</span>
-      Continuar con Google
-    </button>
+    <div class="google-btn-wrap">
+      <div id="google-btn-login" class="google-btn-container"></div>
+      <div id="google-btn-login-icon" class="google-btn-icon"></div>
+    </div>
+
+    <p class="mobile-cta">¿No tienes cuenta? <button type="button" id="btnShowRegisterMobile">Regístrate</button></p>
   </form>
 
   <!-- LOGIN IMAGE -->
@@ -48,12 +50,12 @@
   </div>
 
   <!-- REGISTER FORM -->
-  <div class="panel panel-form register-form">
+  <form class="panel panel-form register-form" id="registerForm" novalidate>
     <h1>Crear Cuenta</h1>
 
     <div class="role-selector">
       <label class="role-option">
-        <input type="radio" name="role" value="usuario" checked/>
+        <input type="radio" name="role" value="organizacion" checked/>
         <span class="radio-dot"></span>
         <span>Usuario</span>
       </label>
@@ -65,51 +67,54 @@
     </div>
 
     <div class="field">
-      <input type="text" placeholder="Nombre" id="reg-name" autocomplete="name"/>
+      <input type="text" placeholder="Nombre" id="reg-name" autocomplete="given-name"/>
     </div>
 
     <div class="field">
-      <input type="text" placeholder="Nombre" id="reg-name" autocomplete="name"/>
+      <input type="text" placeholder="Apellido" id="reg-lastname" autocomplete="family-name"/>
     </div>
 
     <div class="field">
-      <input type="text" placeholder="Nombre" id="reg-name" autocomplete="name"/>
-    </div>
-
-    <div class="field">
-      <input type="text" placeholder="Nombre" id="reg-name" autocomplete="name"/>
-    </div>
-
-    <div class="field">
-      <input type="tel" placeholder="Teléfono" id="reg-phone" autocomplete="tel"/>
+      <input type="tel" placeholder="Lada + número (ej. 5512345678)" id="reg-phone"
+             autocomplete="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"/>
     </div>
 
     <div class="field">
       <input type="email" placeholder="Email" id="reg-email" autocomplete="email"/>
     </div>
 
-    <div class="field">
+    <div class="field select-wrap">
+      <select id="reg-zona">
+        <option value="" disabled selected>Zona</option>
+      </select>
+    </div>
+
+    <div class="field" id="reg-password-wrap">
       <input type="password" placeholder="Contraseña" id="reg-password"/>
       <button class="eye-btn" type="button" aria-label="Mostrar contraseña">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
 
-    <div class="field">
+    <div class="field" id="reg-confirm-wrap">
       <input type="password" placeholder="Confirmar contraseña" id="reg-confirm"/>
       <button class="eye-btn" type="button" aria-label="Mostrar contraseña">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
 
-    <button class="btn-primary">Registrarse</button>
+    <input type="hidden" id="reg-google-token" value=""/>
+
+    <button type="submit" class="btn-primary">Registrarse</button>
 
     <div class="divider">o</div>
 
-    <button class="btn-google">
-      <span class="google-icon">G</span>
-      Continuar con Google
-    </button>
-  </div>
+    <div class="google-btn-wrap">
+      <div id="google-btn-register" class="google-btn-container"></div>
+      <div id="google-btn-register-icon" class="google-btn-icon"></div>
+    </div>
+
+    <p class="mobile-cta">¿Ya tienes cuenta? <button type="button" id="btnShowLoginMobile">Inicia sesión</button></p>
+  </form>
 
 </div>

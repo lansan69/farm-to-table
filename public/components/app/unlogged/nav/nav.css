@@ -151,3 +151,41 @@
   color: var(--color-primary-green);
   border-color: var(--color-primary-green);
 }
+
+/* ── Mobile: icon-only nav ── */
+@media (max-width: 640px) {
+  .ftt-navbar {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Hamburger is redundant when icons are always visible */
+  .ftt-hamburger {
+    display: none;
+  }
+
+  /* Hide text labels, keep icons */
+  .ftt-link__label {
+    display: none;
+  }
+
+  /* Tighter, square tap targets for icon-only links */
+  .ftt-link--icon {
+    padding: 0.5rem;
+  }
+
+  .ftt-link--icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Login button becomes a circle */
+  .ftt-btn-login {
+    padding: 0.5rem;
+    border-radius: 50%;
+  }
+
+  .ftt-btn-login svg {
+    width: 22px;
+    height: 22px;
+  }
+}

@@ -1,37 +1,99 @@
-import { AuthService }               from '../../../../../assets/js/services/auth.js';
-import { navigate }                  from '../../../../../assets/js/app.js';
-import { toastSuccess, toastError }  from '../../../../../assets/js/toast.js';
+import { AuthService } from '../../../../../assets/js/services/auth.js';
+import { navigate } from '../../../../../assets/js/app.js';
+import { toastSuccess, toastError, toastWelcome } from '../../../../../assets/js/toast.js';
+import { initGoogleSignIn, renderGoogleButton, renderGoogleIconButton } from '../../../../../assets/js/google.js';
 
-/**
- * Módulo de autenticación de la interfaz: gestiona los eventos del formulario
- * de login y registro dentro del contenedor proporcionado.
- * Exporta la función init(container) que conecta los listeners necesarios.
- */
+let _inited = false;
+
+export function cleanup() {
+    _inited = false;
+    window.google?.accounts?.id?.cancel?.();
+}
+
 export function init(container) {
-    if (container._authInit) return;
-    container._authInit = true;
+    if (_inited) return;
+    _inited = true;
 
-    // Referencia al contenedor que cambia entre vista de login y registro
     const wrapper = container.querySelector('#authWrapper');
+    const btn = container.querySelector('#loginForm .btn-primary');
+    const originalText = btn.textContent;
 
-    // ___________ Mostrar fromulario de registro_______________________________
+    // ___________ Load zonas into register select _____________________________
+    (async () => {
+        try {
+            const zonas = await AuthService.getZonas();
+            const select = container.querySelector('#reg-zona');
+            zonas.forEach(z => {
+                const opt = document.createElement('option');
+                opt.value = z.id_zona;
+                opt.textContent = z.nombre_delegacion;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('No se pudieron cargar las zonas:', err);
+        }
+    })();
+
+    // ___________ Google Sign-In ______________________________________________
+    (async () => {
+        await initGoogleSignIn(async (idToken) => {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Entrando...';
+            if (wrapper.classList.contains('show-register')) {
+                await handleGoogleRegister(container, idToken, btn, originalText);
+            } else {
+                try {
+                    const user = await AuthService.loginGoogle(idToken);
+                    localStorage.setItem('token', user.email ?? user.id_usuario);
+                    toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" });
+                    navigateByRole(user.rol_usuario);
+                } catch (err) {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                    toastError(err.message || 'Error al iniciar sesión con Google.');
+                }
+            }
+        });
+        renderGoogleButton(container.querySelector('#google-btn-login'));
+        renderGoogleButton(container.querySelector('#google-btn-register'));
+        renderGoogleIconButton(container.querySelector('#google-btn-login-icon'));
+        renderGoogleIconButton(container.querySelector('#google-btn-register-icon'));
+    })().catch((err) => {
+        console.error('Google Sign-In init failed:', err);
+    });
+
+    // ___________ Teléfono: solo dígitos, máx 10 _____________________________
+    container.querySelector('#reg-phone').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    // ___________ Mostrar formulario de registro ______________________________
     container.querySelector('#btnShowRegister')
         .addEventListener('click', () => wrapper.classList.add('show-register'));
 
-    // ___________ Volver al formulario de login ________________________________
+    // ___________ Volver al formulario de login _______________________________
     container.querySelector('#btnShowLogin')
-        .addEventListener('click', () => wrapper.classList.remove('show-register'));
+        .addEventListener('click', () => {
+            wrapper.classList.remove('show-register');
+            resetRegisterForm(container);
+        });
+
+    // ___________ Mobile CTAs (text links below each form) ____________________
+    container.querySelector('#btnShowRegisterMobile')
+        .addEventListener('click', () => wrapper.classList.add('show-register'));
+
+    container.querySelector('#btnShowLoginMobile')
+        .addEventListener('click', () => {
+            wrapper.classList.remove('show-register');
+            resetRegisterForm(container);
+        });
 
     // ___________ Mostrar / ocultar contraseña ________________________________
     container.querySelectorAll('.eye-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            // input correspondiente al botón ojo (elemento anterior en DOM)
             const input = btn.previousElementSibling;
-            // comprobamos si actualmente está oculto (tipo password)
             const isHidden = input.type === 'password';
-            // alternamos entre 'text' y 'password' para mostrar/ocultar
             input.type = isHidden ? 'text' : 'password';
-            // cambiamos el color del icono para dar feedback visual
             btn.style.color = isHidden ? 'var(--green)' : 'var(--muted)';
         });
     });
@@ -39,71 +101,176 @@ export function init(container) {
     // ___________ Submit formulario de login __________________________________
     container.querySelector('#loginForm')
         .addEventListener('submit', async (e) => {
-            // Previene el comportamiento por defecto (recarga/envío)
             e.preventDefault();
-            // Recogida y normalización de valores del formulario
-            const email    = container.querySelector('#login-email').value.trim();
+            const email = container.querySelector('#login-email').value.trim();
             const password = container.querySelector('#login-password').value;
-            // Validación básica: si falta email o contraseña se llama a shake()
-            // para indicar visualmente el error sobre el campo de email.
             if (!email || !password) return shake(container, 'login-email');
 
-            const btn          = container.querySelector('#loginForm .btn-primary');
+            const btn = container.querySelector('#loginForm .btn-primary');
             const originalText = btn.textContent;
-            btn.disabled  = true;
+            btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Entrando...';
 
             try {
-                await AuthService.login(email, password);
-                localStorage.setItem("token", email);
-                toastSuccess('Bienvenido!!!');
-                navigate('/usuario/marketplace');
+                const user = await AuthService.login(email, password);
+                localStorage.setItem('token', user.email ?? user.id_usuario);
+                toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" }); navigateByRole(user.rol_usuario);
             } catch (err) {
                 const isWrongPassword = err.httpStatus === 401;
                 shake(container, isWrongPassword ? 'login-password' : 'login-email');
                 toastError(isWrongPassword ? 'Contraseña incorrecta.' : 'No existe una cuenta con ese correo.');
-                btn.disabled    = false;
+                btn.disabled = false;
                 btn.textContent = originalText;
             }
         });
 
     // ___________ Submit formulario de registro _______________________________
-    container.querySelector('.register-form .btn-primary')
-        .addEventListener('click', () => {
-            // Lectura de campos del formulario de registro
-            const name     = container.querySelector('#reg-name').value.trim();
-            const phone    = container.querySelector('#reg-phone').value.trim();
-            const email    = container.querySelector('#reg-email').value.trim();
-            const password = container.querySelector('#reg-password').value;
-            const confirm  = container.querySelector('#reg-confirm').value;
-            // rol seleccionado (se asume que hay un input radio seleccionado)
-            const role     = container.querySelector('input[name="role"]:checked').value;
+    container.querySelector('#registerForm')
+        .addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            // Validaciones: nombre, email y password obligatorios; confirmación de
-            // contraseña debe coincidir. En caso de fallo se invoca shake() sobre
-            // el campo correspondiente para dar feedback visual.
-            if (!name || !email || !password) return shake(container, 'reg-name');
-            if (password !== confirm) return shake(container, 'reg-confirm');
-            // Aquí debería invocarse AuthService.register({ name, phone, email, password, role })
-            console.log('Register:', { name, phone, email, password, role });
+            const name = container.querySelector('#reg-name').value.trim();
+            const lastname = container.querySelector('#reg-lastname').value.trim();
+            const phone = container.querySelector('#reg-phone').value.trim();
+            const email = container.querySelector('#reg-email').value.trim();
+            const zonaId = container.querySelector('#reg-zona').value;
+            const password = container.querySelector('#reg-password').value;
+            const confirm = container.querySelector('#reg-confirm').value;
+            const role = container.querySelector('input[name="role"]:checked').value;
+            const googleToken = container.querySelector('#reg-google-token').value;
+
+            if (!name) return shake(container, 'reg-name');
+            if (phone.length !== 10) return shake(container, 'reg-phone');
+            if (!zonaId) return shake(container, 'reg-zona');
+
+            const btn = container.querySelector('#registerForm .btn-primary');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creando...';
+
+            try {
+                if (googleToken) {
+                    const user = await AuthService.registerGoogle({
+                        id_token: googleToken,
+                        id_zona: parseInt(zonaId),
+                        telefono: phone,
+                        rol: role,
+                        apellido: lastname,
+                    });
+                    localStorage.setItem('token', user.email ?? user.id_usuario);
+                    toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" });
+                    navigateByRole(user.rol_usuario);
+                } else {
+                    if (!email) return restoreBtn(btn, originalText, () => shake(container, 'reg-email'));
+                    if (!password) return restoreBtn(btn, originalText, () => shake(container, 'reg-password'));
+                    if (password !== confirm) return restoreBtn(btn, originalText, () => shake(container, 'reg-confirm'));
+
+                    await AuthService.register({
+                        id_zona: parseInt(zonaId),
+                        nombre: name,
+                        apellido: lastname,
+                        rol: role,
+                        telefono: phone,
+                        contrasena: password,
+                        email: email || null,
+                    });
+                    toastSuccess('Cuenta creada. ¡Inicia sesión!');
+                    wrapper.classList.remove('show-register');
+                    resetRegisterForm(container);
+                }
+            } catch (err) {
+                toastError(err.message || 'Error al crear la cuenta.');
+                const fieldByMessage = {
+                    'El número de teléfono ya está registrado.': 'reg-phone',
+                    'El correo electrónico ya está registrado.': 'reg-email',
+                };
+                const fieldId = fieldByMessage[err.message];
+                if (fieldId) shake(container, fieldId);
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         });
 }
 
-/**
- * Función utilitaria para hacer un efecto visual de 'temblor' (shake) sobre un
- * input específico dentro del contenedor. Se usa para indicar errores de
- * validación al usuario (por ejemplo campo obligatorio vacío o mismatch).
- *
- * @param {HTMLElement} container - contenedor raíz donde buscar el input
- * @param {string} inputId - id del elemento input al que aplicar el efecto
- */
+function navigateByRole(rol) {
+    switch (rol) {
+        case "productor":
+            navigate('/productor/landing-page');
+            break;
+        case "admin":
+            navigate('/admin/inicio');
+            break;
+        case "organizacion":
+            navigate('/usuario/marketplace');
+            break;
+        default:
+            toastError('Usuario no permitido');
+            navigate('/unlogged/inicio');
+            break;
+    }
+}
+
+// Prefills the register form with data from the Google JWT and hides password fields.
+async function handleGoogleRegister(container, idToken, btn, originalText) {
+    const payload = decodeJwtPayload(idToken);
+    if (!payload) return toastError('No se pudo leer el token de Google.');
+
+    const nameEl = container.querySelector('#reg-name');
+    const lastnameEl = container.querySelector('#reg-lastname');
+    const emailEl = container.querySelector('#reg-email');
+
+    if (payload.given_name) { nameEl.value = payload.given_name; nameEl.readOnly = true; }
+    if (payload.family_name) { lastnameEl.value = payload.family_name; lastnameEl.readOnly = true; }
+    if (payload.email) { emailEl.value = payload.email; emailEl.readOnly = true; }
+
+    container.querySelector('#reg-google-token').value = idToken;
+    container.querySelector('#reg-password-wrap').style.display = 'none';
+    container.querySelector('#reg-confirm-wrap').style.display = 'none';
+
+    try {
+        const user = await AuthService.loginGoogle(idToken);
+        localStorage.setItem('token', user.email ?? user.id_usuario);
+        toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" });
+        navigateByRole(user.rol_usuario);
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        toastSuccess('Cuenta de Google conectada. Selecciona tu zona y teléfono.');
+    }
+}
+
+// Resets the register form to its default state (clears Google mode).
+function resetRegisterForm(container) {
+    container.querySelector('#registerForm').reset();
+    container.querySelector('#reg-google-token').value = '';
+    ['#reg-name', '#reg-lastname', '#reg-email'].forEach(sel => {
+        container.querySelector(sel).readOnly = false;
+    });
+    container.querySelector('#reg-password-wrap').style.display = '';
+    container.querySelector('#reg-confirm-wrap').style.display = '';
+}
+
+function decodeJwtPayload(token) {
+    try {
+        const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        // atob produces Latin-1 bytes; decode them as UTF-8 so accented chars survive
+        const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+        return JSON.parse(new TextDecoder().decode(bytes));
+    } catch {
+        return null;
+    }
+}
+
+function restoreBtn(btn, text, then) {
+    btn.disabled = false;
+    btn.textContent = text;
+    then?.();
+}
+
 function shake(container, inputId) {
     const el = container.querySelector(`#${inputId}`);
-    // Si no existe el elemento, salir silenciosamente
     if (!el) return;
-    // Marcamos el borde en rojo para resaltar el error
     el.style.borderColor = '#e53935';
-    // Animación de traslación horizontal para simular 'temblor'
     el.animate([
         { transform: 'translateX(0)' },
         { transform: 'translateX(-6px)' },
@@ -111,6 +278,5 @@ function shake(container, inputId) {
         { transform: 'translateX(-4px)' },
         { transform: 'translateX(0)' },
     ], { duration: 320, easing: 'ease' });
-    // Restauramos el color del borde pasados 1.2s para no dejar el estilo fijo
     setTimeout(() => el.style.borderColor = '', 1200);
 }

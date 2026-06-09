@@ -13,7 +13,7 @@ function getContainer() {
 
 function show(el) {
     getContainer().appendChild(el);
-    const instance = new bootstrap.Toast(el, { delay: 4000 });
+    const instance = new bootstrap.Toast(el, { delay: 2000 });
     instance.show();
     el.addEventListener('hidden.bs.toast', () => el.remove());
 }
@@ -49,6 +49,41 @@ export function toastError(message) {
             <button type="button" class="btn-close btn-close-white me-2 m-auto"
                     data-bs-dismiss="toast" aria-label="Cerrar"></button>
         </div>`;
+    show(el);
+}
+
+// ── Welcome ───────────────────────────────────────────────────────────────────
+export function toastWelcome({ title = '¡Bienvenido!', body = '' } = {}) {
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.setAttribute('role', 'alert');
+    el.setAttribute('aria-live', 'assertive');
+    el.setAttribute('aria-atomic', 'true');
+    el.innerHTML = `
+        <div class="toast-header" style="background:#1B853F;color:#fff;">
+            <strong class="me-auto">${title}</strong>
+            <button type="button" class="btn-close btn-close-white"
+                    data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+        <div class="toast-body" style="background:#f0f7f2;color:#1B853F;font-weight:500;">${body}</div>`;
+    show(el);
+}
+
+// ── Goodbye ───────────────────────────────────────────────────────────────────
+
+export function toastGoodbye({ title = '¡Hasta pronto!', body = '' } = {}) {
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.setAttribute('role', 'alert');
+    el.setAttribute('aria-live', 'assertive');
+    el.setAttribute('aria-atomic', 'true');
+    el.innerHTML = `
+        <div class="toast-header" style="background:#1B853F;color:#fff;">
+            <strong class="me-auto">${title}</strong>
+            <button type="button" class="btn-close btn-close-white"
+                    data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+        <div class="toast-body" style="background:#f0f7f2;color:#1B853F;font-weight:500;">${body}</div>`;
     show(el);
 }
 

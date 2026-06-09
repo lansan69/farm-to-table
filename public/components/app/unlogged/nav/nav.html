@@ -2,22 +2,25 @@
 
   <a class="ftt-brand" aria-label="Farm To Table – inicio">
     <button class="ftt-hamburger" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
     </button>
     <span class="ftt-brand__text">Farm To Table</span>
   </a>
 
   <div class="ftt-nav-right">
-    <a href="#" class="ftt-link" data-nav="/unlogged/inicio">Inicio</a>
+    <a href="#" class="ftt-link ftt-link--icon" data-nav="/unlogged/inicio">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M3 12L12 4l9 8"/>
+        <path d="M5 10v9a1 1 0 0 0 1 1h4v-5h4v5h4a1 1 0 0 0 1-1v-9"/>
+      </svg>
+      <span class="ftt-link__label">Inicio</span>
+    </a>
 
     <a href="#" class="ftt-link ftt-link--icon" data-nav="/unlogged/contact">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <rect x="3" y="5" width="18" height="14" rx="2"/>
         <path d="M3 7l9 6 9-6"/>
       </svg>
-      Contacto
+      <span class="ftt-link__label">Contacto</span>
     </a>
 
     <a href="#" class="ftt-btn-login" data-nav="/unlogged/login" aria-label="Iniciar sesión">
@@ -26,7 +29,7 @@
         <polyline points="10 17 15 12 10 7"/>
         <line x1="15" y1="12" x2="3" y2="12"/>
       </svg>
-      Log in
+      <span class="ftt-link__label">Log in</span>
     </a>
   </div>
 

@@ -21,9 +21,20 @@ export const AuthService = {
    * @param {{ id_zona, nombre, rol, telefono, contrasena, email? }} datos
    * @returns {Promise<{ id_usuario: number }>}
    */
-  register({ id_zona, nombre, rol, telefono, contrasena, email = null }) {
+  loginGoogle(idToken) {
+    return Http.post('auth.php', { action: 'login_google', id_token: idToken });
+  },
+
+  register({ id_zona, nombre, apellido = null, rol, telefono, contrasena, email = null }) {
     const body = { action: 'register', id_zona, nombre, rol, telefono, contrasena };
-    if (email) body.email = email;
+    if (email)    body.email    = email;
+    if (apellido) body.apellido = apellido;
+    return Http.post('auth.php', body);
+  },
+
+  registerGoogle({ id_token, id_zona, telefono, rol, apellido = null }) {
+    const body = { action: 'register_google', id_token, id_zona, telefono, rol };
+    if (apellido) body.apellido = apellido;
     return Http.post('auth.php', body);
   },
 };
