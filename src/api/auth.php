@@ -48,16 +48,16 @@ function login(AuthDomain $domain, array $body): void
 {
     Router::requireFields(['identificador', 'contrasena'], $body);
 
-    $usuario = $domain->login(
+    $resultado = $domain->login(
         trim($body['identificador']),
         $body['contrasena']
     );
 
-    if ($usuario === null) {
-        json_error('Credenciales incorrectas.', 401);
-    }
-
-    json_ok($usuario);
+    match ($resultado) {
+        'not_found'      => json_error('Usuario no encontrado.',  404),
+        'wrong_password' => json_error('Contraseña incorrecta.',  401),
+        default          => json_ok($resultado),
+    };
 }
 
 function register(AuthDomain $domain, array $body): void

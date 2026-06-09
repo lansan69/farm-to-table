@@ -51,13 +51,16 @@ export async function loadComponent(path, container) {
   // Construye la ruta base del componente y extrae su nombre
   const basePath = `${BASE_PATH}/public/components/${path}`;
   const name     = path.split('/').pop();
+  // Use full path as key to avoid collisions between same-named components
+  // in different shells (e.g. app/unlogged/nav vs app/logged/user/nav).
+  const cssKey   = path.replaceAll('/', '-');
 
   // Inyecta el CSS del componente solo si no está ya en el documento
-  if (!document.querySelector(`link[data-component="${name}"]`)) {
+  if (!document.querySelector(`link[data-component="${cssKey}"]`)) {
     const link = document.createElement('link');
     link.rel               = 'stylesheet';
     link.href              = `${basePath}/${name}.css`;
-    link.dataset.component = name;
+    link.dataset.component = cssKey;
     document.head.appendChild(link);
   }
 
@@ -75,12 +78,13 @@ export async function loadComponent(path, container) {
 // El HTML se elimina automáticamente cuando el contenedor padre recibe nuevo innerHTML.
 
 export function unloadComponent(path) {
-  const name = path.split('/').pop();
+  const name   = path.split('/').pop();
+  const cssKey = path.replaceAll('/', '-');
 
   setTimeout(async () => {
     const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
     if (typeof module.cleanup === 'function') await module.cleanup();
-    document.querySelector(`link[data-component="${name}"]`)?.remove();
+    document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
   }, 1000);
 }
 
@@ -104,7 +108,7 @@ async function router() {
   const app  = document.getElementById('app');
 
   // Si es la raíz, redirige según si el usuario está autenticado o no
-  if (path === '/') return navigate(isLoggedIn() ? '/inicio' : '/unlogged/inicio');
+  if (path === '/') return navigate(isLoggedIn() ? '/usuario/marketplace' : '/unlogged/inicio');
 
   // Busca la ruta en la tabla de rutas definida
   const route = routes.find(r => r.path === path);
@@ -117,7 +121,6 @@ async function router() {
   }
 
   // Redirige si el usuario intenta acceder a una ruta que no le corresponde
-  if (route.auth === 'public'    &&  isLoggedIn()) return navigate('/inicio');
   if (route.auth === 'protected' && !isLoggedIn()) return navigate('/unlogged/login');
 
   // Verifica si la shell (estructura base) cambió respecto a la ruta anterior

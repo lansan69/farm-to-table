@@ -1,4 +1,4 @@
-import { navigate } from '../../../../assets/js/app.js';
+import { navigate } from '../../../../../assets/js/app.js';
 
 let _clickHandler = null;
 
