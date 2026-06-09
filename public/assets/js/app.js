@@ -1,7 +1,7 @@
 // assets/js/router.js
 
 // Ruta base de la aplicación en el servidor
-const BASE_PATH = '/dashboard/farm-to-table';
+const BASE_PATH = '';
 
 // ── Rutas ──────────────────────────────────────────────────────────────────
 // Cada ruta define: qué shell la envuelve, qué página va dentro, y quién puede verla.

@@ -11,7 +11,7 @@
 //   const result   = await Http.patch('lotes.php', { id_lote: 1, estado: 'asignado' });
 //   const result   = await Http.put('perfil.php', { id_usuario: 3, ... });
 
-const API_BASE = '/dashboard/farm-to-table/src/api';
+const API_BASE = '/src/api';
 
 // ── HttpError ─────────────────────────────────────────────────────────────────
 // Error enriquecido con el código HTTP y el mensaje que devolvió el servidor.
