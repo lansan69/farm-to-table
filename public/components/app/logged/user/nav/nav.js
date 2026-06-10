@@ -33,7 +33,8 @@ export function init(container) {
     if (e.target.closest('[data-action="logout"]')) {
       toastGoodbye({ title: "¡Hasta pronto!", body: "Cerrando tu sesión…" });
       closeMenu();
-      localStorage.removeItem('token');
+      localStorage.clear();
+      sessionStorage.clear();
       // give toast a moment to display before navigating
       setTimeout(() => navigate('/unlogged/inicio'), 2000);
       return;
@@ -49,6 +50,9 @@ export function init(container) {
 
   // Set active on mount based on current URL
   setActive(window.location.pathname.replace('/dashboard/farm-to-table', ''));
+
+  // Keep active state in sync with programmatic navigation
+  document.addEventListener('ftt:navigate', (e) => setActive(e.detail.path));
 
   container.addEventListener('click', handleClick);
   _clickHandler = { container, handleClick };

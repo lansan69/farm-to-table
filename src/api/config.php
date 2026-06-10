@@ -9,4 +9,5 @@ require_once __DIR__ . '/../core/Response.php';
 
 json_ok([
     'google_client_id' => GOOGLE_CLIENT_ID,
+    'ably_api_key'     => ABLY_API_KEY,
 ]);

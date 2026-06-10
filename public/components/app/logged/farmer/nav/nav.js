@@ -33,7 +33,8 @@ export function init(container) {
     if (e.target.closest('[data-action="logout"]')) {
       toastGoodbye({ title: "¡Hasta pronto!", body: "Cerrando tu sesión…" });
       closeMenu();
-      localStorage.removeItem('token');
+      localStorage.clear();
+      sessionStorage.clear();
       // give toast a moment to display before navigating
       setTimeout(() => navigate('/unlogged/inicio'), 2000);
       return;

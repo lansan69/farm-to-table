@@ -53,17 +53,14 @@ export function createReportButton() {
 }
 
 /**
- * Delete conversation button shown in the chat header.
- */
-export function createDeleteButton() {
-  return `<button class="btn-delete-chat" type="button">Eliminar conversación</button>`;
-}
-
-/**
- * Chat window header with avatar, name, status, report and delete buttons.
- * @param {{ name, online, color }} contact
+ * Chat window header with avatar, name, status and report button.
+ * Shows a "Negociación finalizada" badge when contact.closed is true.
+ * @param {{ name, online, color, closed }} contact
  */
 export function createChatHeader(contact) {
+  const closedBadge = contact.closed
+    ? `<span class="chat-header__closed-badge">Negociación finalizada</span>`
+    : '';
   return `
     <div class="chat-header">
       <div class="chat-header__left">
@@ -78,8 +75,8 @@ export function createChatHeader(contact) {
         </div>
       </div>
       <div class="chat-header__actions">
+        ${closedBadge}
         ${createReportButton()}
-        ${createDeleteButton()}
       </div>
     </div>
   `;

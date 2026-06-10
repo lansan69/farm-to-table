@@ -16,6 +16,7 @@ define('DB_CHARSET', 'utf8mb4');
 define('BASE_URL', 'http://localhost/farm-to-table');
 define('APP_NAME', 'Farm to Table');
 define('GOOGLE_CLIENT_ID', '775476638499-u0p0cb0rh659i1noniivn1oulqnd9urp.apps.googleusercontent.com');
+define('ABLY_API_KEY', 'GDxHHA.E8rUDQ:wcZrXC9rLo71AD4XPlRkTf4RXq_P_nPkVoJ0fNGfA4w');
 
 // ─── Errores (controlado por entorno) ──────────────────────────────────────
 if (DEBUG) {

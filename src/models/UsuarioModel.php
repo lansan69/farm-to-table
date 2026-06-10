@@ -23,7 +23,12 @@ class UsuarioModel extends BaseModel
 
     public function findById(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM vw_usuarios_ubicacion WHERE id_usuario = ?');
+        $stmt = $this->db->prepare(
+            'SELECT u.*, z.nombre_delegacion AS zona, z.codigo_postal
+             FROM usuarios u
+             LEFT JOIN zonas_operativas z ON z.id_zona = u.id_zona
+             WHERE u.id_usuario = ?'
+        );
         $stmt->execute([$id]);
         return $stmt->fetch() ?: null;
     }
@@ -102,14 +107,35 @@ class UsuarioModel extends BaseModel
 
     public function getStatsComprador(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM vw_stats_comprador WHERE id_usuario = ?');
+        $stmt = $this->db->prepare(
+            'SELECT u.id_usuario,
+                    u.puntuacion_promedio,
+                    COUNT(DISTINCT nc.id_negociacion)                                                                   AS total_negociaciones,
+                    COUNT(DISTINCT CASE WHEN nc.estado_negociacion = "aceptada" THEN nc.id_negociacion END)             AS negociaciones_aceptadas,
+                    COUNT(DISTINCT CASE WHEN nc.estado_negociacion = "pendiente" THEN nc.id_negociacion END)            AS negociaciones_pendientes
+             FROM usuarios u
+             LEFT JOIN negociaciones_contraoferta nc ON nc.id_comprador = u.id_usuario
+             WHERE u.id_usuario = ?
+             GROUP BY u.id_usuario'
+        );
         $stmt->execute([$id]);
         return $stmt->fetch() ?: null;
     }
 
     public function getStatsProductor(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM vw_stats_productor WHERE id_usuario = ?');
+        $stmt = $this->db->prepare(
+            'SELECT u.id_usuario,
+                    u.puntuacion_promedio,
+                    COUNT(DISTINCT le.id_lote)                                                                          AS total_lotes,
+                    COUNT(DISTINCT CASE WHEN le.estado_lote = "disponible"    THEN le.id_lote END)                     AS lotes_disponibles,
+                    COUNT(DISTINCT CASE WHEN le.estado_lote = "en_negociacion" THEN le.id_lote END)                    AS lotes_en_negociacion,
+                    COUNT(DISTINCT CASE WHEN le.estado_lote = "asignado"      THEN le.id_lote END)                     AS lotes_asignados
+             FROM usuarios u
+             LEFT JOIN lotes_excedentes le ON le.id_productor = u.id_usuario
+             WHERE u.id_usuario = ?
+             GROUP BY u.id_usuario'
+        );
         $stmt->execute([$id]);
         return $stmt->fetch() ?: null;
     }

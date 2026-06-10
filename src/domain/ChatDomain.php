@@ -12,7 +12,6 @@ class ChatDomain
 
     /**
      * Returns all chats for $userId with every message already nested inside.
-     * Two queries total: one for chats, one IN for all their messages.
      */
     public function getChats(int $userId): array
     {
@@ -22,13 +21,11 @@ class ChatDomain
         $chatIds  = array_column($chats, 'chat_id');
         $messages = $this->model->findMessagesByChatIds($chatIds);
 
-        // Group messages by chat_id
         $grouped = [];
         foreach ($messages as $msg) {
             $grouped[$msg['chat_id']][] = $msg;
         }
 
-        // Embed messages into each chat row
         foreach ($chats as &$chat) {
             $chat['messages'] = $grouped[$chat['chat_id']] ?? [];
         }
@@ -45,5 +42,14 @@ class ChatDomain
     {
         $id = $this->model->sendMessage($chatId, $remitenteId, $body);
         return ['id' => $id];
+    }
+
+    /**
+     * Returns the existing chat id for a negotiation, or creates one.
+     */
+    public function findOrCreate(int $a, int $b, int $idNegociacion): int
+    {
+        $existing = $this->model->findByNegociacion($idNegociacion);
+        return $existing ?? $this->model->create($a, $b, $idNegociacion);
     }
 }

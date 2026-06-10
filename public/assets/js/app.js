@@ -168,6 +168,7 @@ async function unloadCurrent() {
 
 export function navigate(path) {
   history.pushState({}, '', BASE_PATH + path);
+  document.dispatchEvent(new CustomEvent('ftt:navigate', { detail: { path } }));
   router();
 }
 

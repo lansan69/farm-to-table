@@ -1,10 +1,12 @@
 <?php
 // Endpoint: /src/api/chats.php
 //
-// GET  ?usuario_id=N          → chats where user N is usuario_a or usuario_b
-// GET  ?chat_id=N             → messages in chat N ordered by fecha_enviado ASC
+// GET  ?usuario_id=N                                       → all chats for user
+// GET  ?chat_id=N                                          → messages in chat N
 //
-// POST {chat_id, remitente_id, body}  → send a message, returns {id}
+// POST {action:'find_or_create', usuario_a, usuario_b,
+//       id_negociacion}                                    → {chat_id}
+// POST {chat_id, remitente_id, body}                       → send a message
 
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../core/Response.php';
@@ -31,21 +33,31 @@ function handleGet(ChatDomain $domain): void
         json_ok($domain->getMessages((int) $id));
     }
 
-    json_error('Se requiere usuario_a o chat_id.', 400);
+    json_error('Se requiere usuario_id o chat_id.', 400);
 }
 
 // ── POST ──────────────────────────────────────────────────────────────────────
 
 function handlePost(ChatDomain $domain): void
 {
-    $body = Router::body();
-    Router::requireFields(['chat_id', 'remitente_id', 'body'], $body);
+    $body   = Router::body();
+    $action = $body['action'] ?? null;
 
+    if ($action === 'find_or_create') {
+        Router::requireFields(['usuario_a', 'usuario_b', 'id_negociacion'], $body);
+        $chatId = $domain->findOrCreate(
+            (int) $body['usuario_a'],
+            (int) $body['usuario_b'],
+            (int) $body['id_negociacion']
+        );
+        json_ok(['chat_id' => $chatId]);
+    }
+
+    Router::requireFields(['chat_id', 'remitente_id', 'body'], $body);
     $result = $domain->sendMessage(
         chatId:      (int)    $body['chat_id'],
         remitenteId: (int)    $body['remitente_id'],
         body:        (string) $body['body']
     );
-
     json_ok($result, 201);
 }
