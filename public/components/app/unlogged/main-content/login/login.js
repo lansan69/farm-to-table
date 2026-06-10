@@ -44,7 +44,7 @@ export function init(container) {
             } else {
                 try {
                     const user = await AuthService.loginGoogle(idToken);
-                    localStorage.setItem('token', user.email ?? user.id_usuario);
+                    localStorage.setItem('token', user.id_usuario);
                     toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" });
                     navigateByRole(user.rol_usuario);
                 } catch (err) {
@@ -113,7 +113,7 @@ export function init(container) {
 
             try {
                 const user = await AuthService.login(email, password);
-                localStorage.setItem('token', user.email ?? user.id_usuario);
+                localStorage.setItem('token', user.id_usuario);
                 toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" }); navigateByRole(user.rol_usuario);
             } catch (err) {
                 const isWrongPassword = err.httpStatus === 401;
@@ -157,7 +157,7 @@ export function init(container) {
                         rol: role,
                         apellido: lastname,
                     });
-                    localStorage.setItem('token', user.email ?? user.id_usuario);
+                    localStorage.setItem('token', user.id_usuario);
                     toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" });
                     navigateByRole(user.rol_usuario);
                 } else {
@@ -229,7 +229,7 @@ async function handleGoogleRegister(container, idToken, btn, originalText) {
 
     try {
         const user = await AuthService.loginGoogle(idToken);
-        localStorage.setItem('token', user.email ?? user.id_usuario);
+        localStorage.setItem('token', user.id_usuario);
         toastWelcome({ title: `Bienvenido ${user.nombre_razon_social}!`, body: "Explora productos" });
         navigateByRole(user.rol_usuario);
     } catch (err) {

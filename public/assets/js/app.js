@@ -89,14 +89,14 @@ export async function loadComponent(path, container) {
 // El HTML se elimina automáticamente cuando el contenedor padre recibe nuevo innerHTML.
 
 export function unloadComponent(path) {
-  const name   = path.split('/').pop();
-  const cssKey = path.replaceAll('/', '-');
+  // const name   = path.split('/').pop();
+  // const cssKey = path.replaceAll('/', '-');
 
-  setTimeout(async () => {
-    const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
-    if (typeof module.cleanup === 'function') await module.cleanup();
-    document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
-  }, 1000);
+  // setTimeout(async () => {
+  //   const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
+  //   if (typeof module.cleanup === 'function') await module.cleanup();
+  //   document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
+  // }, 1000);
 }
 
 // ── Autenticación ───────────────────────────────────────────────────────────
