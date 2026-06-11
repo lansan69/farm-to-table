@@ -23,21 +23,32 @@ const routes = [
   { path: '/usuario/catalogo-vendedores',   shell: 'app/logged/user',   page: 'app/logged/user/main-content/catalogo-vendedores',     auth: 'public' },
   { path: '/usuario/perfil',                shell: 'app/logged/user',   page: 'app/logged/user/main-content/perfil',                  auth: 'public' },
   { path: '/usuario/chats',                 shell: 'app/logged/user',   page: 'app/logged/user/main-content/chats',                   auth: 'public' },
-  { path: '/usuario/productos-favoritos',   shell: 'app/logged/user',   page: 'app/logged/user/main-content/productos-favoritos',     auth: 'public' },
-  { path: '/usuario/vendedores-favoritos',  shell: 'app/logged/user',   page: 'app/logged/user/main-content/vendedores-favoritos',    auth: 'public' },
+  { path: '/usuario/favoritos',             shell: 'app/logged/user',   page: 'app/logged/user/main-content/favoritos',               auth: 'public' },
   { path: '/usuario/contraofertas',         shell: 'app/logged/user',   page: 'app/logged/user/main-content/contraofertas',           auth: 'public' },
   { path: '/usuario/calificar-producto',    shell: 'app/logged/user',   page: 'app/logged/user/main-content/calificar-producto',      auth: 'public' },
+  { path: '/usuario/compras',               shell: 'app/logged/user',   page: 'app/logged/user/main-content/compras',                 auth: 'public' },
+
 
 
   // Rutas para productores autenticados
   { path: '/productor/landing-page',          shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/landing-page',            auth: 'public' },
   { path: '/productor/mis-lotes',             shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/lotes',                   auth: 'public' },
-  { path: '/productor/publicar-lote',         shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/publicar-lote',          auth: 'public' },
-  { path: '/productor/editar-lote',           shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/editar-lote',            auth: 'public' },
+  { path: '/productor/publicar-lote',         shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/publicar-lote',           auth: 'public' },
+  { path: '/productor/editar-lote',           shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/editar-lote',             auth: 'public' },
   { path: '/productor/perfil',                shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/perfil',                  auth: 'public' },
   { path: '/productor/chats',                 shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/chats',                   auth: 'public' },
   { path: '/productor/contraofertas',         shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/contraofertas',           auth: 'public' },
+  { path: '/productor/ventas',                shell: 'app/logged/farmer',   page: 'app/logged/farmer/main-content/ventas',                  auth: 'public' },
+
+  // Rutas para administradores
+  { path: '/admin/inicio',    shell: 'app/logged/admin', page: 'app/logged/admin/main-content/inicio',    auth: 'protected' },
+  { path: '/admin/usuarios',  shell: 'app/logged/admin', page: 'app/logged/admin/main-content/usuarios',  auth: 'protected' },
+  { path: '/admin/zonas',     shell: 'app/logged/admin', page: 'app/logged/admin/main-content/zonas',     auth: 'protected' },
+  { path: '/admin/productos', shell: 'app/logged/admin', page: 'app/logged/admin/main-content/productos', auth: 'protected' },
+  { path: '/admin/reportes', shell: 'app/logged/admin',  page: 'app/logged/admin/main-content/reportes',  auth: 'protected' },
+
 ];
+
 
 
 
@@ -78,14 +89,14 @@ export async function loadComponent(path, container) {
 // El HTML se elimina automáticamente cuando el contenedor padre recibe nuevo innerHTML.
 
 export function unloadComponent(path) {
-  const name   = path.split('/').pop();
-  const cssKey = path.replaceAll('/', '-');
+  // const name   = path.split('/').pop();
+  // const cssKey = path.replaceAll('/', '-');
 
-  setTimeout(async () => {
-    const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
-    if (typeof module.cleanup === 'function') await module.cleanup();
-    document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
-  }, 1000);
+  // setTimeout(async () => {
+  //   const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
+  //   if (typeof module.cleanup === 'function') await module.cleanup();
+  //   document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
+  // }, 1000);
 }
 
 // ── Autenticación ───────────────────────────────────────────────────────────
@@ -123,6 +134,9 @@ async function router() {
   // Redirige si el usuario intenta acceder a una ruta que no le corresponde
   if (route.auth === 'protected' && !isLoggedIn()) return navigate('/unlogged/login');
 
+  // Ya estamos en esta ruta — nada que hacer
+  if (currentRoute && currentRoute.path === route.path) return;
+
   // Verifica si la shell (estructura base) cambió respecto a la ruta anterior
   const shellChanged = !currentRoute || currentRoute.shell !== route.shell;
 
@@ -154,6 +168,7 @@ async function unloadCurrent() {
 
 export function navigate(path) {
   history.pushState({}, '', BASE_PATH + path);
+  document.dispatchEvent(new CustomEvent('ftt:navigate', { detail: { path } }));
   router();
 }
 

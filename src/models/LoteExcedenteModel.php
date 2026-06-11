@@ -6,57 +6,70 @@ class LoteExcedenteModel extends BaseModel
     public function findAllDisponibles(): array
     {
         return $this->db
-            ->query('SELECT * FROM vw_lotes_navegador ORDER BY fecha_publicacion DESC')
+            ->query('SELECT * FROM v_lotes_disponibles ORDER BY fecha_publicacion DESC')
             ->fetchAll();
     }
 
     /**
-     * Búsqueda combinada. Pasa null en los parámetros que no apliquen.
-     * Internamente consulta vw_lotes_navegador usando el patrón (? IS NULL OR ...).
+     * Filtered search over v_lotes_disponibles.
+     * Pass null for any parameter that should not be applied.
      */
-    public function buscar(?string $nombre, ?int $idCategoria, ?int $idZona): array
+    public function buscar(?string $nombre, ?int $idCategoria): array
     {
         $like = $nombre !== null ? '%' . $nombre . '%' : null;
         $stmt = $this->db->prepare(
-            'SELECT * FROM vw_lotes_navegador
+            'SELECT * FROM v_lotes_disponibles
              WHERE (? IS NULL OR nombre_producto LIKE ?)
                AND (? IS NULL OR id_categoria   =  ?)
-               AND (? IS NULL OR id_zona        =  ?)
              ORDER BY fecha_publicacion DESC'
         );
-        $stmt->execute([$nombre, $like, $idCategoria, $idCategoria, $idZona, $idZona]);
+        $stmt->execute([$nombre, $like, $idCategoria, $idCategoria]);
         return $stmt->fetchAll();
     }
 
     /**
-     * Devuelve una fila por foto (LEFT JOIN). Si el lote no tiene fotos devuelve
-     * una sola fila con id_foto = null. El Domain se encarga de aplanar el resultado.
+     * Full detail for a single lot regardless of status — backed by v_lotes_card.
      */
-    public function findByIdDetalle(int $idLote): array
+    public function findByIdDetalle(int $idLote): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM vw_detalle_lote WHERE id_lote = ?');
+        $stmt = $this->db->prepare('SELECT * FROM v_lotes_card WHERE id_lote = ?');
         $stmt->execute([$idLote]);
-        return $stmt->fetchAll();
+        return $stmt->fetch() ?: null;
     }
 
+    /**
+     * All lots for a given producer with resolved product/category names.
+     */
     public function findByProductor(int $idProductor): array
     {
         $stmt = $this->db->prepare(
-            'SELECT * FROM vw_lotes_productor
-             WHERE id_productor = ?
-             ORDER BY fecha_publicacion DESC'
+            'SELECT le.*,
+                    COALESCE(cp.nombre_producto,      le.nombre_producto)      AS nombre_producto_display,
+                    COALESCE(cat_cp.nombre_categoria, cat_le.nombre_categoria) AS nombre_categoria
+             FROM lotes_excedentes le
+             LEFT JOIN catalogo_productos   cp     ON cp.id_producto    = le.id_producto
+             LEFT JOIN categorias_productos cat_cp ON cat_cp.id_categoria = cp.id_categoria
+             LEFT JOIN categorias_productos cat_le ON cat_le.id_categoria = le.id_categoria
+             WHERE le.id_productor = ?
+             ORDER BY le.fecha_publicacion DESC'
         );
         $stmt->execute([$idProductor]);
         return $stmt->fetchAll();
     }
 
+    /**
+     * Available lots expiring within the next 3 days.
+     * dias_restantes is computed as days between today and (fecha_cosecha + vida_util_dias).
+     */
     public function findUrgentes(): array
     {
         return $this->db
             ->query(
-                'SELECT * FROM vw_lotes_navegador
-                 WHERE dias_restantes_vida_util BETWEEN 0 AND 3
-                 ORDER BY dias_restantes_vida_util ASC'
+                'SELECT *,
+                        DATEDIFF(DATE_ADD(fecha_cosecha, INTERVAL vida_util_dias DAY), CURDATE()) AS dias_restantes
+                 FROM v_lotes_disponibles
+                 WHERE DATEDIFF(DATE_ADD(fecha_cosecha, INTERVAL vida_util_dias DAY), CURDATE()) BETWEEN 0 AND 3
+                 ORDER BY dias_restantes ASC'
             )
             ->fetchAll();
     }

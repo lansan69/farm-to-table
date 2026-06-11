@@ -1,25 +1,22 @@
 <?php
 require_once __DIR__ . '/BaseModel.php';
 
-/**
- * Requiere la tabla favoritos_marketplace definida en querys/Juan/marketplace-productos-favoritos.sql
- */
 class FavoritoModel extends BaseModel
 {
+    /**
+     * All favorited lots for a user, enriched with product/vendor info from v_lotes_card.
+     */
     public function findByUsuario(int $idUsuario): array
     {
         $stmt = $this->db->prepare(
-            'SELECT fm.id_favorito, fm.id_lote, fm.fecha_agregado,
-                    cp.nombre_producto, cat.nombre_categoria,
-                    le.cantidad_kg, le.precio_recuperacion_sugerido, le.estado_lote,
-                    u.nombre_razon_social AS nombre_productor
-             FROM favoritos_marketplace fm
-             JOIN lotes_excedentes le      ON fm.id_lote      = le.id_lote
-             JOIN catalogo_productos cp    ON le.id_producto  = cp.id_producto
-             JOIN categorias_productos cat ON cp.id_categoria = cat.id_categoria
-             JOIN usuarios u               ON le.id_productor = u.id_usuario
-             WHERE fm.id_usuario = ?
-             ORDER BY fm.fecha_agregado DESC'
+            'SELECT f.id_lote, f.created_at,
+                    v.nombre_producto, v.nombre_categoria, v.nombre_productor,
+                    v.cantidad_kg, v.precio_recuperacion_sugerido, v.estado_lote,
+                    v.calificacion_producto, v.id_categoria, v.zona
+             FROM favoritos f
+             JOIN v_lotes_card v ON v.id_lote = f.id_lote
+             WHERE f.id_usuario = ?
+             ORDER BY f.created_at DESC'
         );
         $stmt->execute([$idUsuario]);
         return $stmt->fetchAll();
@@ -28,25 +25,24 @@ class FavoritoModel extends BaseModel
     public function existe(int $idUsuario, int $idLote): bool
     {
         $stmt = $this->db->prepare(
-            'SELECT COUNT(*) FROM favoritos_marketplace WHERE id_usuario = ? AND id_lote = ?'
+            'SELECT COUNT(*) FROM favoritos WHERE id_usuario = ? AND id_lote = ?'
         );
         $stmt->execute([$idUsuario, $idLote]);
         return (int) $stmt->fetchColumn() > 0;
     }
 
-    public function agregar(int $idUsuario, int $idLote): int
+    public function agregar(int $idUsuario, int $idLote): void
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO favoritos_marketplace (id_usuario, id_lote) VALUES (?, ?)'
+            'INSERT IGNORE INTO favoritos (id_usuario, id_lote) VALUES (?, ?)'
         );
         $stmt->execute([$idUsuario, $idLote]);
-        return (int) $this->db->lastInsertId();
     }
 
     public function eliminar(int $idUsuario, int $idLote): bool
     {
         $stmt = $this->db->prepare(
-            'DELETE FROM favoritos_marketplace WHERE id_usuario = ? AND id_lote = ?'
+            'DELETE FROM favoritos WHERE id_usuario = ? AND id_lote = ?'
         );
         return $stmt->execute([$idUsuario, $idLote]);
     }

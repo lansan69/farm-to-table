@@ -18,37 +18,14 @@ class MarketplaceDomain
 
     // ── Listado y búsqueda ───────────────────────────────────────────────────
 
-    /**
-     * Devuelve los lotes disponibles. Acepta filtros opcionales.
-     */
-    public function getLotes(
-        ?string $nombre      = null,
-        ?int    $idCategoria = null,
-        ?int    $idZona      = null
-    ): array {
-        return $this->loteModel->buscar($nombre, $idCategoria, $idZona);
+    public function getLotes(?string $nombre = null, ?int $idCategoria = null): array
+    {
+        return $this->loteModel->buscar($nombre, $idCategoria);
     }
 
-    /**
-     * Vista individual de producto: datos base + fotos del lote.
-     */
-    public function getDetalleLote(int $idLote): array
+    public function getDetalleLote(int $idLote): ?array
     {
-        $filas = $this->loteModel->findByIdDetalle($idLote);
-        if (empty($filas)) return [];
-
-        $lote  = $filas[0];
-        $fotos = array_values(array_filter(
-            array_map(fn($f) => $f['id_foto'] !== null ? [
-                'id_foto'    => $f['id_foto'],
-                'url_foto'   => $f['url_foto'],
-                'fecha_foto' => $f['fecha_foto'],
-            ] : null, $filas)
-        ));
-
-        unset($lote['id_foto'], $lote['url_foto'], $lote['fecha_foto']);
-        $lote['fotos'] = $fotos;
-        return $lote;
+        return $this->loteModel->findByIdDetalle($idLote);
     }
 
     public function getCategorias(): array

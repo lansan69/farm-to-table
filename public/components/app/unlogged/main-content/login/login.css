@@ -152,6 +152,47 @@
   background: #fff;
 }
 
+.auth-wrapper .field input[readonly] {
+  background: #ddd8d0;
+  cursor: default;
+  color: var(--muted);
+}
+
+/* ── Select ── */
+.auth-wrapper .field select {
+  width: 100%;
+  padding: 14px 40px 14px 16px;
+  background: #e9e7e0;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--dark);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.auth-wrapper .field select:focus {
+  border-color: var(--green);
+  background: #fff;
+}
+
+.auth-wrapper .field.select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--muted);
+  pointer-events: none;
+}
+
 .auth-wrapper .eye-btn {
   position: absolute;
   right: 14px;
@@ -291,41 +332,23 @@
   background: var(--border);
 }
 
-/* ── Google button ── */
-.auth-wrapper .btn-google {
+/* ── Google button (official rendered button) ── */
+.auth-wrapper .google-btn-wrap {
   width: 100%;
-  padding: 13px;
-  background: #fff;
-  border: 1.5px solid var(--border);
-  border-radius: 50px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
-  color: var(--dark);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.auth-wrapper .btn-google:hover {
-  border-color: var(--green);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.auth-wrapper .google-btn-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
 }
 
-.auth-wrapper .google-icon {
-  width: 28px;
-  height: 28px;
-  background: #e53935;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
+.auth-wrapper .google-btn-icon {
+  display: none;
   justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.85rem;
-  flex-shrink: 0;
+  width: 100%;
+  min-height: 44px;
 }
 
 /* ── Entry animation ── */
@@ -345,3 +368,88 @@
 .auth-wrapper .panel-form > *:nth-child(5) { animation-delay: 0.25s; }
 .auth-wrapper .panel-form > *:nth-child(6) { animation-delay: 0.30s; }
 .auth-wrapper .panel-form > *:nth-child(7) { animation-delay: 0.35s; }
+
+/* ── Mobile CTA — hidden on desktop, shown on mobile ── */
+.auth-wrapper .mobile-cta {
+  display: none;
+}
+
+/* ── Mobile (≤ 640 px) ── */
+@media (max-width: 640px) {
+  .auth-wrapper {
+    grid-template-columns: 1fr;
+    height: auto;
+    border-radius: 16px;
+    margin: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .auth-wrapper .panel-form {
+    padding: 40px 28px;
+  }
+
+  /* Image panels become purely decorative — hide them entirely */
+  .auth-wrapper .panel-image {
+    display: none !important;
+  }
+
+  /* Login form: normal flow, always visible unless register is shown */
+  .auth-wrapper .login-form {
+    transform: none !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
+    display: flex;
+  }
+
+  /* Register form: pulled out of absolute positioning, hidden by default */
+  .auth-wrapper .register-form {
+    position: relative;
+    width: 100%;
+    height: auto;
+    top: auto;
+    right: auto;
+    transform: none;
+    opacity: 1;
+    pointer-events: all;
+    display: none;
+  }
+
+  /* show-register state: swap which form is visible */
+  .auth-wrapper.show-register .login-form {
+    display: none;
+  }
+
+  .auth-wrapper.show-register .register-form {
+    display: flex;
+  }
+
+  /* Swap full button for icon-only button */
+  .auth-wrapper .google-btn-container {
+    display: none;
+  }
+
+  .auth-wrapper .google-btn-icon {
+    display: flex;
+  }
+
+  /* Mobile CTA link */
+  .auth-wrapper .mobile-cta {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .auth-wrapper .mobile-cta button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--green);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}

@@ -1,0 +1,407 @@
+.contraofertas-page {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 5vh;
+  color: var(--color-dark);
+}
+
+.contraofertas-catalog {
+  padding: 10px 50px 50px;
+}
+
+/* ── Actions bar ──────────────────────────────────────────────────────────────── */
+
+.contraofertas-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 16px;
+}
+
+/* ── Filters / hamburger ──────────────────────────────────────────────────────── */
+
+.filters-wrap {
+  position: relative;
+}
+
+.filters-toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-dark);
+  transition: background var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.filters-toggle:hover,
+.filters-wrap.open .filters-toggle {
+  background: var(--color-primary-green);
+  color: #fff;
+  border-color: var(--color-primary-green);
+}
+
+.filters {
+  display: flex;
+}
+
+.filter {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-dark);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.filter:first-child { border-radius: 18px 0 0 18px; }
+.filter:last-child  { border-radius: 0 18px 18px 0; }
+.filter:only-child  { border-radius: 18px; }
+
+.filter.active {
+  background: var(--color-primary-green);
+  color: #fff;
+  border-color: var(--color-primary-green);
+}
+
+/* ── Search bar ───────────────────────────────────────────────────────────────── */
+
+.chat-search-bar {
+  width: 300px;
+  height: 36px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.chat-search-bar__icon {
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chat-search-bar__input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  background: transparent;
+  color: var(--color-dark);
+}
+
+.chat-search-bar__input::placeholder { color: #bbb; }
+
+/* ── Negotiation grid ─────────────────────────────────────────────────────────── */
+
+.negoc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ── Negotiation card ─────────────────────────────────────────────────────────── */
+
+.negoc-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition-fast);
+}
+
+.negoc-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Avatar block ─────────────────────────────────────────────────────────────── */
+
+.negoc-avatar-cont {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.negoc-avatar__letter {
+  font-size: 52px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1;
+  user-select: none;
+}
+
+/* ── Card content ─────────────────────────────────────────────────────────────── */
+
+.negoc-content {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.negoc-name {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  line-height: 1.2;
+}
+
+.negoc-vendor {
+  font-size: 12px;
+  color: #888;
+}
+
+.negoc-zona {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #777;
+}
+
+/* ── Prices + estado row ──────────────────────────────────────────────────────── */
+
+.negoc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.negoc-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.negoc-price-label {
+  font-size: 10px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.negoc-price-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-dark);
+  line-height: 1;
+}
+
+.negoc-price-value--offer {
+  color: var(--color-primary-green);
+}
+
+/* ── Estado badge ─────────────────────────────────────────────────────────────── */
+
+.negoc-estado {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  align-self: center;
+  background: #f0f0f0;
+  color: #888;
+}
+
+.negoc-estado--pending  { background: #fff8e1; color: #b8860b; }
+.negoc-estado--counter  { background: #e3f2fd; color: #1565c0; }
+.negoc-estado--accepted { background: #e8f5ec; color: var(--color-primary-green); }
+.negoc-estado--rejected { background: #fce4e4; color: #c62828; }
+
+/* ── Action buttons ───────────────────────────────────────────────────────────── */
+
+.negoc-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.negoc-btn {
+  flex: 1;
+  padding: 9px 6px;
+  border: none;
+  border-radius: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.negoc-btn--msg {
+  background: #f0f0f0;
+  color: var(--color-dark);
+}
+
+.negoc-btn--msg:hover {
+  background: #e0e0e0;
+}
+
+.negoc-btn--msg:disabled {
+  background: #f0f0f0;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.negoc-btn--edit {
+  background: var(--color-primary-green);
+  color: #fff;
+}
+
+.negoc-btn--edit:hover {
+  background: var(--color-teal);
+}
+
+.negoc-btn--edit:disabled {
+  background: #e0e0e0;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.negoc-comment {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+  margin: 0;
+  padding: 6px 8px;
+  background: #f8f8f8;
+  border-radius: 6px;
+}
+
+.negoc-comment--empty {
+  color: #bbb;
+  font-style: italic;
+}
+
+.negoc-comment-input {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--color-dark);
+  border: 1.5px solid var(--color-primary-green);
+  border-radius: 6px;
+  outline: none;
+  background: #f4fbf6;
+  resize: vertical;
+  min-height: 50px;
+  box-sizing: border-box;
+}
+
+.negoc-offer-input {
+  width: 90px;
+  padding: 4px 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary-green);
+  border: 1.5px solid var(--color-primary-green);
+  border-radius: 6px;
+  outline: none;
+  background: #f4fbf6;
+}
+
+/* ── Skeleton ─────────────────────────────────────────────────────────────────── */
+
+.negoc-card--skeleton {
+  height: 340px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 14px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────────── */
+
+.negoc-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+  .negoc-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 750px) {
+  .negoc-grid          { grid-template-columns: 1fr; }
+  .contraofertas-catalog { padding: 10px 20px 40px; }
+}
+
+/* ── Hamburger dropdown (≤ 768px) ─────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .filters-toggle {
+    display: flex;
+  }
+
+  .filters {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    min-width: 180px;
+    gap: 2px;
+  }
+
+  .filters-wrap.open .filters {
+    display: flex;
+  }
+
+  .filter,
+  .filter:first-child,
+  .filter:last-child,
+  .filter:only-child {
+    border-radius: 8px;
+    width: 100%;
+    text-align: left;
+    border-color: transparent;
+  }
+
+  .filter:hover {
+    background: #f5f5f5;
+  }
+}
+
+@media (max-width: 500px) {
+  .contraofertas-actions { flex-direction: column; align-items: flex-start; }
+  .chat-search-bar       { width: 100%; }
+  .negoc-row             { flex-direction: column; align-items: flex-start; }
+}

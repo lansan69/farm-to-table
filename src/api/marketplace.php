@@ -27,11 +27,11 @@ function handleGet(MarketplaceDomain $domain): void
         json_ok($domain->getCategorias());
     }
 
-    // ?id=N → detalle completo de un lote (incluye fotos)
+    // ?id=N → detalle completo de un lote
     $id = Router::query('id');
     if ($id !== null) {
         $lote = $domain->getDetalleLote((int) $id);
-        empty($lote)
+        $lote === null
             ? json_error('Lote no encontrado.', 404)
             : json_ok($lote);
     }
@@ -39,8 +39,7 @@ function handleGet(MarketplaceDomain $domain): void
     // Sin id → listado con filtros opcionales
     $lotes = $domain->getLotes(
         nombre:      Router::query('nombre'),
-        idCategoria: ($c = Router::query('categoria')) !== null ? (int) $c : null,
-        idZona:      ($z = Router::query('zona'))      !== null ? (int) $z : null
+        idCategoria: ($c = Router::query('categoria')) !== null ? (int) $c : null
     );
 
     json_ok($lotes);

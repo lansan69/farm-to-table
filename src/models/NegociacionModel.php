@@ -12,21 +12,30 @@ class NegociacionModel extends BaseModel
         return $stmt->fetch() ?: null;
     }
 
-    /** Vista contraofertas_cliente — filtra por el comprador */
     public function findByComprador(int $idComprador): array
     {
         $stmt = $this->db->prepare(
-            'SELECT * FROM contraofertas_cliente WHERE id_comprador = ?'
+            'SELECT v.*, z.nombre_delegacion AS zona,
+                    d.comentario AS ultimo_comentario
+             FROM v_negociaciones_detalle v
+             JOIN usuarios u ON u.id_usuario = v.id_vendedor
+             LEFT JOIN zonas_operativas z ON z.id_zona = u.id_zona
+             LEFT JOIN detalles_ofertas d ON d.id_detalle = (
+                 SELECT id_detalle FROM detalles_ofertas
+                 WHERE id_negociacion = v.id_negociacion
+                 ORDER BY fecha_envio DESC
+                 LIMIT 1
+             )
+             WHERE v.id_comprador = ?'
         );
         $stmt->execute([$idComprador]);
         return $stmt->fetchAll();
     }
 
-    /** Vista contraofertas_productor — filtra por el productor dueño del lote */
     public function findByProductor(int $idProductor): array
     {
         $stmt = $this->db->prepare(
-            'SELECT * FROM contraofertas_productor WHERE id_productor = ?'
+            'SELECT * FROM v_negociaciones_detalle WHERE id_vendedor = ?'
         );
         $stmt->execute([$idProductor]);
         return $stmt->fetchAll();
@@ -50,31 +59,27 @@ class NegociacionModel extends BaseModel
         return $stmt->execute([$estado, $id]);
     }
 
-    /** Historial completo de compras de un comprador (vista vw_info_compra_venta) */
     public function findHistorialComprador(int $idComprador): array
     {
         $stmt = $this->db->prepare(
-            'SELECT id_negociacion, nombre_producto, cantidad_kg, precio_ultima_oferta,
-                    nombre_productor, estado_negociacion, estado_entrega,
-                    fecha_inicio_negociacion, fecha_recepcion_real
-             FROM vw_info_compra_venta
+            'SELECT id_negociacion, nombre_producto, cantidad_kg, ultima_oferta,
+                    nombre_vendedor, estado_negociacion, fecha_creacion
+             FROM v_negociaciones_detalle
              WHERE id_comprador = ?
-             ORDER BY fecha_inicio_negociacion DESC'
+             ORDER BY fecha_creacion DESC'
         );
         $stmt->execute([$idComprador]);
         return $stmt->fetchAll();
     }
 
-    /** Historial completo de ventas de un productor (vista vw_info_compra_venta) */
     public function findHistorialProductor(int $idProductor): array
     {
         $stmt = $this->db->prepare(
-            'SELECT id_negociacion, nombre_producto, cantidad_kg, precio_ultima_oferta,
-                    nombre_comprador, estado_negociacion, estado_entrega,
-                    fecha_inicio_negociacion, fecha_recepcion_real
-             FROM vw_info_compra_venta
-             WHERE id_productor = ?
-             ORDER BY fecha_inicio_negociacion DESC'
+            'SELECT id_negociacion, nombre_producto, cantidad_kg, ultima_oferta,
+                    nombre_comprador, estado_negociacion, fecha_creacion
+             FROM v_negociaciones_detalle
+             WHERE id_vendedor = ?
+             ORDER BY fecha_creacion DESC'
         );
         $stmt->execute([$idProductor]);
         return $stmt->fetchAll();

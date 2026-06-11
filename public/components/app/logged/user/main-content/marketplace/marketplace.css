@@ -1,26 +1,52 @@
 .marketplace-page {
-  color: #1f1f1f;
   width: 100%;
   height: 100%;
+  overflow-y: scroll;
   padding: 5vh;
-
+  color: var(--color-dark);
 }
 
 .marketplace {
   padding: 10px 50px 50px;
 }
 
-.marketplace h2 {
-  font-size: 32px;
-  color: #0d3d1c;
-  margin-bottom: 8px;
-}
+/* ── Actions bar ─────────────────────────────────────────────────────────────── */
 
 .market-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  gap: 16px;
+}
+
+/* ── Filters ─────────────────────────────────────────────────────────────────── */
+
+.filters-wrap {
+  position: relative;
+}
+
+/* Hamburger toggle — hidden on desktop, shown on mobile */
+.filters-toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-dark);
+  transition: background var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.filters-toggle:hover,
+.filters-wrap.open .filters-toggle {
+  background: var(--color-primary-green);
+  color: #fff;
+  border-color: var(--color-primary-green);
 }
 
 .filters {
@@ -29,29 +55,29 @@
 
 .filter {
   padding: 8px 14px;
-  border: 1px solid #222;
+  border: 1px solid #ccc;
   background: #fff;
   cursor: pointer;
   font-size: 14px;
+  color: var(--color-dark);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.filter:first-child {
-  border-radius: 18px 0 0 18px;
-}
-
-.filter:last-child {
-  border-radius: 0 18px 18px 0;
-}
+.filter:first-child { border-radius: 18px 0 0 18px; }
+.filter:last-child  { border-radius: 0 18px 18px 0; }
 
 .filter.active {
-  background: #35c46b;
-  color: white;
+  background: var(--color-primary-green);
+  color: #fff;
+  border-color: var(--color-primary-green);
 }
 
-.search-box {
-  width: 310px;
-  height: 34px;
-  background: white;
+/* ── Search bar (chat-components) ────────────────────────────────────────────── */
+
+.chat-search-bar {
+  width: 300px;
+  height: 36px;
+  background: #fff;
   border: 1px solid #ddd;
   border-radius: 18px;
   display: flex;
@@ -60,113 +86,328 @@
   padding: 0 14px;
 }
 
-.search-box input {
+.chat-search-bar__icon {
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chat-search-bar__input {
   border: none;
   outline: none;
   width: 100%;
-  font-size: 12px;
+  font-size: 13px;
+  background: transparent;
+  color: var(--color-dark);
 }
+
+.chat-search-bar__input::placeholder { color: #bbb; }
+
+/* ── Products grid ───────────────────────────────────────────────────────────── */
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 28px 32px;
-  padding: 0 52px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
 }
+
+/* ── Product card ────────────────────────────────────────────────────────────── */
 
 .product-card {
-  background: white;
-  border-radius: 8px;
+  background: #fff;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.14);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition-fast);
 }
 
-.product-card img {
+.product-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Image container ──────────────────────────────────────────────────────────── */
+
+.product-image-cont {
+  position: relative;
   width: 100%;
-  height: 94px;
+}
+
+.product-image {
+  width: 100%;
+  height: 180px;
   object-fit: cover;
+  display: block;
 }
 
-.product-info {
-  padding: 8px 10px 12px;
+.product-fav-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-dark);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
-.product-info h3 {
-  font-size: 10px;
+.product-fav-btn:hover {
+  color: var(--color-primary-green);
+  background: #f0f8f3;
+}
+
+.product-fav-btn.active {
+  color: #F9C623;
+  background: #fffbeb;
+}
+
+.product-fav-btn.active svg {
+  fill: #F9C623;
+  stroke: #F9C623;
+}
+
+/* ── Card content ────────────────────────────────────────────────────────────── */
+
+.product-content {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.product-name {
+  font-size: 13px;
   font-weight: 800;
-  margin: 0 0 4px;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  line-height: 1.2;
 }
 
-.location {
-  font-size: 8px;
+.product-vendor {
+  font-size: 12px;
+  color: #888;
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.product-rating__stars { color: var(--color-primary-green); }
+.product-rating__value { color: #555; font-size: 12px; }
+
+.product-zona {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
   color: #777;
+}
+
+/* ── Price + status row ──────────────────────────────────────────────────────── */
+
+.product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.product-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary-green);
+  line-height: 1;
+}
+
+.product-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.product-status--active {
+  background: #e8f5ec;
+  color: var(--color-primary-green);
+}
+
+.product-status--inactive {
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* ── CTA button ──────────────────────────────────────────────────────────────── */
+
+.product-cta-btn {
+  margin-top: auto;
+  padding-top: 4px;
+  width: 100%;
+  padding: 10px;
+  background: var(--color-primary-green);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.product-cta-btn:hover {
+  background: var(--color-teal);
+}
+
+/* ── Contraoferta modal ───────────────────────────────────────────────────────── */
+
+.mc-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-dark);
   margin-bottom: 6px;
 }
 
-.rating {
-  font-size: 9px;
-  color: #259c42;
-  margin-bottom: 4px;
+.mc-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-dark);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  background: #fafafa;
+  box-sizing: border-box;
 }
 
-.price {
-  color: #008f52;
-  font-size: 15px;
-  font-weight: bold;
-  margin-bottom: 5px;
+.mc-input:focus {
+  border-color: var(--color-primary-green);
+  background: #fff;
 }
 
-.card-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.mc-textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
-.status {
-  background: #36ad4d;
-  color: white;
-  border-radius: 12px;
-  padding: 4px 13px;
-  font-size: 8px;
-  font-weight: bold;
-}
-
-.icons {
-  display: flex;
-  gap: 10px;
-}
-
-.icons button {
+.mc-btn {
+  padding: 10px 24px;
   border: none;
-  background: #fff0f0;
-  border-radius: 5px;
-  font-size: 18px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background var(--transition-fast);
 }
 
-@media (max-width: 1100px) {
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.mc-btn--cancel {
+  background: #f0f0f0;
+  color: var(--color-dark);
 }
 
-@media (max-width: 750px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 0;
+.mc-btn--cancel:hover { background: #e0e0e0; }
+
+.mc-btn--confirm {
+  background: var(--color-primary-green);
+  color: #fff;
+}
+
+.mc-btn--confirm:hover    { background: var(--color-teal); }
+.mc-btn--confirm:disabled { background: #aaa; cursor: not-allowed; }
+
+/* ── Skeleton ────────────────────────────────────────────────────────────────── */
+
+.product-card--skeleton {
+  height: 320px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 14px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty / error state ─────────────────────────────────────────────────────── */
+
+.market-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 850px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .marketplace   { padding: 10px 20px 40px; }
+}
+
+/* ── Hamburger dropdown (≤ 768px) ────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .filters-toggle {
+    display: flex;
   }
 
-  .market-actions {
+  .filters {
+    display: none;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    min-width: 180px;
+    gap: 2px;
   }
 
-  .topbar {
-    padding: 0 20px;
+  .filters-wrap.open .filters {
+    display: flex;
   }
 
-  .brand h1 {
-    font-size: 26px;
+  /* In column layout every filter gets its own full-width rounded row */
+  .filter,
+  .filter:first-child,
+  .filter:last-child {
+    border-radius: 8px;
+    width: 100%;
+    text-align: left;
+    border-color: transparent;
   }
+
+  .filter:hover {
+    background: #f5f5f5;
+  }
+}
+
+@media (max-width: 500px) {
+  .products-grid   { grid-template-columns: 1fr; }
+  .market-actions  { flex-direction: column; align-items: flex-start; }
+  .chat-search-bar { width: 100%; }
 }
