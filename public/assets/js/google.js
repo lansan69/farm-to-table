@@ -46,7 +46,7 @@ export function renderGoogleIconButton(container) {
 }
 
 async function fetchClientId() {
-    const res  = await fetch('/dashboard/farm-to-table/src/api/config.php');
+    const res  = await fetch('/src/api/config.php');
     const json = await res.json();
     if (!json?.data?.google_client_id) throw new Error('Google client ID no disponible.');
     return json.data.google_client_id;
