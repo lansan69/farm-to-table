@@ -3,3 +3,4 @@ config/*
 !config/config.example.php
 
 .htaccess
+node_modules/
