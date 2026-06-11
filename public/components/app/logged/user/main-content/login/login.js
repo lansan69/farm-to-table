@@ -17,8 +17,8 @@ export function init(container) {
         });
     });
 
-    container.querySelector('.login-form .btn-primary')
-        .addEventListener('click', (e) => {
+    container.querySelector('#loginForm')
+        .addEventListener('submit', (e) => {
             e.preventDefault();
             const email    = container.querySelector('#login-email').value.trim();
             const password = container.querySelector('#login-password').value;
@@ -26,8 +26,8 @@ export function init(container) {
             console.log('Login:', { email, password });
         });
 
-    container.querySelector('.register-form .btn-primary')
-        .addEventListener('click', (e) => {
+    container.querySelector('#registerForm')
+        .addEventListener('submit', (e) => {
             e.preventDefault();
             const name     = container.querySelector('#reg-name').value.trim();
             const phone    = container.querySelector('#reg-phone').value.trim();
