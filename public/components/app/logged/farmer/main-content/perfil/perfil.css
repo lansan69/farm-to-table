@@ -138,7 +138,7 @@
 .negoc-btn--msg {
     background: var(--green-dark);
     color: #fff;
-    border-radius: var(--radius-btn);
+    border-radius: 10px;
     padding: 11px 20px;
     font-size: 0.82rem;
     letter-spacing: 0.04em;
@@ -487,6 +487,12 @@
     .perfil-page {
         flex-direction: column !important;
         padding: 16px;
+        overflow-y: auto;
+        height: auto;
+    }
+
+    .sidebar-info {
+        margin: 0 0 18px 0;
     }
 
     .sidebar-info,

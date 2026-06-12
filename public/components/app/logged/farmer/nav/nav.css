@@ -224,7 +224,7 @@
 }
 
 /* ── Hamburger drawer (≤ 600 px) ── */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   /* Re-show the hamburger (overrides the 1200px rule) */
   .ftt-hamburger {
     display: flex !important;

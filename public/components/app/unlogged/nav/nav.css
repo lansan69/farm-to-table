@@ -186,8 +186,8 @@
   }
 }
 
-/* ── Hamburger drawer (≤ 600px) ── */
-@media (max-width: 600px) {
+/* ── Hamburger drawer (≤ 640px) ── */
+@media (max-width: 640px) {
   .ftt-hamburger {
     display: flex !important;
   }

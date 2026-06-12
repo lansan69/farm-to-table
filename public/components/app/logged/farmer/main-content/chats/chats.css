@@ -428,3 +428,46 @@
 .farmer-chat .skeleton-bubble--sm { width: 120px; }
 .farmer-chat .skeleton-bubble--md { width: 200px; }
 .farmer-chat .skeleton-bubble--lg { width: 280px; }
+
+/* ── Back button (mobile only) ──────────────────────────────────────────── */
+.farmer-chat .chat-back-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-dark);
+  padding: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Mobile responsive ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .farmer-chat .contact-list {
+    width: 100%;
+  }
+
+  .farmer-chat .chat-window {
+    display: none;
+    width: 100%;
+  }
+
+  .farmer-chat.chat--view-window .contact-list {
+    display: none;
+  }
+
+  .farmer-chat.chat--view-window .chat-window {
+    display: flex;
+    flex: 1;
+  }
+
+  .farmer-chat .chat-back-btn {
+    display: flex;
+  }
+
+  .farmer-chat .chat-back-btn:active {
+    background: #f0f0f0;
+  }
+}
