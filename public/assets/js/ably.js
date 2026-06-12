@@ -23,3 +23,15 @@ export function subscribeToChat(chatId, onMessage) {
 export function publishMessage(chatId, payload) {
   return _client.channels.get(`chat:${chatId}`).publish('message', payload);
 }
+
+// Personal inbox channel — used to notify a user about new/updated chats
+// even when they are not subscribed to that specific chat channel yet.
+export function subscribeToInbox(userId, onPing) {
+  const channel = _client.channels.get(`inbox:${userId}`);
+  channel.subscribe('ping', onPing);
+  return () => channel.unsubscribe('ping', onPing);
+}
+
+export function notifyInbox(recipientId, chatId) {
+  return _client.channels.get(`inbox:${recipientId}`).publish('ping', { chatId });
+}

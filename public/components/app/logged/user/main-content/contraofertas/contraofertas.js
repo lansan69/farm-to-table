@@ -1,8 +1,10 @@
+import { userCache }              from '../../user.js';
 import { NegociacionesService }    from '../../../../../../assets/js/services/negociaciones.js';
 import { ChatsService }            from '../../../../../../assets/js/services/chats.js';
 import { createNegociacionCard }   from '../../../../../../assets/js/components/negociacion-components.js';
 import { createSearchBar }         from '../../../../../../assets/js/components/chat-components.js';
 import { navigate }                from '../../../../../../assets/js/app.js';
+
 const ESTADO_LABELS = {
   pendiente:              'Pendiente',
   contraoferta_productor: 'Contraoferta',
@@ -11,14 +13,14 @@ const ESTADO_LABELS = {
 };
 
 export async function init(container) {
-  const userId      = parseInt(localStorage.getItem('token'), 10) || null;
+  const userId      = userCache.userId;
   const grid        = container.querySelector('#negocGrid');
   const searchSlot  = container.querySelector('#contraofertas-search');
   const filtersWrap = container.querySelector('.filters-wrap');
   const filtersBar  = filtersWrap.querySelector('.filters');
   const toggleBtn   = filtersWrap.querySelector('.filters-toggle');
 
-  let allNegoc    = [];
+  let allNegoc     = [];
   let activeEstado = '';
   let searchQuery  = '';
 
@@ -77,12 +79,6 @@ export async function init(container) {
       btn.textContent    = ESTADO_LABELS[estado] ?? estado;
       filtersBar.appendChild(btn);
     });
-  }
-
-  function renderSkeleton(n = 6) {
-    grid.innerHTML = Array.from({ length: n })
-      .map(() => '<div class="negoc-card--skeleton"></div>')
-      .join('');
   }
 
   function renderGrid() {
@@ -144,9 +140,9 @@ export async function init(container) {
 
       // ── Second click: save ────────────────────────────────────────────
       if (editBtn.dataset.editing === 'true') {
-        const input       = card.querySelector('.negoc-offer-input');
-        const textarea    = card.querySelector('.negoc-comment-input');
-        const newMonto    = parseFloat(input?.value);
+        const input         = card.querySelector('.negoc-offer-input');
+        const textarea      = card.querySelector('.negoc-comment-input');
+        const newMonto      = parseFloat(input?.value);
         const newComentario = textarea?.value.trim() || null;
         if (!newMonto || newMonto <= 0) { input?.focus(); return; }
 
@@ -159,8 +155,8 @@ export async function init(container) {
             comentario:     newComentario,
           });
 
-          neg.ultima_oferta      = newMonto;
-          neg.ultimo_comentario  = newComentario;
+          neg.ultima_oferta     = newMonto;
+          neg.ultimo_comentario = newComentario;
 
           input.replaceWith(
             Object.assign(document.createElement('span'), {
@@ -170,8 +166,8 @@ export async function init(container) {
           );
           textarea.replaceWith(
             Object.assign(document.createElement('p'), {
-              className:   'negoc-comment',
-              innerHTML:   newComentario || '<span class="negoc-comment--empty">Sin comentario</span>',
+              className: 'negoc-comment',
+              innerHTML: newComentario || '<span class="negoc-comment--empty">Sin comentario</span>',
             })
           );
           delete editBtn.dataset.editing;
@@ -198,9 +194,9 @@ export async function init(container) {
       offerSpan.replaceWith(input);
 
       const textarea = document.createElement('textarea');
-      textarea.className = 'negoc-comment-input';
-      textarea.rows      = 2;
-      textarea.value     = neg.ultimo_comentario || '';
+      textarea.className   = 'negoc-comment-input';
+      textarea.rows        = 2;
+      textarea.value       = neg.ultimo_comentario || '';
       textarea.placeholder = 'Agregar comentario…';
       commentEl.replaceWith(textarea);
       input.focus();
@@ -211,21 +207,14 @@ export async function init(container) {
     }
   });
 
-  // ── Load ────────────────────────────────────────────────────────────────────
+  // ── Render from cache (no fetch needed) ────────────────────────────────────
 
-  renderSkeleton();
   if (!userId) {
     grid.innerHTML = '<p class="negoc-empty">Inicia sesión para ver tus negociaciones.</p>';
     return;
   }
 
-  try {
-    const data = await NegociacionesService.getByComprador(userId);
-    allNegoc   = Array.isArray(data) ? data : (data.data ?? []);
-    buildEstadoFilters(allNegoc);
-    renderGrid();
-  } catch (err) {
-    console.error('Error cargando negociaciones:', err);
-    grid.innerHTML = '<p class="negoc-empty">Error al cargar las negociaciones.</p>';
-  }
+  allNegoc = userCache.negociaciones;
+  buildEstadoFilters(allNegoc);
+  renderGrid();
 }

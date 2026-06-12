@@ -17,29 +17,42 @@ class PerfilDomain
     }
 
     /**
-     * Perfil completo del comprador: stats + valoraciones recibidas.
+     * Perfil completo del comprador: datos de v_usuarios_zona + stats + valoraciones.
+     * Los campos del usuario se devuelven al nivel raíz (sin anidar en 'ubicacion').
      */
     public function getPerfilComprador(int $idUsuario): ?array
     {
-        $perfil = $this->usuarioModel->getStatsComprador($idUsuario);
-        if ($perfil === null) return null;
+        $stats = $this->usuarioModel->getStatsComprador($idUsuario);
+        if ($stats === null) return null;
 
-        $perfil['ubicacion']   = $this->usuarioModel->findById($idUsuario);
-        $perfil['valoraciones'] = $this->valoracionModel->findByEvaluado($idUsuario);
-        return $perfil;
+        $datos = $this->usuarioModel->findByIdFromView($idUsuario) ?? [];
+
+        return array_merge($datos, [
+            'total_negociaciones'      => $stats['total_negociaciones'],
+            'negociaciones_aceptadas'  => $stats['negociaciones_aceptadas'],
+            'negociaciones_pendientes' => $stats['negociaciones_pendientes'],
+            'valoraciones'             => $this->safeGetValoraciones($idUsuario),
+        ]);
     }
 
     /**
-     * Perfil completo del productor: stats + valoraciones recibidas.
+     * Perfil completo del productor: datos de v_usuarios_zona + stats + valoraciones.
+     * Los campos del usuario se devuelven al nivel raíz (sin anidar en 'ubicacion').
      */
     public function getPerfilProductor(int $idUsuario): ?array
     {
-        $perfil = $this->usuarioModel->getStatsProductor($idUsuario);
-        if ($perfil === null) return null;
+        $stats = $this->usuarioModel->getStatsProductor($idUsuario);
+        if ($stats === null) return null;
 
-        $perfil['ubicacion']   = $this->usuarioModel->findById($idUsuario);
-        $perfil['valoraciones'] = $this->valoracionModel->findByEvaluado($idUsuario);
-        return $perfil;
+        $datos = $this->usuarioModel->findByIdFromView($idUsuario) ?? [];
+
+        return array_merge($datos, [
+            'total_lotes'           => $stats['total_lotes'],
+            'lotes_disponibles'     => $stats['lotes_disponibles'],
+            'lotes_en_negociacion'  => $stats['lotes_en_negociacion'],
+            'lotes_asignados'       => $stats['lotes_asignados'],
+            'valoraciones'          => $this->safeGetValoraciones($idUsuario),
+        ]);
     }
 
     public function getValoraciones(int $idUsuario): array
@@ -67,15 +80,40 @@ class PerfilDomain
     }
 
     /**
-     * Actualiza los datos editables del perfil (nombre, teléfono, zona).
+     * Actualiza los datos editables del perfil.
      */
-    public function updatePerfil(int $idUsuario, string $nombre, string $telefono, int $idZona): bool
+    public function updatePerfil(
+        int     $idUsuario,
+        string  $nombre,
+        ?string $apellido,
+        string  $telefono,
+        int     $idZona,
+        ?string $email = null
+    ): bool {
+        return $this->usuarioModel->update($idUsuario, $nombre, $apellido, $telefono, $idZona, $email);
+    }
+
+    /**
+     * Cambia la contraseña del usuario (hashea antes de guardar).
+     */
+    public function updatePassword(int $idUsuario, string $password): bool
     {
-        return $this->usuarioModel->update($idUsuario, $nombre, $telefono, $idZona);
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        return $this->usuarioModel->updatePassword($idUsuario, $hash);
     }
 
     public function getZonasActivas(): array
     {
         return $this->zonaModel->findAllActivas();
+    }
+
+    /** Returns valoraciones or empty array if the table does not yet exist. */
+    private function safeGetValoraciones(int $idUsuario): array
+    {
+        try {
+            return $this->valoracionModel->findByEvaluado($idUsuario);
+        } catch (\PDOException $e) {
+            return [];
+        }
     }
 }

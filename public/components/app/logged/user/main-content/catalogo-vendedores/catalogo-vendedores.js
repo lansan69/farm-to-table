@@ -1,6 +1,6 @@
-import { VendedoresService }  from '../../../../../../assets/js/services/vendedores.js';
-import { createVendorCard }   from '../../../../../../assets/js/components/vendor-components.js';
-import { createSearchBar }    from '../../../../../../assets/js/components/chat-components.js';
+import { userCache }         from '../../user.js';
+import { createVendorCard }  from '../../../../../../assets/js/components/vendor-components.js';
+import { createSearchBar }   from '../../../../../../assets/js/components/chat-components.js';
 
 export async function init(container) {
   const grid        = container.querySelector('#vendorsGrid');
@@ -9,7 +9,6 @@ export async function init(container) {
   const filtersBar  = filtersWrap.querySelector('.filters');
   const toggleBtn   = filtersWrap.querySelector('.filters-toggle');
 
-  let allVendors  = [];
   let activeZone  = '';
   let searchQuery = '';
 
@@ -70,14 +69,10 @@ export async function init(container) {
     });
   }
 
-  function renderSkeleton(n = 8) {
-    grid.innerHTML = Array.from({ length: n })
-      .map(() => '<div class="vendor-card--skeleton"></div>')
-      .join('');
-  }
-
   function renderGrid() {
-    const filtered = allVendors.filter(v => {
+    const vendors = userCache.vendedores;
+
+    const filtered = vendors.filter(v => {
       const matchesZone   = !activeZone || v.zona === activeZone;
       const matchesSearch = !searchQuery
         || (v.nombre_razon_social || '').toLowerCase().includes(searchQuery);
@@ -98,16 +93,8 @@ export async function init(container) {
     })).join('');
   }
 
-  // ── Load ──────────────────────────────────────────────────────────────────────
+  // ── Render from cache (no fetch needed) ───────────────────────────────────────
 
-  renderSkeleton();
-  try {
-    const data  = await VendedoresService.getVendedores();
-    allVendors  = Array.isArray(data) ? data : (data.data ?? []);
-    buildZoneFilters(allVendors);
-    renderGrid();
-  } catch (err) {
-    console.error('Error cargando vendedores:', err);
-    grid.innerHTML = '<p class="vendors-empty">Error al cargar vendedores.</p>';
-  }
+  buildZoneFilters(userCache.vendedores);
+  renderGrid();
 }

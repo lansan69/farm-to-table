@@ -33,6 +33,13 @@ class UsuarioModel extends BaseModel
         return $stmt->fetch() ?: null;
     }
 
+    public function findByIdFromView(int $id): ?array
+    {
+        $stmt = $this->db->prepare('SELECT * FROM v_usuarios_zona WHERE id_usuario = ?');
+        $stmt->execute([$id]);
+        return $stmt->fetch() ?: null;
+    }
+
     public function existeTelefono(string $telefono): bool
     {
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM usuarios WHERE telefono_contacto = ?');
@@ -82,12 +89,18 @@ class UsuarioModel extends BaseModel
         return (int) $this->db->lastInsertId();
     }
 
-    public function update(int $id, string $nombre, string $telefono, int $idZona, ?string $email = null): bool
+    public function update(int $id, string $nombre, ?string $apellido, string $telefono, int $idZona, ?string $email = null): bool
     {
         $stmt = $this->db->prepare(
-            'UPDATE usuarios SET nombre_razon_social = ?, telefono_contacto = ?, id_zona = ?, email = ? WHERE id_usuario = ?'
+            'UPDATE usuarios SET nombre_razon_social = ?, apellido = ?, telefono_contacto = ?, id_zona = ?, email = ? WHERE id_usuario = ?'
         );
-        return $stmt->execute([$nombre, $telefono, $idZona, $email, $id]);
+        return $stmt->execute([$nombre, $apellido, $telefono, $idZona, $email, $id]);
+    }
+
+    public function updatePassword(int $id, string $hash): bool
+    {
+        $stmt = $this->db->prepare('UPDATE usuarios SET hash_contrasena = ? WHERE id_usuario = ?');
+        return $stmt->execute([$hash, $id]);
     }
 
     public function findByGoogleId(string $googleId): ?array

@@ -3,9 +3,13 @@
 //
 // GET  ?id_usuario=N&rol=comprador       → perfil comprador (stats + valoraciones)
 // GET  ?id_usuario=N&rol=productor       → perfil productor (stats + valoraciones)
+// GET  ?action=zonas                     → lista de zonas operativas activas
 //
-// PUT  {id_usuario, nombre,
+// PUT  {id_usuario, nombre, apellido?,
 //       telefono, id_zona, email?}       → actualiza datos editables del perfil
+//
+// PUT  {action:'password',
+//       id_usuario, password}            → cambia contraseña (se hashea en backend)
 //
 // POST {action:'valoracion',
 //       id_entrega, id_evaluador,
@@ -30,6 +34,13 @@ match (Router::method()) {
 
 function handleGet(PerfilDomain $domain): void
 {
+    $action = Router::query('action');
+
+    if ($action === 'zonas') {
+        json_ok($domain->getZonasActivas());
+        return;
+    }
+
     $idUsuario = Router::query('id_usuario');
     if ($idUsuario === null) {
         json_error('Se requiere id_usuario.', 422);
@@ -51,19 +62,48 @@ function handleGet(PerfilDomain $domain): void
 
 function handlePut(PerfilDomain $domain): void
 {
-    $body = Router::body();
+    $body   = Router::body();
+    $action = $body['action'] ?? 'update';
+
+    match ($action) {
+        'password' => cambiarPassword($domain, $body),
+        default    => actualizarPerfil($domain, $body),
+    };
+}
+
+function actualizarPerfil(PerfilDomain $domain, array $body): void
+{
     Router::requireFields(['id_usuario', 'nombre', 'telefono', 'id_zona'], $body);
 
     $ok = $domain->updatePerfil(
-        idUsuario: (int) $body['id_usuario'],
-        nombre:         trim($body['nombre']),
-        telefono:       trim($body['telefono']),
-        idZona:    (int) $body['id_zona']
+        idUsuario: (int)    $body['id_usuario'],
+        nombre:             trim($body['nombre']),
+        apellido:           isset($body['apellido']) ? trim($body['apellido']) : null,
+        telefono:           trim($body['telefono']),
+        idZona:    (int)    $body['id_zona'],
+        email:              isset($body['email'])    ? trim($body['email'])    : null,
     );
 
     $ok
         ? json_ok()
         : json_error('No se pudo actualizar el perfil.', 500);
+}
+
+function cambiarPassword(PerfilDomain $domain, array $body): void
+{
+    Router::requireFields(['id_usuario', 'password'], $body);
+
+    $password = trim($body['password']);
+    if (strlen($password) < 6) {
+        json_error('La contraseña debe tener al menos 6 caracteres.', 422);
+        return;
+    }
+
+    $ok = $domain->updatePassword((int) $body['id_usuario'], $password);
+
+    $ok
+        ? json_ok()
+        : json_error('No se pudo actualizar la contraseña.', 500);
 }
 
 // ── POST ──────────────────────────────────────────────────────────────────────

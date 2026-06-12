@@ -33,12 +33,22 @@ export function createNegociacionCard({
   precioReal     = 0,
   estado      = 'pendiente',
   comentario  = '',
+  mode        = 'comprador',   // 'comprador' | 'productor'
 }) {
-  const initial   = (nombre || '?')[0].toUpperCase();
-  const color     = AVATAR_COLORS[idLote % AVATAR_COLORS.length];
-  const estadoLbl = ESTADO_LABELS[estado] ?? estado;
-  const estadoMod = ESTADO_MODS[estado]   ?? '';
-  const fmt       = (n) => `$${Number(n).toFixed(2)}`;
+  const initial    = (nombre || '?')[0].toUpperCase();
+  const color      = AVATAR_COLORS[idLote % AVATAR_COLORS.length];
+  const estadoLbl  = ESTADO_LABELS[estado] ?? estado;
+  const estadoMod  = ESTADO_MODS[estado]   ?? '';
+  const fmt        = (n) => `$${Number(n).toFixed(2)}`;
+  const isTerminal = ['aceptada', 'rechazada'].includes(estado);
+  const dis        = isTerminal ? 'disabled' : '';
+
+  const actionsHtml = mode === 'productor'
+    ? `<button class="negoc-btn negoc-btn--msg"    data-id="${id}" ${dis}>Enviar mensaje</button>
+       <button class="negoc-btn negoc-btn--reject"  data-id="${id}" ${dis}>Rechazar</button>
+       <button class="negoc-btn negoc-btn--accept"  data-id="${id}" ${dis}>Aceptar</button>`
+    : `<button class="negoc-btn negoc-btn--msg"    data-id="${id}" ${dis}>Enviar mensaje</button>
+       <button class="negoc-btn negoc-btn--edit"   data-id="${id}" ${dis}>Modificar oferta</button>`;
 
   return `
     <article class="negoc-card" data-id="${id}">
@@ -51,7 +61,7 @@ export function createNegociacionCard({
         <p class="negoc-zona">${LOCATION_ICON} ${zona || 'Sin zona'}</p>
         <div class="negoc-row">
           <div class="negoc-price-block">
-            <span class="negoc-price-label">Mi oferta</span>
+            <span class="negoc-price-label">Oferta actual</span>
             <span class="negoc-price-value negoc-price-value--offer">${fmt(precioOfertado)}</span>
           </div>
           <div class="negoc-price-block">
@@ -62,10 +72,7 @@ export function createNegociacionCard({
         </div>
         <p class="negoc-comment">${comentario || '<span class="negoc-comment--empty">Sin comentario</span>'}</p>
         <div class="negoc-actions">
-          <button class="negoc-btn negoc-btn--msg"  data-id="${id}"
-           ${['aceptada','rechazada'].includes(estado) ? 'disabled' : ''}>Enviar mensaje</button>
-          <button class="negoc-btn negoc-btn--edit" data-id="${id}"
-            ${['aceptada','rechazada'].includes(estado) ? 'disabled' : ''}>Modificar oferta</button>
+          ${actionsHtml}
         </div>
       </div>
     </article>

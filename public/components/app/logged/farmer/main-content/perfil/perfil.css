@@ -1,0 +1,505 @@
+    :root {
+      --green-dark:   #2d6a2d;
+      --green-mid:    #3e8e3e;
+      --green-light:  #e8f5e8;
+      --green-pill:   #c8ebc8;
+      --gray-bg:      #f4f6f4;
+      --gray-card:    #ffffff;
+      --gray-border:  #e0e7e0;
+      --gray-muted:   #8a9e8a;
+      --gray-label:   #6b7c6b;
+      --text-main:    #1a2e1a;
+      --radius-card:  14px;
+      --radius-btn:   999px;
+      --radius-input: 8px;
+      --shadow-card:  0 1px 6px rgba(0,0,0,0.07);
+    }
+
+.perfil-page {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    color: var(--color-dark);
+    padding: 2vw;
+}
+
+/* ══════════════════════════
+       SIDEBAR
+    ══════════════════════════ */
+.sidebar-info {
+    background: var(--gray-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 28px 22px;
+    gap: 0;
+    margin: 0 20px 0 0;
+}
+
+/* Avatar */
+.sidebar-info__image-container {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 16px;
+}
+
+.sidebar-info__avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: #d8e8d8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.sidebar-info__avatar svg {
+    width: 52px;
+    height: 52px;
+    color: var(--gray-muted);
+    fill: var(--gray-muted);
+}
+
+.sidebar-info__avatar-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 28px;
+    height: 28px;
+    background: var(--green-dark);
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.sidebar-info__avatar-badge svg {
+    width: 13px;
+    height: 13px;
+    stroke: #fff;
+    fill: none;
+}
+
+/* Name + role */
+.sidebar-info__name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+    color: var(--text-main);
+}
+
+.sidebar-info__role-pill {
+    display: inline-block;
+    background: var(--green-pill);
+    color: var(--green-dark);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 14px;
+    border-radius: var(--radius-btn);
+    margin: 0 auto 18px;
+}
+
+.sidebar-info__divider {
+    border: none;
+    border-top: 1px solid var(--gray-border);
+    margin: 4px 0 18px;
+}
+
+/* Data rows */
+.sidebar-info__field {
+    margin-bottom: 14px;
+}
+
+.sidebar-info__field-label {
+    font-size: 0.7rem;
+    color: var(--gray-label);
+    margin-bottom: 2px;
+    letter-spacing: 0.02em;
+}
+
+.sidebar-info__field-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* Edit button */
+.negoc-btn {
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.18s, transform 0.1s;
+}
+
+.negoc-btn--msg {
+    background: var(--green-dark);
+    color: #fff;
+    border-radius: var(--radius-btn);
+    padding: 11px 20px;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.negoc-btn--msg:hover {
+    background: var(--green-mid);
+    transform: translateY(-1px);
+}
+
+/* ══════════════════════════
+       MAIN AREA
+    ══════════════════════════ */
+.rest-of-info {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.info-card {
+    background: var(--gray-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 24px 26px;
+}
+
+.info-card__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-main);
+}
+
+/* ── Tipo de Cuenta ── */
+.account-type-options {
+    display: flex;
+    gap: 14px;
+}
+
+.account-type-option {
+    flex: 1;
+    border: 2px solid var(--gray-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.account-type-option.active {
+    border-color: var(--green-dark);
+    background: var(--green-light);
+}
+
+.account-type-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.account-type-option__radio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-border);
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.account-type-option.active .account-type-option__radio {
+    border-color: var(--green-dark);
+    background: var(--green-dark);
+    box-shadow: inset 0 0 0 3px #fff;
+}
+
+.account-type-option__text strong {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.account-type-option__text span {
+    font-size: 0.75rem;
+    color: var(--gray-muted);
+}
+
+/* ── Historial ── */
+.activity-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-border);
+}
+
+.activity-row:last-child {
+    border-bottom: none;
+}
+
+.activity-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--green-dark);
+    flex-shrink: 0;
+}
+
+.activity-desc {
+    flex: 1;
+    font-size: 0.88rem;
+}
+
+.activity-date {
+    font-size: 0.78rem;
+    color: var(--gray-muted);
+    white-space: nowrap;
+}
+
+.activity-status {
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: var(--radius-btn);
+    white-space: nowrap;
+}
+
+/* ── Bottom row ── */
+.bottom-row {
+    display: flex;
+    gap: 18px;
+}
+
+.bottom-row .info-card {
+    flex: 1;
+    margin: 0;
+}
+
+/* Password */
+.password-input-wrap {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.password-field-wrap {
+    position: relative;
+    flex: 1;
+}
+
+.password-field-wrap input {
+    width: 100%;
+    border: 1.5px solid var(--gray-border);
+    border-radius: var(--radius-input);
+    padding: 10px 38px 10px 12px;
+    font-size: 0.88rem;
+    outline: none;
+    color: var(--text-main);
+    transition: border-color 0.15s;
+}
+
+.password-field-wrap input:focus {
+    border-color: var(--green-dark);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: var(--gray-muted);
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    fill: none;
+}
+
+.negoc-btn--modificar {
+    background: var(--green-dark);
+    color: #fff;
+    border-radius: var(--radius-btn);
+    padding: 10px 22px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.negoc-btn--modificar:hover {
+    background: var(--green-mid);
+}
+
+/* Cerrar sesión */
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    color: var(--text-main);
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: var(--radius-card);
+    transition: background 0.15s;
+}
+
+.logout-btn:hover {
+    background: #fdf0f0;
+    color: #b91c1c;
+}
+
+.logout-btn:hover svg {
+    stroke: #b91c1c;
+}
+
+.logout-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--text-main);
+    fill: none;
+    transition: stroke 0.15s;
+}
+
+/* ── Edit-info modal ── */
+.perfil-modal-label {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--gray-label);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+}
+
+.perfil-modal-input {
+    width: 100%;
+    border: 1.5px solid var(--gray-border);
+    border-radius: var(--radius-input);
+    padding: 9px 12px;
+    font-size: 0.88rem;
+    color: var(--text-main);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: auto;
+}
+
+.perfil-modal-input:focus {
+    border-color: var(--green-dark);
+}
+
+.perfil-save-btn {
+    background: var(--green-dark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-btn);
+    padding: 10px 26px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.perfil-save-btn:hover:not(:disabled) {
+    background: var(--green-mid);
+}
+
+.perfil-save-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.perfil-cancel-btn {
+    background: none;
+    color: var(--gray-muted);
+    border: 1.5px solid var(--gray-border);
+    border-radius: var(--radius-btn);
+    padding: 10px 26px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.perfil-cancel-btn:hover {
+    border-color: var(--gray-muted);
+    color: var(--text-main);
+}
+
+/* ── Vendedor rating card ── */
+.rating-stars {
+    display: flex;
+    gap: 4px;
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+}
+
+.star { transition: color 0.1s; }
+.star--full  { color: #f5a623; }
+.star--half  { color: #f5a623; opacity: 0.55; }
+.star--empty { color: #d9d9d9; }
+
+.rating-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 10px;
+}
+
+.rating-max {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--gray-muted);
+}
+
+.rating-lotes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 0;
+    font-size: 0.82rem;
+    color: var(--gray-label);
+}
+
+.lote-stat { }
+.lote-stat strong { color: var(--text-main); }
+.lote-stat--sep { margin: 0 8px; color: var(--gray-border); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .perfil-page {
+        flex-direction: column !important;
+        padding: 16px;
+    }
+
+    .sidebar-info,
+    .rest-of-info {
+        flex: 1 1 100% !important;
+        width: 100%;
+    }
+
+    .bottom-row {
+        flex-direction: column;
+    }
+
+    .account-type-options {
+        flex-direction: column;
+    }
+}

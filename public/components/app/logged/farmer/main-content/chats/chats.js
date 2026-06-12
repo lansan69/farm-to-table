@@ -1,3 +1,4 @@
+import { farmerCache } from '../../farmer.js';
 import {
   createSearchBar,
   createContactCard,
@@ -5,14 +6,19 @@ import {
   createChatMessage,
   createMessageInput,
   createEmptyState,
-  createContactSkeleton,
-  createMessagesSkeleton,
 } from '../../../../../../assets/js/components/chat-components.js';
 import { ChatsService } from '../../../../../../assets/js/services/chats.js';
-import { initAbly, subscribeToChat, publishMessage } from '../../../../../../assets/js/ably.js';
-import { toastNotification, toastContactoReportado, toastConversacionEliminada, toastConfirm } from '../../../../../../assets/js/toast.js';
+import {
+  initAbly,
+  subscribeToChat,
+  publishMessage,
+  subscribeToInbox,
+  notifyInbox,
+} from '../../../../../../assets/js/ably.js';
+import { toastNotification, toastContactoReportado } from '../../../../../../assets/js/toast.js';
 
 const AVATAR_COLORS = ['#1B853F', '#00796B', '#85B72C', '#E74C3C', '#E67E22', '#9B59B6', '#3498DB', '#1ABC9C'];
+const CLOSED_STATES  = ['aceptada', 'rechazada'];
 
 // ── Time helpers ──────────────────────────────────────────────────────────────
 
@@ -45,15 +51,23 @@ function formatMessageTime(dateStr) {
 // ── Data mappers ──────────────────────────────────────────────────────────────
 
 function apiChatToContact(row, index) {
-  const apellido = row.contact_apellido ? ` ${row.contact_apellido}` : '';
+  const apellido  = row.contact_apellido ? ` ${row.contact_apellido}` : '';
+  const closed    = CLOSED_STATES.includes(row.estado_negociacion);
+  // Derive the other user's ID from the two-participant columns
+  const contactId = row.my_role === 'a'
+    ? parseInt(row.usuario_b, 10)
+    : parseInt(row.usuario_a, 10);
   return {
-    id:          row.chat_id,
-    name:        row.contact_name + apellido,
-    lastMessage: row.last_message  || '',
-    time:        formatContactTime(row.last_message_time),
-    unread:      0,
-    online:      false,
-    color:       AVATAR_COLORS[index % AVATAR_COLORS.length],
+    id:                row.chat_id,
+    contactId,
+    name:              row.contact_name + apellido,
+    lastMessage:       row.last_message       || '',
+    time:              formatContactTime(row.last_message_time),
+    unread:            0,
+    online:            false,
+    color:             AVATAR_COLORS[index % AVATAR_COLORS.length],
+    estadoNegociacion: row.estado_negociacion,
+    closed,
   };
 }
 
@@ -67,17 +81,22 @@ function apiMsgToMsg(msg, userId) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
+let _unsubscribers = [];
+
 export async function init(container) {
-  const userId = parseInt(localStorage.getItem('token'), 10);
+  _unsubscribers = [];
+  const userId = farmerCache.userId;
 
-  let contacts   = [];
-  let activeId   = null;
-  let searchTerm = '';
+  let contacts     = [];
+  let activeId     = null;
+  let searchTerm   = '';
+  let filterEstado = '';
 
-  // Per-chat message cache: chatId → [{text, time, sent}]
   const msgCache = new Map();
+  const unsubscribers = _unsubscribers;
 
   const searchSlot = container.querySelector('#contact-search');
+  const filtersBar = container.querySelector('#chat-filters');
   const itemsSlot  = container.querySelector('#contact-items');
   const headerSlot = container.querySelector('#chat-header');
   const msgsSlot   = container.querySelector('#chat-messages');
@@ -90,30 +109,69 @@ export async function init(container) {
   const inputField = inputSlot.querySelector('.message-input__field');
   const sendBtn    = inputSlot.querySelector('.message-input__send');
 
-  // ── Load contact list + all messages in one shot ─────────────────────
-  itemsSlot.innerHTML = createContactSkeleton(7);
-  try {
-    const rows = await ChatsService.getChats(userId);
-    contacts = rows.map((r, i) => {
-      const contact = apiChatToContact(r, i);
-      // Pre-populate cache — clicking any contact is instant from here on
-      msgCache.set(contact.id, (r.messages ?? []).map(m => apiMsgToMsg(m, userId)));
-      return contact;
-    });
-  } catch (err) {
-    console.error('Error cargando chats:', err);
-  }
+  // ── Build contacts from cache (instant render) ────────────────────────
+  const cachedRows = farmerCache.chats ?? [];
+  contacts = cachedRows.map((r, i) => {
+    const contact = apiChatToContact(r, i);
+    msgCache.set(contact.id, (r.messages ?? []).map(m => apiMsgToMsg(m, userId)));
+    return contact;
+  });
   renderContacts();
 
-  // ── Ably real-time subscriptions ──────────────────────────────────────
+  // Auto-open a specific chat if another page requested it
+  const pendingChatId = sessionStorage.getItem('openChatId');
+  if (pendingChatId) {
+    sessionStorage.removeItem('openChatId');
+    const id = parseInt(pendingChatId, 10);
+    if (contacts.some(c => c.id === id)) openChat(id);
+  }
+
+  // ── Ably real-time ────────────────────────────────────────────────────
   try {
     await initAbly(userId);
-    contacts.forEach(contact => {
-      subscribeToChat(contact.id, msg => handleIncomingMessage(contact.id, msg));
+
+    // Subscribe to every known chat channel
+    contacts.forEach(c => {
+      const unsub = subscribeToChat(c.id, msg => handleIncomingMessage(c.id, msg));
+      unsubscribers.push(unsub);
     });
+
+    // Personal inbox: fires when someone sends us a message on a chat
+    // we weren't subscribed to (new chat or first message after shell load).
+    const inboxUnsub = subscribeToInbox(userId, handleInboxPing);
+    unsubscribers.push(inboxUnsub);
+
   } catch (err) {
     console.error('Error inicializando Ably:', err);
   }
+
+  // ── Background refresh: catch stale last-messages + new chats ─────────
+  ChatsService.getChats(userId).then(freshRows => {
+    if (!Array.isArray(freshRows)) return;
+    const knownIds = new Set(contacts.map(c => c.id));
+    let changed = false;
+
+    freshRows.forEach((r, i) => {
+      if (knownIds.has(r.chat_id)) {
+        // Update stale last-message for non-active contacts
+        const c = contacts.find(c => c.id === r.chat_id);
+        if (c && r.last_message !== undefined && r.last_message !== c.lastMessage) {
+          c.lastMessage = r.last_message || '';
+          c.time        = formatContactTime(r.last_message_time);
+          if (c.id !== activeId) {
+            msgCache.set(c.id, (r.messages ?? []).map(m => apiMsgToMsg(m, userId)));
+          }
+          changed = true;
+        }
+      } else {
+        // Brand-new chat that wasn't in the shell cache
+        addNewChat(r, contacts.length + i);
+        changed = true;
+      }
+    });
+
+    if (changed) renderContacts();
+  }).catch(() => {});
 
   // ── Send (optimistic) ─────────────────────────────────────────────────
   async function sendMessage() {
@@ -122,12 +180,12 @@ export async function init(container) {
     if (!text) return;
 
     const contact = contacts.find(c => c.id === activeId);
-    const time    = formatMessageTime(new Date().toISOString());
-    const msg     = { text, time, sent: true };
+    if (contact?.closed) return;
 
-    // Update cache and DOM immediately — no waiting for the server
+    const time = formatMessageTime(new Date().toISOString());
+
     const cached = msgCache.get(activeId) ?? [];
-    cached.push(msg);
+    cached.push({ text, time, sent: true });
     msgCache.set(activeId, cached);
 
     msgsSlot.insertAdjacentHTML('beforeend', createChatMessage(text, time, true));
@@ -139,18 +197,21 @@ export async function init(container) {
     inputField.focus();
     renderContacts();
 
-    // Publish to Ably so the recipient receives it in real-time
     publishMessage(activeId, { text, time });
 
-    // Confirm with server in background
+    // Ping recipient's inbox so their contact list updates instantly
+    if (contact.contactId) {
+      notifyInbox(contact.contactId, activeId).catch(() => {});
+    }
+
     ChatsService.sendMessage(activeId, userId, text).catch(err => {
       console.error('Error enviando mensaje:', err);
     });
   }
 
-  // ── Handle a message arriving from the other participant ──────────────
+  // ── Incoming real-time message on a subscribed chat channel ───────────
   function handleIncomingMessage(chatId, msg) {
-    if (msg.clientId === String(userId)) return; // own message already shown optimistically
+    if (msg.clientId === String(userId)) return;
 
     const { text, time } = msg.data;
     const contact = contacts.find(c => c.id === chatId);
@@ -165,6 +226,7 @@ export async function init(container) {
       msgsSlot.scrollTop = msgsSlot.scrollHeight;
     } else {
       contact.unread = (contact.unread || 0) + 1;
+      toastNotification({ title: contact.name, body: text, time });
     }
 
     contact.lastMessage = text;
@@ -172,8 +234,46 @@ export async function init(container) {
     renderContacts();
   }
 
+  // ── Personal inbox ping: a new or unseen chat sent us a message ───────
+  function handleInboxPing(msg) {
+    const chatId = msg.data?.chatId;
+    if (!chatId) return;
+
+    // If we're already subscribed to this chat, handleIncomingMessage covers it
+    if (contacts.some(c => c.id === chatId)) return;
+
+    // Unknown chat — fetch and add it
+    ChatsService.getChats(userId).then(rows => {
+      if (!Array.isArray(rows)) return;
+      const row = rows.find(r => r.chat_id === chatId);
+      if (!row) return;
+      if (contacts.some(c => c.id === chatId)) return; // race guard
+      addNewChat(row, contacts.length);
+      renderContacts();
+    }).catch(() => {});
+  }
+
+  // ── Add a newly discovered chat ───────────────────────────────────────
+  function addNewChat(row, index) {
+    const contact = apiChatToContact(row, index);
+    msgCache.set(contact.id, (row.messages ?? []).map(m => apiMsgToMsg(m, userId)));
+    contacts.push(contact);
+    const unsub = subscribeToChat(contact.id, msg => handleIncomingMessage(contact.id, msg));
+    unsubscribers.push(unsub);
+  }
+
   sendBtn.addEventListener('click', sendMessage);
   inputField.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+  // ── Filters ───────────────────────────────────────────────────────────
+  filtersBar.addEventListener('click', e => {
+    const btn = e.target.closest('.chat-filter');
+    if (!btn) return;
+    filtersBar.querySelectorAll('.chat-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterEstado = btn.dataset.filter;
+    renderContacts();
+  });
 
   // ── Search ────────────────────────────────────────────────────────────
   searchSlot.querySelector('.chat-search-bar__input').addEventListener('input', e => {
@@ -183,9 +283,15 @@ export async function init(container) {
 
   // ── Render contact list ───────────────────────────────────────────────
   function renderContacts() {
-    const filtered = contacts.filter(c =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const term = searchTerm.toLowerCase();
+
+    const filtered = contacts.filter(c => {
+      const matchSearch = c.name.toLowerCase().includes(term);
+      const matchFilter = filterEstado === ''
+        ? true
+        : filterEstado === 'terminadas' ? c.closed : !c.closed;
+      return matchSearch && matchFilter;
+    });
 
     itemsSlot.innerHTML = filtered.map(c => createContactCard(c)).join('');
 
@@ -200,7 +306,7 @@ export async function init(container) {
   }
 
   // ── Open a conversation ───────────────────────────────────────────────
-  async function openChat(id) {
+  function openChat(id) {
     const contact = contacts.find(c => c.id === id);
     if (!contact) return;
 
@@ -209,37 +315,28 @@ export async function init(container) {
 
     headerSlot.innerHTML = createChatHeader(contact);
 
-    headerSlot.querySelector('.btn-report').addEventListener('click', () => {
+    headerSlot.querySelector('.btn-report')?.addEventListener('click', () => {
       toastContactoReportado(contact.name);
     });
 
-    headerSlot.querySelector('.btn-delete-chat').addEventListener('click', () => {
-      toastConfirm({
-        message:       `¿Eliminar la conversación con "${contact.name}"?`,
-        confirmLabel:  'Eliminar',
-        onConfirm: () => {
-          msgCache.delete(id);
-          contacts             = contacts.filter(c => c.id !== id);
-          activeId             = null;
-          headerSlot.innerHTML = '';
-          msgsSlot.innerHTML   = createEmptyState();
-          renderContacts();
-          toastConversacionEliminada(contact.name);
-          ChatsService.deleteChat(id, userId).catch(err => {
-            console.error('Error eliminando chat:', err);
-          });
-        },
-      });
-    });
+    inputField.disabled    = contact.closed;
+    sendBtn.disabled       = contact.closed;
+    inputField.placeholder = contact.closed
+      ? 'La negociación ha finalizado'
+      : 'Escribe un mensaje...';
 
-    // Cache is always warm after the initial load — render is synchronous
     renderMessages(msgCache.get(id) ?? []);
     renderContacts();
   }
 
-  // ── Render messages into the panel ────────────────────────────────────
+  // ── Render messages ───────────────────────────────────────────────────
   function renderMessages(msgs) {
     msgsSlot.innerHTML = msgs.map(m => createChatMessage(m.text, m.time, m.sent)).join('');
     msgsSlot.scrollTop = msgsSlot.scrollHeight;
   }
+}
+
+export function cleanup() {
+  _unsubscribers.forEach(fn => { try { fn(); } catch {} });
+  _unsubscribers = [];
 }
