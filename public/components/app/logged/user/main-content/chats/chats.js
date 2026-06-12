@@ -1,4 +1,4 @@
-import { userCache } from '../../user.js';
+import { userCache, updateChat} from '../../user.js';
 import {
   createSearchBar,
   createContactCard,
@@ -19,6 +19,7 @@ import { toastNotification, toastContactoReportado } from '../../../../../../ass
 
 const AVATAR_COLORS = ['#1B853F', '#00796B', '#85B72C', '#E74C3C', '#E67E22', '#9B59B6', '#3498DB', '#1ABC9C'];
 const CLOSED_STATES  = ['aceptada', 'rechazada'];
+const BACK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
 
 // ── Time helpers ──────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ function apiMsgToMsg(msg, userId) {
 let _unsubscribers = [];
 
 export async function init(container) {
+  console.log("init");
   _unsubscribers = [];
   const userId = userCache.userId;
 
@@ -95,6 +97,7 @@ export async function init(container) {
   const msgCache = new Map();
   const unsubscribers = _unsubscribers;
 
+  const layout     = container.querySelector('.chat-layout');
   const searchSlot = container.querySelector('#contact-search');
   const filtersBar = container.querySelector('#chat-filters');
   const itemsSlot  = container.querySelector('#contact-items');
@@ -117,11 +120,10 @@ export async function init(container) {
     return contact;
   });
   renderContacts();
-
   // Auto-open a specific chat if another page requested it
   const pendingChatId = sessionStorage.getItem('openChatId');
+  console.log("init Opening chatID", pendingChatId);
   if (pendingChatId) {
-    sessionStorage.removeItem('openChatId');
     const id = parseInt(pendingChatId, 10);
     if (contacts.some(c => c.id === id)) openChat(id);
   }
@@ -144,34 +146,6 @@ export async function init(container) {
   } catch (err) {
     console.error('Error inicializando Ably:', err);
   }
-
-  // ── Background refresh: catch stale last-messages + new chats ─────────
-  ChatsService.getChats(userId).then(freshRows => {
-    if (!Array.isArray(freshRows)) return;
-    const knownIds = new Set(contacts.map(c => c.id));
-    let changed = false;
-
-    freshRows.forEach((r, i) => {
-      if (knownIds.has(r.chat_id)) {
-        // Update stale last-message for non-active contacts
-        const c = contacts.find(c => c.id === r.chat_id);
-        if (c && r.last_message !== undefined && r.last_message !== c.lastMessage) {
-          c.lastMessage = r.last_message || '';
-          c.time        = formatContactTime(r.last_message_time);
-          if (c.id !== activeId) {
-            msgCache.set(c.id, (r.messages ?? []).map(m => apiMsgToMsg(m, userId)));
-          }
-          changed = true;
-        }
-      } else {
-        // Brand-new chat that wasn't in the shell cache
-        addNewChat(r, contacts.length + i);
-        changed = true;
-      }
-    });
-
-    if (changed) renderContacts();
-  }).catch(() => {});
 
   // ── Send (optimistic) ─────────────────────────────────────────────────
   async function sendMessage() {
@@ -204,9 +178,11 @@ export async function init(container) {
       notifyInbox(contact.contactId, activeId).catch(() => {});
     }
 
-    ChatsService.sendMessage(activeId, userId, text).catch(err => {
+    await ChatsService.sendMessage(activeId, userId, text).catch(err => {
       console.error('Error enviando mensaje:', err);
     });
+
+    updateChat();
   }
 
   // ── Incoming real-time message on a subscribed chat channel ───────────
@@ -311,9 +287,18 @@ export async function init(container) {
     if (!contact) return;
 
     activeId       = id;
+    sessionStorage.setItem('openChatId', activeId);
     contact.unread = 0;
 
     headerSlot.innerHTML = createChatHeader(contact);
+
+    // Inject back button (visible only on mobile via CSS)
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.className = 'chat-back-btn';
+    backBtn.innerHTML = BACK_ICON;
+    backBtn.addEventListener('click', goBack);
+    headerSlot.querySelector('.chat-header__left').prepend(backBtn);
 
     headerSlot.querySelector('.btn-report')?.addEventListener('click', () => {
       toastContactoReportado(contact.name);
@@ -325,7 +310,22 @@ export async function init(container) {
       ? 'La negociación ha finalizado'
       : 'Escribe un mensaje...';
 
+    layout.classList.add('chat--view-window');
+
     renderMessages(msgCache.get(id) ?? []);
+    renderContacts();
+  }
+
+  // ── Go back to contact list (mobile) ─────────────────────────────────
+  function goBack() {
+    layout.classList.remove('chat--view-window');
+    sessionStorage.removeItem('openChatId');
+    activeId = null;
+    msgsSlot.innerHTML = createEmptyState();
+    headerSlot.innerHTML = '';
+    inputField.disabled = false;
+    sendBtn.disabled = false;
+    inputField.placeholder = 'Escribe un mensaje...';
     renderContacts();
   }
 

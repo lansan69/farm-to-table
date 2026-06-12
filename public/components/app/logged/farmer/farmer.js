@@ -47,3 +47,9 @@ export async function cleanup() {
   farmerCache.negociaciones = [];
   farmerCache.chats         = [];
 }
+
+export async function updateChat() {
+  console.log("Before update chat", farmerCache.chats);
+  farmerCache.chats = farmerCache.userId ? await ChatsService.getChats(farmerCache.userId).catch(e => { console.error('[farmer] chats:', e); return []; }) : [];
+  console.log("Update chat", farmerCache.chats);
+}

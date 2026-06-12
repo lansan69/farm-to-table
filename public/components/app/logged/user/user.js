@@ -63,6 +63,8 @@ export async function cleanup() {
   userCache.perfil        = null;
 }
 
-function updateChats(chats){
-   userCache.chats = chats;
+export async function updateChat() {
+  console.log("Before update chat", userCache.chats);
+  userCache.chats = userCache.userId ? await ChatsService.getChats(userCache.userId).catch(e => { console.error('[farmer] chats:', e); return []; }) : [];
+  console.log("Update chat", userCache.chats);
 }
