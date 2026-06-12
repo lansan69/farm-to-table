@@ -145,10 +145,10 @@ async function router() {
     // Si la shell es la misma, solo descarga la página anterior
     if (currentRoute) await unloadComponent(currentRoute.page);
   }
-
   // Carga la nueva página dentro del contenedor de contenido
   const pageContainer = app.querySelector('#page-content');
   await loadComponent(route.page, pageContainer);
+  
   currentRoute = route;
 }
 
