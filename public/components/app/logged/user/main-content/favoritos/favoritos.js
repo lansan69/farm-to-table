@@ -1,7 +1,8 @@
-import { createSearchBar }   from '../../../../../../assets/js/components/chat-components.js';
-import { createProductCard } from '../../../../../../assets/js/components/marketplace-components.js';
-import { FavoritosService }  from '../../../../../../assets/js/services/favoritos.js';
-import { toastSuccess }      from '../../../../../../assets/js/toast.js';
+import { userCache }          from '../../user.js';
+import { createSearchBar }    from '../../../../../../assets/js/components/chat-components.js';
+import { createProductCard }  from '../../../../../../assets/js/components/marketplace-components.js';
+import { FavoritosService }   from '../../../../../../assets/js/services/favoritos.js';
+import { toastSuccess }       from '../../../../../../assets/js/toast.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ function mapFavorito(f) {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export async function init(container) {
-  const userId       = parseInt(localStorage.getItem('token'), 10) || null;
+  const userId       = userCache.userId;
   const searchSlot   = container.querySelector('#market-search');
   const productsGrid = container.querySelector('#productsGrid');
   const filtersWrap  = container.querySelector('.filters-wrap');
@@ -38,34 +39,22 @@ export async function init(container) {
   let currentCatId = 0;
   let searchTerm   = '';
 
-  // ── Skeleton ───────────────────────────────────────────────────────────
-  productsGrid.innerHTML = Array(4).fill(
-    '<div class="product-card product-card--skeleton"></div>'
-  ).join('');
+  // ── Populate from cache (no fetch needed) ─────────────────────────────
+  allProducts = (userId ? userCache.favoritos : []).map(mapFavorito);
 
-  // ── Load favorites ─────────────────────────────────────────────────────
-  try {
-    const favs  = userId ? await FavoritosService.getFavoritos(userId) : [];
-    allProducts = favs.map(mapFavorito);
+  const seenCats = new Map();
+  allProducts.forEach(p => {
+    if (!seenCats.has(p.catId)) seenCats.set(p.catId, p.catName);
+  });
+  seenCats.forEach((name, id) => {
+    const btn = document.createElement('button');
+    btn.className     = 'filter';
+    btn.dataset.catId = id;
+    btn.textContent   = name;
+    filtersEl.appendChild(btn);
+  });
 
-    // Build category filter buttons from the unique categories in this user's favorites
-    const seenCats = new Map();
-    allProducts.forEach(p => {
-      if (!seenCats.has(p.catId)) seenCats.set(p.catId, p.catName);
-    });
-    seenCats.forEach((name, id) => {
-      const btn = document.createElement('button');
-      btn.className     = 'filter';
-      btn.dataset.catId = id;
-      btn.textContent   = name;
-      filtersEl.appendChild(btn);
-    });
-
-    renderProducts();
-  } catch (err) {
-    console.error('Error cargando favoritos:', err);
-    productsGrid.innerHTML = '<p class="market-empty">No se pudieron cargar los favoritos.</p>';
-  }
+  renderProducts();
 
   // ── Hamburger toggle ──────────────────────────────────────────────────
   toggleBtn?.addEventListener('click', () => {
@@ -106,15 +95,15 @@ export async function init(container) {
     const lotId   = parseInt(btn.dataset.id);
     const product = allProducts.find(p => p.id === lotId);
 
-    // Optimistic: drop from list and re-render immediately
     allProducts = allProducts.filter(p => p.id !== lotId);
+    // Keep cache in sync so marketplace reflects the removal
+    userCache.favoritos = userCache.favoritos.filter(f => f.id_lote !== lotId);
     renderProducts();
     toastSuccess(`"${product?.name}" eliminado de favoritos.`);
 
     try {
       await FavoritosService.toggleFavorito(userId, lotId);
     } catch (err) {
-      // Revert on API failure
       if (product) allProducts.push(product);
       renderProducts();
       console.error('Error eliminando favorito:', err);

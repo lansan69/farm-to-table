@@ -1,5 +1,5 @@
 /* ── Layout ─────────────────────────────────────────────────────────────── */
-.chat-layout {
+.farmer-chat {
   display: flex;
   width: 100%;
   flex: 1;
@@ -9,7 +9,7 @@
 }
 
 /* ── Contact List ──────────────────────────────────────────────────────── */
-.contact-list {
+.farmer-chat .contact-list {
   width: 300px;
   flex-shrink: 0;
   display: flex;
@@ -19,21 +19,21 @@
   overflow: hidden;
 }
 
-.contact-list__search {
+.farmer-chat .contact-list__search {
   padding: 10px 12px;
   border-bottom: 1px solid var(--color-nav-border);
 }
 
-.contact-list__items {
+.farmer-chat .contact-list__items {
   flex: 1;
   overflow-y: auto;
 }
 
-.contact-list__items::-webkit-scrollbar { width: 4px; }
-.contact-list__items::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+.farmer-chat .contact-list__items::-webkit-scrollbar { width: 4px; }
+.farmer-chat .contact-list__items::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
 /* ── Search Bar ─────────────────────────────────────────────────────────── */
-.chat-search-bar {
+.farmer-chat .chat-search-bar {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -42,14 +42,14 @@
   padding: 8px 14px;
 }
 
-.chat-search-bar__icon {
+.farmer-chat .chat-search-bar__icon {
   color: #999;
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.chat-search-bar__input {
+.farmer-chat .chat-search-bar__input {
   border: none;
   background: transparent;
   outline: none;
@@ -58,10 +58,10 @@
   color: var(--color-dark);
 }
 
-.chat-search-bar__input::placeholder { color: #bbb; }
+.farmer-chat .chat-search-bar__input::placeholder { color: #bbb; }
 
 /* ── Contact Card ───────────────────────────────────────────────────────── */
-.contact-card {
+.farmer-chat .contact-card {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -71,10 +71,10 @@
   transition: background var(--transition-fast);
 }
 
-.contact-card:hover         { background: #f8fff8; }
-.contact-card--active       { background: #e8f5e9; }
+.farmer-chat .contact-card:hover         { background: #f8fff8; }
+.farmer-chat .contact-card--active       { background: #e8f5e9; }
 
-.contact-card__avatar {
+.farmer-chat .contact-card__avatar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -87,19 +87,19 @@
   flex-shrink: 0;
 }
 
-.contact-card__body {
+.farmer-chat .contact-card__body {
   flex: 1;
   min-width: 0;
 }
 
-.contact-card__top {
+.farmer-chat .contact-card__top {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   margin-bottom: 3px;
 }
 
-.contact-card__name {
+.farmer-chat .contact-card__name {
   font-weight: 600;
   font-size: 0.875rem;
   color: var(--color-dark);
@@ -109,19 +109,19 @@
   max-width: 165px;
 }
 
-.contact-card__time {
+.farmer-chat .contact-card__time {
   font-size: 0.72rem;
   color: #999;
   flex-shrink: 0;
 }
 
-.contact-card__bottom {
+.farmer-chat .contact-card__bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.contact-card__preview {
+.farmer-chat .contact-card__preview {
   font-size: 0.8rem;
   color: #999;
   white-space: nowrap;
@@ -130,7 +130,7 @@
   flex: 1;
 }
 
-.contact-card__badge {
+.farmer-chat .contact-card__badge {
   background: var(--color-primary-green);
   color: #fff;
   font-size: 0.68rem;
@@ -147,7 +147,7 @@
 }
 
 /* ── Chat Window ────────────────────────────────────────────────────────── */
-.chat-window {
+.farmer-chat .chat-window {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -157,7 +157,7 @@
 }
 
 /* ── Chat Header ────────────────────────────────────────────────────────── */
-.chat-header {
+.farmer-chat .chat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -168,13 +168,13 @@
   min-height: 68px;
 }
 
-.chat-header__left {
+.farmer-chat .chat-header__left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.chat-header__avatar {
+.farmer-chat .chat-header__avatar {
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -187,22 +187,22 @@
   flex-shrink: 0;
 }
 
-.chat-header__name {
+.farmer-chat .chat-header__name {
   display: block;
   font-weight: 600;
   font-size: 0.95rem;
   color: var(--color-dark);
 }
 
-.chat-header__status {
+.farmer-chat .chat-header__status {
   font-size: 0.78rem;
   color: #999;
 }
 
-.chat-header__status--online { color: var(--color-primary-green); }
+.farmer-chat .chat-header__status--online { color: var(--color-primary-green); }
 
 /* ── Report Button ──────────────────────────────────────────────────────── */
-.btn-report {
+.farmer-chat .btn-report {
   background: #dc3545;
   color: #fff;
   border: none;
@@ -215,36 +215,56 @@
   white-space: nowrap;
 }
 
-.btn-report:hover { background: #b02a37; }
+.farmer-chat .btn-report:hover { background: #b02a37; }
 
 /* ── Header actions group ───────────────────────────────────────────────── */
-.chat-header__actions {
+.farmer-chat .chat-header__actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* ── Delete Conversation Button ─────────────────────────────────────────── */
-.btn-delete-chat {
-  background: transparent;
-  color: #dc3545;
-  border: 1.5px solid #dc3545;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 0.875rem;
+/* ── Closed negotiation badge ───────────────────────────────────────────── */
+.farmer-chat .chat-header__closed-badge {
+  font-size: 11px;
   font-weight: 600;
-  cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #fce4e4;
+  color: #c62828;
   white-space: nowrap;
 }
 
-.btn-delete-chat:hover {
-  background: #dc3545;
+/* ── Filter bar ─────────────────────────────────────────────────────────── */
+.farmer-chat .chat-filter-bar {
+  display: flex;
+  padding: 6px 10px;
+  gap: 4px;
+  border-bottom: 1px solid var(--color-nav-border);
+}
+
+.farmer-chat .chat-filter {
+  flex: 1;
+  padding: 5px 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #666;
+  transition: background var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.farmer-chat .chat-filter.active {
+  background: var(--color-primary-green);
   color: #fff;
+  border-color: var(--color-primary-green);
 }
 
 /* ── Messages Area ──────────────────────────────────────────────────────── */
-.chat-window__messages {
+.farmer-chat .chat-window__messages {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -254,11 +274,11 @@
   gap: 6px;
 }
 
-.chat-window__messages::-webkit-scrollbar { width: 4px; }
-.chat-window__messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+.farmer-chat .chat-window__messages::-webkit-scrollbar { width: 4px; }
+.farmer-chat .chat-window__messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
 
 /* ── Empty State ────────────────────────────────────────────────────────── */
-.chat-empty-state {
+.farmer-chat .chat-empty-state {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -268,30 +288,30 @@
   color: #999;
 }
 
-.chat-empty-state__icon { font-size: 3rem; }
-.chat-empty-state__text { font-size: 0.95rem; }
+.farmer-chat .chat-empty-state__icon { font-size: 3rem; }
+.farmer-chat .chat-empty-state__text { font-size: 0.95rem; }
 
 /* ── Message Bubbles ────────────────────────────────────────────────────── */
-.chat-message {
+.farmer-chat .chat-message {
   max-width: 65%;
   padding: 8px 12px 6px;
   border-radius: 10px;
   box-shadow: 0 1px 2px rgba(0,0,0,.08);
 }
 
-.chat-message--received {
+.farmer-chat .chat-message--received {
   align-self: flex-start;
   background: #fff;
   border-bottom-left-radius: 2px;
 }
 
-.chat-message--sent {
+.farmer-chat .chat-message--sent {
   align-self: flex-end;
   background: #dcf8c6;
   border-bottom-right-radius: 2px;
 }
 
-.chat-message__text {
+.farmer-chat .chat-message__text {
   font-size: 0.875rem;
   color: var(--color-dark);
   margin: 0 0 4px;
@@ -299,7 +319,7 @@
   word-break: break-word;
 }
 
-.chat-message__time {
+.farmer-chat .chat-message__time {
   font-size: 0.68rem;
   color: #999;
   float: right;
@@ -308,7 +328,7 @@
 }
 
 /* ── Message Input ──────────────────────────────────────────────────────── */
-.message-input {
+.farmer-chat .message-input {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -318,7 +338,7 @@
   flex-shrink: 0;
 }
 
-.message-input__field {
+.farmer-chat .message-input__field {
   flex: 1;
   border: none;
   background: #f0f4f0;
@@ -330,9 +350,9 @@
   font-family: inherit;
 }
 
-.message-input__field::placeholder { color: #bbb; }
+.farmer-chat .message-input__field::placeholder { color: #bbb; }
 
-.message-input__send {
+.farmer-chat .message-input__send {
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -347,23 +367,33 @@
   flex-shrink: 0;
 }
 
-.message-input__send:hover { background: var(--color-teal); }
+.farmer-chat .message-input__send:hover { background: var(--color-teal); }
+
+.farmer-chat .message-input__field:disabled {
+  background: #f5f5f5;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.farmer-chat .message-input__send:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
 
 /* ── Skeleton shimmer ───────────────────────────────────────────────────────── */
-@keyframes skeleton-shimmer {
+@keyframes fc-skeleton-shimmer {
   0%   { background-position: -600px 0; }
   100% { background-position:  600px 0; }
 }
 
-.skeleton {
+.farmer-chat .skeleton {
   background: linear-gradient(90deg, #e4e4e4 25%, #f0f0f0 50%, #e4e4e4 75%);
   background-size: 1200px 100%;
-  animation: skeleton-shimmer 1.4s infinite linear;
+  animation: fc-skeleton-shimmer 1.4s infinite linear;
   border-radius: 6px;
 }
 
-/* ── Contact-list skeleton ──────────────────────────────────────────────────── */
-.skeleton-contact-card {
+.farmer-chat .skeleton-contact-card {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -371,48 +401,30 @@
   border-bottom: 1px solid #f5f5f5;
 }
 
-.skeleton-avatar {
+.farmer-chat .skeleton-avatar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.skeleton-contact-body {
+.farmer-chat .skeleton-contact-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.skeleton-line {
-  height: 12px;
-  border-radius: 6px;
-}
+.farmer-chat .skeleton-line { height: 12px; border-radius: 6px; }
+.farmer-chat .skeleton-line--name    { width: 55%; }
+.farmer-chat .skeleton-line--preview { width: 80%; height: 10px; }
 
-.skeleton-line--name    { width: 55%; }
-.skeleton-line--preview { width: 80%; height: 10px; }
+.farmer-chat .skeleton-messages { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+.farmer-chat .skeleton-msg { display: flex; }
+.farmer-chat .skeleton-msg--received { justify-content: flex-start; }
+.farmer-chat .skeleton-msg--sent     { justify-content: flex-end; }
 
-/* ── Messages skeleton ──────────────────────────────────────────────────────── */
-.skeleton-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 4px 0;
-}
-
-.skeleton-msg {
-  display: flex;
-}
-
-.skeleton-msg--received { justify-content: flex-start; }
-.skeleton-msg--sent     { justify-content: flex-end; }
-
-.skeleton-bubble {
-  height: 42px;
-  border-radius: 10px;
-}
-
-.skeleton-bubble--sm { width: 120px; }
-.skeleton-bubble--md { width: 200px; }
-.skeleton-bubble--lg { width: 280px; }
+.farmer-chat .skeleton-bubble { height: 42px; border-radius: 10px; }
+.farmer-chat .skeleton-bubble--sm { width: 120px; }
+.farmer-chat .skeleton-bubble--md { width: 200px; }
+.farmer-chat .skeleton-bubble--lg { width: 280px; }

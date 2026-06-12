@@ -1,8 +1,8 @@
-import { createSearchBar }      from '../../../../../../assets/js/components/chat-components.js';
-import { createProductCard }    from '../../../../../../assets/js/components/marketplace-components.js';
-import { MarketplaceService }   from '../../../../../../assets/js/services/marketplace.js';
-import { FavoritosService }     from '../../../../../../assets/js/services/favoritos.js';
-import { NegociacionesService } from '../../../../../../assets/js/services/negociaciones.js';
+import { userCache }              from '../../user.js';
+import { createSearchBar }         from '../../../../../../assets/js/components/chat-components.js';
+import { createProductCard }       from '../../../../../../assets/js/components/marketplace-components.js';
+import { FavoritosService }        from '../../../../../../assets/js/services/favoritos.js';
+import { NegociacionesService }    from '../../../../../../assets/js/services/negociaciones.js';
 import { toastSuccess, toastError } from '../../../../../../assets/js/toast.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ function injectModal() {
 }
 
 export async function init(container) {
-  const userId       = parseInt(localStorage.getItem('token'), 10) || null;
+  const userId       = userCache.userId;
   const searchSlot   = container.querySelector('#market-search');
   const productsGrid = container.querySelector('#productsGrid');
   const filtersWrap  = container.querySelector('.filters-wrap');
@@ -72,42 +72,23 @@ export async function init(container) {
   searchSlot.innerHTML = createSearchBar('Buscar productos...');
   const searchInput = searchSlot.querySelector('.chat-search-bar__input');
 
-  let allProducts  = [];
-  let favSet       = new Set();   // id_lote values the user has favorited
-  let currentCatId = 0;          // 0 = all categories
+  let favSet       = new Set();
+  let currentCatId = 0;
   let searchTerm   = '';
 
-  // ── Skeleton ───────────────────────────────────────────────────────────
-  productsGrid.innerHTML = Array(8).fill(
-    '<div class="product-card product-card--skeleton"></div>'
-  ).join('');
+  // ── Populate from cache (no fetch needed) ─────────────────────────────
+  userCache.favoritos.forEach(f => favSet.add(f.id_lote));
 
-  // ── Fetch categories, products and favorites in parallel ───────────────
-  try {
-    const requests = [
-      MarketplaceService.getCategorias(),
-      MarketplaceService.getLotes(),
-    ];
-    if (userId) requests.push(FavoritosService.getFavoritos(userId));
+  userCache.categorias.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className     = 'filter';
+    btn.dataset.catId = cat.id_categoria;
+    btn.textContent   = cat.nombre_categoria;
+    filtersEl.appendChild(btn);
+  });
 
-    const [categorias, lotes, favs = []] = await Promise.all(requests);
-
-    favs.forEach(f => favSet.add(f.id_lote));
-
-    categorias.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.className     = 'filter';
-      btn.dataset.catId = cat.id_categoria;
-      btn.textContent   = cat.nombre_categoria;
-      filtersEl.appendChild(btn);
-    });
-
-    allProducts = lotes.map(mapLote);
-    renderProducts();
-  } catch (err) {
-    console.error('Error cargando marketplace:', err);
-    productsGrid.innerHTML = '<p class="market-empty">No se pudieron cargar los productos.</p>';
-  }
+  const allProducts = userCache.lotes.map(mapLote);
+  renderProducts();
 
   // ── Hamburger toggle ──────────────────────────────────────────────────
   toggleBtn?.addEventListener('click', () => {
@@ -115,7 +96,6 @@ export async function init(container) {
     toggleBtn.setAttribute('aria-expanded', String(isOpen));
   });
 
-  // Close dropdown when clicking outside
   document.addEventListener('click', e => {
     if (!filtersWrap.contains(e.target)) {
       filtersWrap.classList.remove('open');
@@ -130,7 +110,6 @@ export async function init(container) {
     filtersEl.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentCatId = parseInt(btn.dataset.catId) || 0;
-    // Close dropdown on mobile after selection
     filtersWrap.classList.remove('open');
     toggleBtn?.setAttribute('aria-expanded', 'false');
     renderProducts();
@@ -147,8 +126,8 @@ export async function init(container) {
     const btn = e.target.closest('.product-fav-btn');
     if (!btn || !userId) return;
 
-    const lotId   = parseInt(btn.dataset.id);
-    const nowFav  = btn.classList.toggle('active');   // optimistic UI
+    const lotId  = parseInt(btn.dataset.id);
+    const nowFav = btn.classList.toggle('active');
     if (nowFav) {
       favSet.add(lotId);
       toastSuccess('Agregado a favoritos.');
@@ -159,7 +138,6 @@ export async function init(container) {
     try {
       await FavoritosService.toggleFavorito(userId, lotId);
     } catch (err) {
-      // Revert on failure
       btn.classList.toggle('active');
       if (nowFav) favSet.delete(lotId); else favSet.add(lotId);
       console.error('Error toggling favorito:', err);
@@ -167,12 +145,12 @@ export async function init(container) {
   });
 
   // ── Contraofertar modal ────────────────────────────────────────────────
-  const modalEl    = injectModal();
-  const bsModal    = new bootstrap.Modal(modalEl);
-  const mcName     = modalEl.querySelector('#mc-product-name');
-  const mcMonto    = modalEl.querySelector('#mc-monto');
-  const mcComent   = modalEl.querySelector('#mc-comentario');
-  const mcConfirm  = modalEl.querySelector('#mc-confirmar');
+  const modalEl   = injectModal();
+  const bsModal   = new bootstrap.Modal(modalEl);
+  const mcName    = modalEl.querySelector('#mc-product-name');
+  const mcMonto   = modalEl.querySelector('#mc-monto');
+  const mcComent  = modalEl.querySelector('#mc-comentario');
+  const mcConfirm = modalEl.querySelector('#mc-confirmar');
 
   let activeLotId = null;
 
@@ -184,29 +162,26 @@ export async function init(container) {
     const product = allProducts.find(p => p.id === lotId);
     if (!product) return;
 
-    activeLotId    = lotId;
+    activeLotId        = lotId;
     mcName.textContent = product.name;
-    mcMonto.value  = '';
-    mcComent.value = '';
+    mcMonto.value      = '';
+    mcComent.value     = '';
     bsModal.show();
   });
 
   mcConfirm.addEventListener('click', async () => {
     const monto = parseFloat(mcMonto.value);
-    if (!monto || monto <= 0) {
-      mcMonto.focus();
-      return;
-    }
+    if (!monto || monto <= 0) { mcMonto.focus(); return; }
     if (!userId) return;
 
-    mcConfirm.disabled = true;
+    mcConfirm.disabled    = true;
     mcConfirm.textContent = 'Enviando…';
     try {
       await NegociacionesService.iniciar({
-        id_lote:     activeLotId,
+        id_lote:      activeLotId,
         id_comprador: userId,
         monto,
-        comentario: mcComent.value.trim() || null,
+        comentario:   mcComent.value.trim() || null,
       });
       bsModal.hide();
       toastSuccess('Negociación iniciada correctamente.');
@@ -214,7 +189,7 @@ export async function init(container) {
       toastError('No se pudo iniciar la negociación.');
       console.error(err);
     } finally {
-      mcConfirm.disabled = false;
+      mcConfirm.disabled    = false;
       mcConfirm.textContent = 'Confirmar';
     }
   });
