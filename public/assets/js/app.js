@@ -94,7 +94,6 @@ export async function unloadComponent(path) {
 
   const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
   if (typeof module.cleanup === 'function') await module.cleanup();
-  document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
 }
 
 // ── Autenticación ───────────────────────────────────────────────────────────
