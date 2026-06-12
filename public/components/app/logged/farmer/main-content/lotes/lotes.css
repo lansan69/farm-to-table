@@ -1,0 +1,227 @@
+.mis-lotes-page {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 5vh;
+  color: var(--color-dark);
+}
+
+.mis-lotes {
+  padding: 10px 50px 50px;
+}
+
+/* ── Actions bar ─────────────────────────────────────────────────────────────── */
+
+.lotes-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 16px;
+}
+
+.lotes-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+/* ── Search bar ──────────────────────────────────────────────────────────────── */
+
+.chat-search-bar {
+  width: 300px;
+  height: 36px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.chat-search-bar__icon {
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chat-search-bar__input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  background: transparent;
+  color: var(--color-dark);
+}
+
+.chat-search-bar__input::placeholder { color: #bbb; }
+
+/* ── Products grid ───────────────────────────────────────────────────────────── */
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* ── Product card ────────────────────────────────────────────────────────────── */
+
+.product-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition-fast);
+}
+
+.product-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.product-image-cont {
+  position: relative;
+  width: 100%;
+}
+
+.product-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.product-content {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.product-name {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  line-height: 1.2;
+}
+
+.product-vendor {
+  font-size: 12px;
+  color: #888;
+}
+
+.product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+  gap: 8px;
+}
+
+.product-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary-green);
+  line-height: 1;
+}
+
+/* ── Estado select ───────────────────────────────────────────────────────────── */
+
+.lote-estado-select {
+  padding: 5px 10px;
+  border: 1.5px solid #ddd;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-dark);
+  background: #f9f9f9;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.lote-estado-select:focus {
+  border-color: var(--color-primary-green);
+}
+
+.lote-estado-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Editar / Eliminar buttons ───────────────────────────────────────────────── */
+
+.lote-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.lote-editar-btn,
+.lote-eliminar-btn {
+  flex: 1;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.lote-editar-btn {
+  background: var(--color-primary-green);
+  color: #fff;
+}
+
+.lote-editar-btn:hover {
+  background: var(--color-teal);
+}
+
+.lote-eliminar-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.lote-eliminar-btn:hover {
+  background: #fca5a5;
+}
+
+.lote-eliminar-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────────── */
+
+.market-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 850px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .mis-lotes     { padding: 10px 20px 40px; }
+}
+
+@media (max-width: 500px) {
+  .products-grid  { grid-template-columns: 1fr; }
+  .lotes-actions  { flex-direction: column; align-items: flex-start; }
+  .chat-search-bar { width: 100%; }
+}

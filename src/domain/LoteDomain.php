@@ -117,7 +117,7 @@ class LoteDomain
      */
     public function cambiarEstadoLote(int $idLote, int $idProductor, string $estado): bool
     {
-        $validos = ['disponible', 'en_negociacion', 'asignado', 'caducado'];
+        $validos = ['disponible', 'en_negociacion', 'asignado', 'caducado', 'eliminado'];
         if (!in_array($estado, $validos, true)) return false;
         return $this->loteModel->updateEstado($idLote, $idProductor, $estado);
     }
