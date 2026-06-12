@@ -53,8 +53,17 @@ async function fetchClientId() {
 }
 
 function waitForGSI() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         if (window.google?.accounts?.id) return resolve();
-        window.addEventListener('load', resolve, { once: true });
+        const start = Date.now();
+        const iv = setInterval(() => {
+            if (window.google?.accounts?.id) {
+                clearInterval(iv);
+                resolve();
+            } else if (Date.now() - start > 10_000) {
+                clearInterval(iv);
+                reject(new Error('Google GSI timed out'));
+            }
+        }, 50);
     });
 }

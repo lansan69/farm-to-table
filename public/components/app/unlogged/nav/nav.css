@@ -152,23 +152,20 @@
   border-color: var(--color-primary-green);
 }
 
-/* ── Mobile: icon-only nav ── */
-@media (max-width: 640px) {
+/* ── Icon-only nav (≤ 1400px) ── */
+@media (max-width: 1400px) {
   .ftt-navbar {
     padding: 0.75rem 1rem;
   }
 
-  /* Hamburger is redundant when icons are always visible */
   .ftt-hamburger {
     display: none;
   }
 
-  /* Hide text labels, keep icons */
   .ftt-link__label {
     display: none;
   }
 
-  /* Tighter, square tap targets for icon-only links */
   .ftt-link--icon {
     padding: 0.5rem;
   }
@@ -178,7 +175,6 @@
     height: 22px;
   }
 
-  /* Login button becomes a circle */
   .ftt-btn-login {
     padding: 0.5rem;
     border-radius: 50%;
@@ -187,5 +183,62 @@
   .ftt-btn-login svg {
     width: 22px;
     height: 22px;
+  }
+}
+
+/* ── Hamburger drawer (≤ 600px) ── */
+@media (max-width: 600px) {
+  .ftt-hamburger {
+    display: flex !important;
+  }
+
+  .ftt-nav-right {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    background: #ffffff;
+    border-bottom: 1px solid var(--color-nav-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    z-index: 999;
+    padding: 0.375rem 0;
+  }
+
+  .ftt-navbar.menu-open .ftt-nav-right {
+    display: flex;
+  }
+
+  .ftt-link__label {
+    display: inline !important;
+  }
+
+  .ftt-link--icon {
+    padding: 0.85rem 1.5rem;
+    border-radius: 0;
+    gap: 0.75rem;
+  }
+
+  .ftt-link--icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ftt-btn-login {
+    border: none;
+    border-top: 1px solid rgba(27, 133, 63, 0.2);
+    border-radius: 0;
+    padding: 0.85rem 1.5rem;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .ftt-btn-login svg {
+    width: 20px;
+    height: 20px;
   }
 }

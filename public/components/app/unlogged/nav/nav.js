@@ -4,12 +4,22 @@ let _clickHandler = null;
 
 export function init(container) {
   // ── Hamburger ────────────────────────────────────────────────────────────
-  const btn = container.querySelector('#hamburgerBtn');
+  const btn    = container.querySelector('#hamburgerBtn');
+  const navbar = container.querySelector('.ftt-navbar');
+
   btn?.addEventListener('click', function () {
     const open = this.classList.toggle('is-open');
     this.setAttribute('aria-expanded', open);
     this.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    navbar.classList.toggle('menu-open', open);
   });
+
+  function closeMenu() {
+    btn?.classList.remove('is-open');
+    btn?.setAttribute('aria-expanded', 'false');
+    btn?.setAttribute('aria-label', 'Abrir menú');
+    navbar.classList.remove('menu-open');
+  }
 
   // ── Nav links ────────────────────────────────────────────────────────────
   const links = container.querySelectorAll('[data-nav]');
@@ -22,6 +32,7 @@ export function init(container) {
     const link = e.target.closest('[data-nav]');
     if (!link) return;
     e.preventDefault();
+    closeMenu();
     setActive(link.dataset.nav);
     navigate(link.dataset.nav);
   }
@@ -29,14 +40,20 @@ export function init(container) {
   // Set active on mount based on current URL
   setActive(window.location.pathname.replace('/dashboard/farm-to-table', ''));
 
+  function handleNavigate(e) {
+    setActive(e.detail.path);
+  }
+
   container.addEventListener('click', handleClick);
-  _clickHandler = { container, handleClick };
-  
+  document.addEventListener('ftt:navigate', handleNavigate);
+  _clickHandler = { container, handleClick, handleNavigate };
+
 }
 
 export function cleanup() {
   if (_clickHandler) {
     _clickHandler.container.removeEventListener('click', _clickHandler.handleClick);
+    document.removeEventListener('ftt:navigate', _clickHandler.handleNavigate);
     _clickHandler = null;
   }
 }
