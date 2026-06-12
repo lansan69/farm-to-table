@@ -1,1 +1,2 @@
-export function init(_container) {}
+export function init(_container) {
+}

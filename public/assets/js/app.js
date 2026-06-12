@@ -88,15 +88,13 @@ export async function loadComponent(path, container) {
 // Elimina el CSS del componente del <head> y ejecuta su función cleanup() si existe.
 // El HTML se elimina automáticamente cuando el contenedor padre recibe nuevo innerHTML.
 
-export function unloadComponent(path) {
-  // const name   = path.split('/').pop();
-  // const cssKey = path.replaceAll('/', '-');
+export async function unloadComponent(path) {
+  const name   = path.split('/').pop();
+  const cssKey = path.replaceAll('/', '-');
 
-  // setTimeout(async () => {
-  //   const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
-  //   if (typeof module.cleanup === 'function') await module.cleanup();
-  //   document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
-  // }, 1000);
+  const module = await import(`${BASE_PATH}/public/components/${path}/${name}.js`);
+  if (typeof module.cleanup === 'function') await module.cleanup();
+  document.querySelector(`link[data-component="${cssKey}"]`)?.remove();
 }
 
 // ── Autenticación ───────────────────────────────────────────────────────────
