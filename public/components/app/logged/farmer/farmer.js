@@ -55,3 +55,7 @@ export async function cleanup() {
 export async function updateChat() {
   farmerCache.chats = farmerCache.userId ? await ChatsService.getChats(farmerCache.userId).catch(e => { console.error('[farmer] chats:', e); return []; }) : [];
 }
+
+export async function updateLotes(){
+  farmerCache.lotes = farmerCache.userId ? await LotesService.getLotesProductor(userId).catch(e => { console.error('[farmer] lotes:', e); return []; })              : [];
+}
