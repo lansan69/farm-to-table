@@ -78,30 +78,32 @@ class LoteDomain
      * Publica un nuevo lote: inserta el lote, registra el evento inicial en
      * trazabilidad y adjunta fotos; todo dentro de una transacción.
      *
-     * @param string[] $fotosUrls URLs de las evidencias fotográficas (puede estar vacío)
      */
-    public function publicarLote(
-        int    $idProductor,
-        int    $idProducto,
-        float  $cantidad,
-        string $fechaCosecha,
-        float  $precio,
-        array  $fotosUrls = []
+public function publicarLote(
+        int     $idProductor,
+        string  $nombre,
+        int     $idCategoria,
+        float   $cantidad,
+        float   $precio,
+        string  $fechaCosecha,
+        ?string $descripcion = null,
+        ?string $foto = null,
+        ?int    $idProducto = null
     ): array {
         $db = Database::getInstance()->getConnection();
         $db->beginTransaction();
         try {
-            $idLote = $this->loteModel->create($idProductor, $idProducto, $cantidad, $fechaCosecha, $precio);
-
-            $this->trazabilidadModel->create(
-                $idLote,
-                $idProductor,
-                "Registro inicial de {$cantidad} kg del producto #{$idProducto}"
+            $idLote = $this->loteModel->create(
+                idProductor:  $idProductor,
+                nombre:       $nombre,
+                idCategoria:  $idCategoria,
+                cantidad:     $cantidad,
+                precio:       $precio,
+                fechaCosecha: $fechaCosecha,
+                descripcion:  $descripcion,
+                foto:         $foto,
+                idProducto:   $idProducto
             );
-
-            foreach ($fotosUrls as $url) {
-                $this->fotoModel->create($idLote, $url);
-            }
 
             $db->commit();
             return ['success' => true, 'id_lote' => $idLote];
@@ -111,7 +113,6 @@ class LoteDomain
             return ['success' => false, 'message' => $msg];
         }
     }
-
     /**
      * Cambia el estado de un lote. Solo el productor dueño puede modificarlo.
      */

@@ -22,7 +22,6 @@ export function init(container) {
             const email    = container.querySelector('#login-email').value.trim();
             const password = container.querySelector('#login-password').value;
             if (!email || !password) return shake(container, 'login-email');
-            console.log('Login:', { email, password });
         });
 
     container.querySelector('.register-form .btn-primary')
@@ -36,7 +35,6 @@ export function init(container) {
 
             if (!name || !email || !password) return shake(container, 'reg-name');
             if (password !== confirm) return shake(container, 'reg-confirm');
-            console.log('Register:', { name, phone, email, password, role });
         });
 }
 

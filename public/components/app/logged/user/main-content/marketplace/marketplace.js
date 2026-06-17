@@ -1,10 +1,9 @@
-import { userCache }              from '../../user.js';
+import { userCache, updateData }              from '../../user.js';
 import { createSearchBar }         from '../../../../../../assets/js/components/chat-components.js';
-import { createProductCard }       from '../../../../../../assets/js/components/marketplace-components.js';
+import { createProductCard, createProductCardExpanded } from '../../../../../../assets/js/components/marketplace-components.js';
 import { FavoritosService }        from '../../../../../../assets/js/services/favoritos.js';
 import { NegociacionesService }    from '../../../../../../assets/js/services/negociaciones.js';
 import { toastSuccess, toastError } from '../../../../../../assets/js/toast.js';
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function mapLote(l) {
@@ -17,11 +16,19 @@ function mapLote(l) {
     status: l.estado_lote === 'disponible' ? 'Disponible' : 'En negociación',
     catId:  l.id_categoria,
     zona:   l.zona || '',
-    image:  'assets/images/login/frutas.jpeg',
+    image:  `assets/images/login/${l.foto}`,
   };
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
+function renderSkeletons(count = 8) {
+  // Crea un array con 'count' esqueletos y los une en un string HTML
+  const skeletonsHTML = Array(count)
+    .fill('<article class="product-card--skeleton"></article>')
+    .join('');
+  
+  productsGrid.innerHTML = skeletonsHTML;
+}
 
 function injectModal() {
   document.getElementById('market-contraoferta-modal')?.remove();
@@ -76,7 +83,7 @@ export async function init(container) {
   let currentCatId = 0;
   let searchTerm   = '';
 
-  // ── Populate from cache (no fetch needed) ─────────────────────────────
+  // ── Populate from cache ─────────────────────────────────────────────────
   userCache.favoritos.forEach(f => favSet.add(f.id_lote));
 
   userCache.categorias.forEach(cat => {
@@ -121,13 +128,12 @@ export async function init(container) {
     renderProducts();
   });
 
-  // ── Fav button (event delegation — survives re-renders) ────────────────
-  productsGrid.addEventListener('click', async e => {
-    const btn = e.target.closest('.product-fav-btn');
-    if (!btn || !userId) return;
-
+  // ── Handlers reutilizables (Fav & Contraoferta) ────────────────────────
+  async function handleFavToggle(btn) {
+    if (!userId) return;
     const lotId  = parseInt(btn.dataset.id);
     const nowFav = btn.classList.toggle('active');
+    
     if (nowFav) {
       favSet.add(lotId);
       toastSuccess('Agregado a favoritos.');
@@ -136,28 +142,16 @@ export async function init(container) {
     }
 
     try {
+      updateData();
       await FavoritosService.toggleFavorito(userId, lotId);
     } catch (err) {
       btn.classList.toggle('active');
       if (nowFav) favSet.delete(lotId); else favSet.add(lotId);
       console.error('Error toggling favorito:', err);
     }
-  });
+  }
 
-  // ── Contraofertar modal ────────────────────────────────────────────────
-  const modalEl   = injectModal();
-  const bsModal   = new bootstrap.Modal(modalEl);
-  const mcName    = modalEl.querySelector('#mc-product-name');
-  const mcMonto   = modalEl.querySelector('#mc-monto');
-  const mcComent  = modalEl.querySelector('#mc-comentario');
-  const mcConfirm = modalEl.querySelector('#mc-confirmar');
-
-  let activeLotId = null;
-
-  productsGrid.addEventListener('click', e => {
-    const btn = e.target.closest('.product-cta-btn');
-    if (!btn) return;
-
+  function handleContraoferta(btn) {
     const lotId   = parseInt(btn.dataset.id);
     const product = allProducts.find(p => p.id === lotId);
     if (!product) return;
@@ -167,7 +161,70 @@ export async function init(container) {
     mcMonto.value      = '';
     mcComent.value     = '';
     bsModal.show();
+  }
+
+  // ── Overlay Expandido ──────────────────────────────────────────────────
+  const expandedOverlay = document.createElement('div');
+  expandedOverlay.id = 'market-expanded-overlay';
+  Object.assign(expandedOverlay.style, {
+    position: 'fixed', top: '0', left: '0', width: '100vw', height: '100vh',
+    backgroundColor: 'rgba(0,0,0,0.6)', zIndex: '9999',
+    display: 'none', alignItems: 'center', justifyContent: 'center', padding: '20px'
   });
+  document.body.appendChild(expandedOverlay);
+
+  expandedOverlay.addEventListener('click', e => {
+    // Cerrar overlay al tocar fondo o botón X
+    if (e.target === expandedOverlay || e.target.closest('.mc-close-btn')) {
+      expandedOverlay.style.display = 'none';
+      return;
+    }
+    // Reutilizar lógica de botones internos
+    const favBtn = e.target.closest('.product-fav-btn');
+    if (favBtn) handleFavToggle(favBtn);
+
+    const ctaBtn = e.target.closest('.product-cta-btn');
+    if (ctaBtn) {
+      expandedOverlay.style.display = 'none'; // Cerrar overlay al abrir modal
+      handleContraoferta(ctaBtn);
+    }
+  });
+
+  // ── Product Grid Clicks ────────────────────────────────────────────────
+  productsGrid.addEventListener('click', e => {
+    const favBtn = e.target.closest('.product-fav-btn');
+    if (favBtn) return handleFavToggle(favBtn);
+
+    const ctaBtn = e.target.closest('.product-cta-btn');
+    if (ctaBtn) return handleContraoferta(ctaBtn);
+
+    // Clic en la tarjeta (abrir vista expandida)
+    const card = e.target.closest('.product-card');
+    if (card) {
+      const lotId = parseInt(card.dataset.id);
+      const rawProduct = userCache.lotes.find(l => l.id_lote === lotId);
+      if (!rawProduct) return;
+
+      expandedOverlay.innerHTML = `
+        <div style="position: relative; max-width: 600px; width: 100%; border-radius: 14px; background: #fff; max-height: 90vh; overflow-y: auto;">
+          <button class="mc-close-btn" style="position: absolute; top: 12px; right: 12px; background: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-weight: bold; cursor: pointer; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">✕</button>
+          <div class="products-grid--expanded" style="display: block;">
+            ${createProductCardExpanded({ ...rawProduct, isFav: favSet.has(lotId), foto: `assets/images/login/${rawProduct.foto}` })}
+          </div>
+        </div>
+      `;
+      expandedOverlay.style.display = 'flex';
+    }
+  });
+
+  // ── Contraofertar modal Init ───────────────────────────────────────────
+  const modalEl   = injectModal();
+  const bsModal   = new bootstrap.Modal(modalEl);
+  const mcName    = modalEl.querySelector('#mc-product-name');
+  const mcMonto   = modalEl.querySelector('#mc-monto');
+  const mcComent  = modalEl.querySelector('#mc-comentario');
+  const mcConfirm = modalEl.querySelector('#mc-confirmar');
+  let activeLotId = null;
 
   mcConfirm.addEventListener('click', async () => {
     const monto = parseFloat(mcMonto.value);

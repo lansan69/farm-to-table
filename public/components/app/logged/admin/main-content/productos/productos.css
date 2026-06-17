@@ -1,0 +1,384 @@
+.admin-productos-page {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  padding: 5vh;
+  color: var(--color-dark);
+}
+
+.admin-productos {
+  padding: 10px 50px 50px;
+}
+
+/* ── Actions bar ─────────────────────────────────────────────────────────────── */
+
+.prod-admin-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 16px;
+}
+
+/* ── Filters ─────────────────────────────────────────────────────────────────── */
+
+.filters-wrap {
+  position: relative;
+}
+
+/* Hamburger toggle — hidden on desktop, shown on mobile */
+.filters-toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 18px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-dark);
+  transition: background var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.filters-toggle:hover,
+.filters-wrap.open .filters-toggle {
+  background: var(--color-primary-green);
+  color: #fff;
+  border-color: var(--color-primary-green);
+}
+
+.filters {
+  display: flex;
+}
+
+.filter {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-dark);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.filter:first-child { border-radius: 18px 0 0 18px; }
+.filter:last-child  { border-radius: 0 18px 18px 0; }
+
+.filter.active {
+  background: var(--color-primary-green);
+  color: #fff;
+  border-color: var(--color-primary-green);
+}
+
+/* ── Search bar (chat-components) ────────────────────────────────────────────── */
+
+.chat-search-bar {
+  width: 300px;
+  height: 36px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+}
+
+.chat-search-bar__icon {
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chat-search-bar__input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  background: transparent;
+  color: var(--color-dark);
+}
+
+.chat-search-bar__input::placeholder { color: #bbb; }
+
+/* ── Products grid ───────────────────────────────────────────────────────────── */
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* ── Product card ────────────────────────────────────────────────────────────── */
+
+.product-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition-fast);
+}
+
+.product-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Image container ──────────────────────────────────────────────────────────── */
+
+.product-image-cont {
+  position: relative;
+  width: 100%;
+}
+
+.product-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Card content ────────────────────────────────────────────────────────────── */
+
+.product-content {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.product-name {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  line-height: 1.2;
+}
+
+.product-vendor {
+  font-size: 12px;
+  color: #888;
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.product-rating__stars { color: var(--color-primary-green); }
+.product-rating__value { color: #555; font-size: 12px; }
+
+.product-zona {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #777;
+}
+
+/* ── Price + status row ──────────────────────────────────────────────────────── */
+
+.product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.product-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary-green);
+  line-height: 1;
+}
+
+.product-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.product-status--active {
+  background: #e8f5ec;
+  color: var(--color-primary-green);
+}
+
+.product-status--inactive {
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* ── Admin product action buttons ────────────────────────────────────────────── */
+
+.admin-prod-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.admin-prod-edit-btn,
+.admin-prod-delete-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.admin-prod-edit-btn {
+  background: var(--color-primary-green);
+  color: #fff;
+}
+
+.admin-prod-edit-btn:hover { background: var(--color-teal); }
+
+.admin-prod-delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.admin-prod-delete-btn:hover { background: #fca5a5; }
+
+.admin-prod-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Edit modal ──────────────────────────────────────────────────────────────── */
+
+.ae-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin-bottom: 6px;
+}
+
+.ae-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-dark);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.ae-input:focus { border-color: var(--color-primary-green); background: #fff; }
+
+.ae-select { appearance: auto; cursor: pointer; }
+
+.ae-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.ae-btn--cancel           { background: #f0f0f0; color: var(--color-dark); }
+.ae-btn--cancel:hover     { background: #e0e0e0; }
+.ae-btn--confirm          { background: var(--color-primary-green); color: #fff; }
+.ae-btn--confirm:hover    { background: var(--color-teal); }
+.ae-btn--confirm:disabled { background: #aaa; cursor: not-allowed; }
+
+/* ── Skeleton ────────────────────────────────────────────────────────────────── */
+
+.product-card--skeleton {
+  height: 320px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 14px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty / error state ─────────────────────────────────────────────────────── */
+
+.prod-admin-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 850px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-productos   { padding: 10px 20px 40px; }
+}
+
+/* ── Hamburger dropdown (≤ 768px) ────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .filters-toggle {
+    display: flex;
+  }
+
+  .filters {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 100;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    min-width: 180px;
+    gap: 2px;
+  }
+
+  .filters-wrap.open .filters {
+    display: flex;
+  }
+
+  /* In column layout every filter gets its own full-width rounded row */
+  .filter,
+  .filter:first-child,
+  .filter:last-child {
+    border-radius: 8px;
+    width: 100%;
+    text-align: left;
+    border-color: transparent;
+  }
+
+  .filter:hover {
+    background: #f5f5f5;
+  }
+}
+
+@media (max-width: 500px) {
+  .products-grid   { grid-template-columns: 1fr; }
+  .prod-admin-actions  { flex-direction: column; align-items: flex-start; }
+  .chat-search-bar { width: 100%; }
+}

@@ -82,3 +82,75 @@ export function createProductCard({ id = '', image = '', name = '', vendor = '',
     </article>
   `;
 }
+
+export function createProductCardExpanded(data) {
+  // Desestructuramos con valores por defecto para evitar errores con nulls
+  const {
+    id_lote = '',
+    foto = '',
+    nombre_producto = 'Sin nombre',
+    nombre_productor = 'Productor desconocido',
+    calificacion_producto = 0,
+    calificacion_vendedor = '0.00',
+    precio_recuperacion_sugerido = '0',
+    estado_lote = 'disponible',
+    cantidad_kg = '0',
+    fecha_cosecha = '',
+    vida_util_dias = 0,
+    nombre_categoria = '',
+    descripcion_producto = '',
+    telefono_productor = '',
+    email_productor = '',
+    zona = '',
+    isFav = false
+  } = data;
+
+  const statusMod = estado_lote === 'disponible' ? 'product-status--active' : 'product-status--inactive';
+  const priceStr = `$${parseFloat(precio_recuperacion_sugerido).toFixed(2)}`;
+  const kgStr = `${parseFloat(cantidad_kg).toFixed(2)} kg`;
+  
+  // Manejo de nulos en calificaciones
+  const ratingProd = calificacion_producto !== null ? calificacion_producto : 0;
+
+  return `
+    <article class="product-card product-card--expanded" data-id="${id_lote}">
+      <div class="product-image-cont">
+        <img class="product-image" src="${foto || 'assets/img/default-product.jpg'}" alt="${nombre_producto}">
+        <button class="product-fav-btn${isFav ? ' active' : ''}" data-id="${id_lote}" aria-label="Agregar a favoritos">
+          ${FAV_ICON}
+        </button>
+      </div>
+      
+      <div class="product-content">
+        <div class="product-header">
+          <h3 class="product-name">${nombre_producto}</h3>
+          <span class="product-status ${statusMod}">${estado_lote}</span>
+        </div>
+        
+        <p class="product-vendor">${nombre_productor} <span class="vendor-rating">⭐ ${parseFloat(calificacion_vendedor).toFixed(1)}</span></p>
+        <p class="product-category">${nombre_categoria}</p>
+
+        ${descripcion_producto ? `<p class="product-desc">${descripcion_producto}</p>` : ''}
+
+        <div class="product-details-grid">
+          <div class="detail-item"><strong>Cantidad:</strong> ${kgStr}</div>
+          <div class="detail-item"><strong>Cosecha:</strong> ${fecha_cosecha}</div>
+          <div class="detail-item"><strong>Vida útil:</strong> ${vida_util_dias} días</div>
+          <div class="detail-item"><strong>Calidad:</strong> ${renderStars(ratingProd)}</div>
+        </div>
+
+        <div class="product-contact">
+          <p>📞 ${telefono_productor}</p>
+          <p>✉️ ${email_productor}</p>
+          <p class="product-zona">${LOCATION_ICON} ${zona || 'Zona no especificada'}</p>
+        </div>
+
+        <div class="product-row">
+          <span class="product-price">${priceStr}</span>
+        </div>
+        
+        <button class="product-cta-btn" data-id="${id_lote}">Contraofertar</button>
+      </div>
+    </article>
+  `;
+}

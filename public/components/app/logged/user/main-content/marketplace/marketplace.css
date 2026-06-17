@@ -115,13 +115,14 @@
 /* ── Product card ────────────────────────────────────────────────────────────── */
 
 .product-card {
+  cursor: pointer;
   background: #fff;
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
   display: flex;
   flex-direction: column;
-  transition: box-shadow var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .product-card:hover {
@@ -336,6 +337,107 @@
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
   border-radius: 14px;
+}
+
+/* ── Grid para tarjetas grandes ──────────────────────────────────────────────── */
+
+/* Aplica esta clase al contenedor <div id="productsGrid" class="products-grid products-grid--expanded"> */
+.products-grid--expanded {
+  grid-template-columns: repeat(3, 1fr); /* 3 columnas en lugar de 4 */
+  gap: 30px;
+}
+
+/* ── Tarjeta Expandida (Sobreescribe/Añade a .product-card) ──────────────────── */
+
+.product-card--expanded {
+  /* Hereda la base de .product-card automáticamente */
+}
+
+.product-card--expanded .product-image {
+  height: 240px; /* Imagen más grande (antes 180px) */
+}
+
+.product-card--expanded .product-content {
+  overflow-y: scroll;
+  padding: 20px; /* Más espacio interior */
+  gap: 12px;
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.product-card--expanded .product-name {
+  font-size: 16px; /* Texto principal más grande */
+}
+
+.product-category {
+  font-size: 12px;
+  color: var(--color-primary-green);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: -6px;
+}
+
+.vendor-rating {
+  font-weight: 600;
+  color: #333;
+}
+
+.product-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── Cuadrícula de detalles internos ─────────────────────────────────────────── */
+
+.product-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #444;
+}
+
+.product-details-grid strong {
+  color: var(--color-dark);
+}
+
+/* ── Información de contacto ─────────────────────────────────────────────────── */
+
+.product-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.product-contact p {
+  margin: 0;
+}
+
+.product-card--expanded .product-price {
+  font-size: 26px; /* Precio más destacado */
+}
+
+/* ── Responsive para tarjetas grandes ────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+  .products-grid--expanded { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 850px) {
+  .products-grid--expanded { grid-template-columns: 1fr; }
 }
 
 @keyframes shimmer {

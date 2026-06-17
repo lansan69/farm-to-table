@@ -4,6 +4,7 @@ import { VendedoresService }    from '../../../../assets/js/services/vendedores.
 import { NegociacionesService } from '../../../../assets/js/services/negociaciones.js';
 import { ChatsService }         from '../../../../assets/js/services/chats.js';
 import { LotesService }         from '../../../../assets/js/services/lotes.js';
+import { MarketplaceService } from '../../../../assets/js/services/marketplace.js';
 
 export const farmerCache = {
   userId:        null,
@@ -12,6 +13,7 @@ export const farmerCache = {
   lotes:         [],
   negociaciones: [],
   chats:         [],
+  categorias:    []
 };
 
 export async function init(container) {
@@ -21,12 +23,13 @@ export async function init(container) {
   const navContainer = container.querySelector('#nav-container');
   const navLoad = loadComponent('app/logged/farmer/nav', navContainer);
 
-  const [perfil, vendedor, lotes, negociaciones, chats] = await Promise.all([
+  const [perfil, vendedor, lotes, negociaciones, chats, categorias] = await Promise.all([
     userId ? PerfilService.getPerfilProductor(userId).catch(e => { console.error('[farmer] perfil:', e); return null; })         : null,
     userId ? VendedoresService.getVendedor(userId).catch(e => { console.error('[farmer] vendedor:', e); return null; })          : null,
     userId ? LotesService.getLotesProductor(userId).catch(e => { console.error('[farmer] lotes:', e); return []; })              : [],
     userId ? NegociacionesService.getByProductor(userId).catch(e => { console.error('[farmer] negociaciones:', e); return []; }) : [],
     userId ? ChatsService.getChats(userId).catch(e => { console.error('[farmer] chats:', e); return []; })                      : [],
+    MarketplaceService.getCategorias().catch(() => []),
   ]);
 
   farmerCache.perfil        = perfil;
@@ -34,7 +37,8 @@ export async function init(container) {
   farmerCache.lotes         = Array.isArray(lotes) ? lotes : (lotes?.data ?? []);
   farmerCache.negociaciones = Array.isArray(negociaciones) ? negociaciones : (negociaciones?.data ?? []);
   farmerCache.chats         = Array.isArray(chats) ? chats : (chats?.data ?? []);
-
+  farmerCache.categorias    = categorias;
+  
   await navLoad;
 }
 
@@ -49,7 +53,5 @@ export async function cleanup() {
 }
 
 export async function updateChat() {
-  console.log("Before update chat", farmerCache.chats);
   farmerCache.chats = farmerCache.userId ? await ChatsService.getChats(farmerCache.userId).catch(e => { console.error('[farmer] chats:', e); return []; }) : [];
-  console.log("Update chat", farmerCache.chats);
 }

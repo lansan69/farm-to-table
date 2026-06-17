@@ -85,7 +85,6 @@ function apiMsgToMsg(msg, userId) {
 let _unsubscribers = [];
 
 export async function init(container) {
-  console.log("init");
   _unsubscribers = [];
   const userId = userCache.userId;
 
@@ -122,7 +121,6 @@ export async function init(container) {
   renderContacts();
   // Auto-open a specific chat if another page requested it
   const pendingChatId = sessionStorage.getItem('openChatId');
-  console.log("init Opening chatID", pendingChatId);
   if (pendingChatId) {
     const id = parseInt(pendingChatId, 10);
     if (contacts.some(c => c.id === id)) openChat(id);
