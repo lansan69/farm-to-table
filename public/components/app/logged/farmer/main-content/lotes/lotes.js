@@ -1,4 +1,4 @@
-import { farmerCache } from '../../farmer.js';
+import { farmerCache, updateLotes } from '../../farmer.js';
 import { navigate } from '../../../../../../assets/js/app.js';
 import { createSearchBar } from '../../../../../../assets/js/components/chat-components.js';
 import { createLoteCard } from '../../../../../../assets/js/components/marketplace-components.js';
@@ -185,7 +185,7 @@ export async function init(container) {
 
       renderLotes();
       toastSuccess('Lote creado correctamente.');
-      
+      updateLotes();
       addOverlay.style.display = 'none';
       form.reset();
       imagePreview.src = '';

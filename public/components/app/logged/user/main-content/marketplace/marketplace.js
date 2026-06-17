@@ -16,7 +16,7 @@ function mapLote(l) {
     status: l.estado_lote === 'disponible' ? 'Disponible' : 'En negociación',
     catId:  l.id_categoria,
     zona:   l.zona || '',
-    image:  `assets/images/login/${l.foto}`,
+    image:  l.foto ? `assets/images/lotes/${l.foto}`:`assets/images/lotes/frutas.jpeg`,
   };
 }
 
@@ -69,6 +69,7 @@ function injectModal() {
 }
 
 export async function init(container) {
+  console.log(userCache.lotes);
   const userId       = userCache.userId;
   const searchSlot   = container.querySelector('#market-search');
   const productsGrid = container.querySelector('#productsGrid');
@@ -209,7 +210,7 @@ export async function init(container) {
         <div style="position: relative; max-width: 600px; width: 100%; border-radius: 14px; background: #fff; max-height: 90vh; overflow-y: auto;">
           <button class="mc-close-btn" style="position: absolute; top: 12px; right: 12px; background: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-weight: bold; cursor: pointer; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">✕</button>
           <div class="products-grid--expanded" style="display: block;">
-            ${createProductCardExpanded({ ...rawProduct, isFav: favSet.has(lotId), foto: `assets/images/login/${rawProduct.foto}` })}
+            ${createProductCardExpanded({ ...rawProduct, isFav: favSet.has(lotId), foto: `assets/images/lotes/${rawProduct.foto}` })}
           </div>
         </div>
       `;
