@@ -74,19 +74,35 @@ class LoteExcedenteModel extends BaseModel
             ->fetchAll();
     }
 
-    public function create(
-        int    $idProductor,
-        int    $idProducto,
-        float  $cantidad,
-        string $fechaCosecha,
-        float  $precio
+public function create(
+        int     $idProductor,
+        string  $nombre,
+        int     $idCategoria,
+        float   $cantidad,
+        float   $precio,
+        string  $fechaCosecha,
+        ?string $descripcion = null,
+        ?string $foto = null,
+        ?int    $idProducto = null
     ): int {
         $stmt = $this->db->prepare(
             'INSERT INTO lotes_excedentes
-                (id_productor, id_producto, cantidad_kg, fecha_cosecha, precio_recuperacion_sugerido)
-             VALUES (?, ?, ?, ?, ?)'
+                (id_productor, nombre_producto, id_categoria, cantidad_kg, precio_recuperacion_sugerido, fecha_cosecha, descripcion_producto, foto, id_producto)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
-        $stmt->execute([$idProductor, $idProducto, $cantidad, $fechaCosecha, $precio]);
+        
+        $stmt->execute([
+            $idProductor,
+            $nombre,
+            $idCategoria,
+            $cantidad,
+            $precio,
+            $fechaCosecha,
+            $descripcion,
+            $foto,
+            $idProducto
+        ]);
+        
         return (int) $this->db->lastInsertId();
     }
 

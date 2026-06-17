@@ -1,8 +1,11 @@
 <div class="mis-lotes-page">
-  <section class="mis-lotes">
+  <section class="mis-lotes" style="position: relative;">
     <div class="lotes-actions">
       <h2 class="lotes-title">Mis Lotes</h2>
-      <div id="lotes-search"></div>
+      <div class="d-flex" style="gap: 8px;">
+        <div id="lotes-search"></div>
+        <button class="d-flex align-items-center justify-content-center" id="add-lote-btn" style="background: var(--color-teal); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 40px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);" aria-label="Añadir nuevo lote">+</button>
+      </div>
     </div>
     <div class="products-grid" id="lotesGrid"></div>
   </section>

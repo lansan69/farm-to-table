@@ -118,6 +118,53 @@ class UsuarioModel extends BaseModel
         $stmt->execute([$googleId, $userId]);
     }
 
+    /**
+     * Lista todos los usuarios con filtros opcionales por nombre, correo y rol.
+     * Nunca expone hash_contrasena ni google_id.
+     */
+    public function findAll(?string $nombre = null, ?string $correo = null, ?string $rol = null): array
+    {
+        $where  = [];
+        $params = [];
+
+        if ($nombre !== null && $nombre !== '') {
+            $where[]  = '(u.nombre_razon_social LIKE ? OR u.apellido LIKE ?)';
+            $term     = '%' . $nombre . '%';
+            $params[] = $term;
+            $params[] = $term;
+        }
+
+        if ($correo !== null && $correo !== '') {
+            $where[]  = 'u.email LIKE ?';
+            $params[] = '%' . $correo . '%';
+        }
+
+        if ($rol !== null && $rol !== '') {
+            $where[]  = 'u.rol_usuario = ?';
+            $params[] = $rol;
+        }
+
+        $sql = 'SELECT u.id_usuario,
+                       u.nombre_razon_social,
+                       u.apellido,
+                       u.rol_usuario,
+                       u.telefono_contacto,
+                       u.email,
+                       u.fecha_registro,
+                       u.puntuacion_promedio,
+                       z.id_zona,
+                       z.nombre_delegacion,
+                       z.codigo_postal
+                FROM usuarios u
+                LEFT JOIN zonas_operativas z ON z.id_zona = u.id_zona'
+            . ($where ? ' WHERE ' . implode(' AND ', $where) : '')
+            . ' ORDER BY u.fecha_registro DESC';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
     public function getStatsComprador(int $id): ?array
     {
         $stmt = $this->db->prepare(

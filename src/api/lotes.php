@@ -54,20 +54,38 @@ function handleGet(LoteDomain $domain): void
 
 function handlePost(LoteDomain $domain): void
 {
-    $body = Router::body();
-    Router::requireFields(['id_productor', 'id_producto', 'cantidad', 'fecha_cosecha', 'precio'], $body);
+    // Con FormData, los datos llegan por POST nativo
+    $body = $_POST; 
+    
+    Router::requireFields(['id_productor', 'nombre', 'categoria_id', 'cantidad', 'precio_sugerido', 'fecha'], $body);
+
+    $fotoNombre = null;
+    
+    // Validar y procesar la imagen
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+        $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+        $fotoNombre = uniqid('lote_') . '.' . $ext; // Genera nombre único
+        
+        // Ajusta los '../' según dónde esté este archivo php respecto a la raíz de tu proyecto
+        $destino = __DIR__ . '/../../public/assets/images/lotes/' . $fotoNombre; 
+        
+        move_uploaded_file($_FILES['foto']['tmp_name'], $destino);
+    }
 
     $result = $domain->publicarLote(
         idProductor:  (int)   $body['id_productor'],
-        idProducto:   (int)   $body['id_producto'],
+        nombre:       (string)$body['nombre'],
+        idCategoria:  (int)   $body['categoria_id'],
         cantidad:     (float) $body['cantidad'],
-        fechaCosecha:         $body['fecha_cosecha'],
-        precio:       (float) $body['precio'],
-        fotosUrls:            $body['fotos'] ?? []
+        precio:       (float) $body['precio_sugerido'],
+        fechaCosecha: (string)$body['fecha'],
+        descripcion:  $body['descripcion'] ?? null,
+        foto:         $fotoNombre, // Pasamos solo el nombre del archivo
+        idProducto:   $body['id_producto'] ?? null
     );
 
     $result['success']
-        ? json_ok(['id_lote' => $result['id_lote']], 201)
+        ? json_ok(['id_lote' => $result['id_lote'], 'foto_nombre' => $fotoNombre], 201)
         : json_error($result['message'], 500);
 }
 

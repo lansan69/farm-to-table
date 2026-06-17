@@ -38,6 +38,12 @@ export const LotesService = {
     });
   },
 
+subirLote(formData) {
+    // Se envía directamente el FormData.
+    // Importante: tu clase Http.post NO debe hacer JSON.stringify si detecta que es un FormData
+    return Http.post('lotes.php', formData);
+  },
+
   /**
    * Cambia el estado de un lote (solo el productor dueño del lote).
    * @param {number} idLote
@@ -46,5 +52,22 @@ export const LotesService = {
    */
   cambiarEstado(idLote, idProductor, estado) {
     return Http.patch('lotes.php', { id_lote: idLote, id_productor: idProductor, estado });
+  },
+
+  /**
+   * Actualiza precio y/o estado de un lote (uso exclusivo del admin).
+   * @param {number} idLote
+   * @param {{ precio?: number, estado?: string }} datos
+   */
+  actualizar(idLote, datos) {
+    return Http.patch('lotes.php', { id_lote: idLote, ...datos });
+  },
+
+  /**
+   * Elimina un lote (uso exclusivo del admin).
+   * @param {number} idLote
+   */
+  eliminar(idLote) {
+    return Http.delete('lotes.php', { id_lote: idLote });
   },
 };

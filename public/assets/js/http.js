@@ -32,9 +32,19 @@ export class HttpError extends Error {
 async function request(endpoint, method = 'GET', body = null) {
   const init = { method };
 
+  // Detectamos si el cuerpo es una instancia de FormData
+  const isFormData = body instanceof FormData;
+
   if (body !== null) {
-    init.headers = { 'Content-Type': 'application/json' };
-    init.body    = JSON.stringify(body);
+    if (isFormData) {
+      // SI ES FORMDATA:
+      // No ponemos Content-Type. El navegador genera el boundary automáticamente.
+      init.body = body;
+    } else {
+      // SI ES JSON (comportamiento anterior):
+      init.headers = { 'Content-Type': 'application/json' };
+      init.body = JSON.stringify(body);
+    }
   }
 
   let res;
@@ -51,6 +61,7 @@ async function request(endpoint, method = 'GET', body = null) {
     throw new HttpError(`Respuesta inesperada del servidor (${res.status}).`, res.status);
   }
 
+  // Nota: si tu API devuelve errores 4xx o 5xx, el json podría tener status 'error'
   if (json.status === 'error') {
     throw new HttpError(json.message ?? 'Error desconocido.', res.status);
   }

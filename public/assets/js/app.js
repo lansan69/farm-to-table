@@ -112,7 +112,6 @@ let currentRoute = null;
 async function router() {
   // Obtiene la ruta relativa eliminando el BASE_PATH
   const path = window.location.pathname.replace(BASE_PATH, '') || '/';
-  console.log('Navegando a:', path);
   const app  = document.getElementById('app');
 
   // Si es la raíz, redirige según si el usuario está autenticado o no
@@ -120,7 +119,6 @@ async function router() {
 
   // Busca la ruta en la tabla de rutas definida
   const route = routes.find(r => r.path === path);
-    console.log('Ruta encontrada:', route);
 
   // Si no se encontró la ruta, muestra un error 404
   if (!route) {
