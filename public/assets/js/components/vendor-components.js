@@ -16,14 +16,21 @@ function renderStars(rating) {
  * Vendor card for the catalogo-vendedores grid.
  * @param {{ id, name, rating, zona, mainProduct }} vendor
  */
-export function createVendorCard({ id = 0, name = '', rating = 0, zona = '', mainProduct = '' }) {
+export function createVendorCard({ id = 0, name = '', rating = 0, zona = '', mainProduct = '', foto = null }) {
   const initial = (name || '?')[0].toUpperCase();
   const color   = AVATAR_COLORS[id % AVATAR_COLORS.length];
 
+  // Lógica para mostrar foto o inicial
+  const avatarContent = foto 
+    ? `<img src="../assets/images/users/${foto}" style="width:100%; height:100%; object-fit:cover;" />`
+    : `<span class="vendor-avatar__letter">${initial}</span>`;
+    
+  const avatarStyle = foto ? `background-color: transparent;` : `background-color: ${color};`;
+
   return `
     <article class="vendor-card" data-id="${id}">
-      <div class="vendor-avatar-cont" style="background-color:${color}">
-        <span class="vendor-avatar__letter">${initial}</span>
+      <div class="vendor-avatar-cont" style="${avatarStyle}">
+        ${avatarContent}
       </div>
       <div class="vendor-content">
         <h3 class="vendor-name">${name}</h3>
@@ -51,7 +58,8 @@ export function createVendorCardExpanded(data = {}) {
     fecha_registro = '',
     zona = 'Sin zona',
     codigo_postal = '',
-    rol_usuario = 'productor'
+    rol_usuario = 'productor',
+    foto = null
   } = data;
 
   const fullName = apellido ? `${nombre_razon_social} ${apellido}` : nombre_razon_social;
@@ -61,14 +69,23 @@ export function createVendorCardExpanded(data = {}) {
   const joinedDate = fecha_registro ? fecha_registro.split(' ')[0] : 'Desconocida';
   const zonaStr = codigo_postal ? `${zona}, C.P. ${codigo_postal}` : zona;
 
+  // Lógica de avatar: Imagen o Inicial
+  const avatarContent = foto 
+    ? `<img src="../assets/images/users/${foto}" style="width:100%; height:100%; object-fit:cover;" />`
+    : initial;
+
+  const avatarStyle = foto 
+    ? `background-color: transparent;` 
+    : `background-color: ${color};`;
+  
   return `
     <article class="card border-0 rounded-4 w-100 shadow-sm overflow-hidden vendor-card--expanded" data-id="${id_usuario}">
       <div class="card-body p-4 p-md-5">
         
         <div class="d-flex align-items-center gap-3 mb-4">
-          <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm flex-shrink-0" 
-               style="background-color: ${color}; width: 70px; height: 70px; font-size: 2rem; font-weight: bold;">
-            ${initial}
+          <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm flex-shrink-0 overflow-hidden" 
+               style="${avatarStyle} width: 70px; height: 70px; font-size: 2rem; font-weight: bold;">
+            ${avatarContent}
           </div>
           <div class="overflow-hidden">
             <h3 class="h4 mb-1 fw-bold text-dark text-truncate" title="${fullName}">${fullName}</h3>

@@ -9,7 +9,7 @@ export async function init(container) {
   const filtersWrap = container.querySelector('.filters-wrap');
   const filtersBar  = filtersWrap.querySelector('.filters');
   const toggleBtn   = filtersWrap.querySelector('.filters-toggle');
-
+  console.log("vendedore: ", userCache.vendedores);
   let activeZone  = '';
   let searchQuery = '';
 
@@ -165,6 +165,7 @@ export async function init(container) {
       rating:      parseFloat(v.puntuacion_promedio) || 0,
       zona:        v.zona,
       mainProduct: v.producto_principal,
+      foto:        v.foto,
     })).join('');
   }
 
