@@ -1,1 +1,64 @@
-<p>Aquí irá Usuarios</p>
+<div class="usuarios-page">
+
+  <div class="usuarios-header">
+    <div>
+      <h1 class="usuarios-title">Usuarios</h1>
+      <p class="usuarios-sub" id="uSub"></p>
+    </div>
+    <div class="u-search-bar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#999" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.099zm-5.242 1.6a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11"/>
+      </svg>
+      <input id="uSearch" type="text" placeholder="Buscar por nombre o correo…" autocomplete="off" />
+    </div>
+  </div>
+
+  <!-- Role tabs -->
+  <div class="role-tabs" id="roleTabs">
+    <button class="role-tab active" data-rol="todos">Todos</button>
+    <button class="role-tab" data-rol="usuario">Usuario</button>
+    <button class="role-tab" data-rol="productor">Productor</button>
+    <button class="role-tab" data-rol="organizacion">Organización</button>
+    <button class="role-tab" data-rol="admin">Admin</button>
+  </div>
+
+  <!-- Table -->
+  <div class="u-table-wrap">
+    <table class="u-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Rol</th>
+          <th>Zona</th>
+          <th>Teléfono</th>
+          <th>Registro</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="uTableBody"></tbody>
+    </table>
+    <div class="u-empty" id="uEmpty" style="display:none">
+      <p>No se encontraron usuarios.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Detalle de usuario -->
+<div class="modal fade" id="userDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header ud-modal-header">
+        <div class="ud-avatar-wrap">
+          <div class="ud-avatar" id="udAvatar"></div>
+          <div>
+            <h5 class="ud-name" id="udName"></h5>
+            <span class="ud-role-badge" id="udRoleBadge"></span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body ud-body" id="udBody"></div>
+    </div>
+  </div>
+</div>

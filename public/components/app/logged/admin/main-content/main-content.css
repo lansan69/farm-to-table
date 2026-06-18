@@ -10,7 +10,8 @@
 #admin-main-content-inicio,
 #admin-main-content-usuarios,
 #admin-main-content-zonas,
-#admin-main-content-productos {
+#admin-main-content-productos,
+#admin-main-content-reportes {
   display: none;
   width: 100%;
   height: 100%;
@@ -21,6 +22,7 @@
 #admin-main-content-inicio.active,
 #admin-main-content-usuarios.active,
 #admin-main-content-zonas.active,
-#admin-main-content-productos.active {
+#admin-main-content-productos.active,
+#admin-main-content-reportes.active {
   display: flex;
 }

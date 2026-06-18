@@ -1,1 +1,60 @@
-<p>Aquí irá Zonas</p>
+<div class="zonas-page">
+
+  <div class="zonas-header">
+    <div>
+      <h1 class="zonas-title">Zonas operativas</h1>
+      <p class="zonas-sub" id="zSub"></p>
+    </div>
+    <button class="z-add-btn" id="btnNuevaZona">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+      </svg>
+      Nueva zona
+    </button>
+  </div>
+
+  <div class="zonas-grid" id="zonasGrid"></div>
+
+</div>
+
+<!-- Modal: Crear / Editar zona -->
+<div class="modal fade" id="zonaFormModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:1px solid #eee;">
+        <h5 class="modal-title zf-title" id="zonaFormTitle">Nueva zona</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+        <input type="hidden" id="zfId" value="" />
+        <div>
+          <label class="zf-label" for="zfNombre">Nombre / Delegación</label>
+          <input class="zf-input" id="zfNombre" type="text" placeholder="Ej. Cuauhtémoc" autocomplete="off" />
+        </div>
+        <div>
+          <label class="zf-label" for="zfCP">Código postal</label>
+          <input class="zf-input" id="zfCP" type="text" inputmode="numeric" maxlength="5" placeholder="Ej. 06600" autocomplete="off" />
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #eee;gap:8px;">
+        <button type="button" class="zf-btn zf-btn--cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="zf-btn zf-btn--confirm" id="zfGuardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Confirmar toggle activa -->
+<div class="modal fade" id="zonaToggleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-body" style="padding:1.5rem;text-align:center;">
+        <p class="zt-msg" id="ztMsg"></p>
+      </div>
+      <div class="modal-footer justify-content-center" style="border-top:1px solid #eee;gap:8px;">
+        <button type="button" class="zf-btn zf-btn--cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="zf-btn" id="ztConfirm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>

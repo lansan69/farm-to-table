@@ -1,1 +1,57 @@
-<p>Aquí irá Reportes</p>
+<div class="reportes-page">
+
+  <div class="reportes-header">
+    <div>
+      <h1 class="reportes-title">Reportes</h1>
+      <p class="reportes-sub" id="rSub"></p>
+    </div>
+    <div class="r-search-bar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#999" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.099zm-5.242 1.6a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11"/>
+      </svg>
+      <input id="rSearch" type="text" placeholder="Buscar por nombre…" autocomplete="off" />
+    </div>
+  </div>
+
+  <!-- Situación tabs -->
+  <div class="r-tabs" id="rTabs">
+    <button class="r-tab active" data-situ="todos">Todos</button>
+    <button class="r-tab" data-situ="pendiente">Pendientes</button>
+    <button class="r-tab" data-situ="en_revision">En revisión</button>
+    <button class="r-tab" data-situ="resuelto">Resueltos</button>
+    <button class="r-tab" data-situ="cerrado">Cerrados</button>
+  </div>
+
+  <!-- Table -->
+  <div class="r-table-wrap">
+    <table class="r-table">
+      <thead>
+        <tr>
+          <th>Reportante</th>
+          <th>Reportado</th>
+          <th>Situación</th>
+          <th>Fecha</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="rTableBody"></tbody>
+    </table>
+    <div class="r-empty" id="rEmpty" style="display:none">
+      <p>No se encontraron reportes.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Detalle del reporte -->
+<div class="modal fade" id="reporteDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom:1px solid #eee;">
+        <h5 class="modal-title" style="font-size:15px;font-weight:700;">Detalle del reporte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="rDetailBody" style="padding:1.5rem;display:flex;flex-direction:column;gap:0.85rem;"></div>
+    </div>
+  </div>
+</div>
