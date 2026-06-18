@@ -1,4 +1,4 @@
-import { userCache, updateFavoritos }              from '../../user.js';
+import { userCache, updateFavoritos, updateNegociaciones }              from '../../user.js';
 import { createSearchBar }         from '../../../../../../assets/js/components/chat-components.js';
 import { createProductCard, createProductCardExpanded } from '../../../../../../assets/js/components/marketplace-components.js';
 import { FavoritosService }        from '../../../../../../assets/js/services/favoritos.js';
@@ -286,6 +286,7 @@ if (searchFromProductor) {
       toastError('No se pudo iniciar la negociación.');
       console.error(err);
     } finally {
+      updateNegociaciones();
       mcConfirm.disabled    = false;
       mcConfirm.textContent = 'Confirmar';
     }
