@@ -164,3 +164,35 @@ export function toastNotification({ title = 'Notificación', body = '', img = ''
         <div class="toast-body">${body}</div>`;
     show(el);
 }
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+
+export function toastLoading(message) {
+    const el = document.createElement('div');
+    // Usamos text-bg-primary (azul) para diferenciarlo del success (verde)
+    el.className = 'toast align-items-center text-bg-primary border-0';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.setAttribute('aria-atomic', 'true');
+    el.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>`;
+
+    getContainer().appendChild(el);
+    
+    // autohide en false para que espere a que termine la petición
+    const instance = new bootstrap.Toast(el, { autohide: false });
+    instance.show();
+
+    el.addEventListener('hidden.bs.toast', () => el.remove());
+
+    // Retornamos una función para destruirlo cuando termine la carga
+    return {
+        hide: () => instance.hide()
+    };
+}

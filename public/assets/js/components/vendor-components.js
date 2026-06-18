@@ -35,3 +35,80 @@ export function createVendorCard({ id = 0, name = '', rating = 0, zona = '', mai
     </article>
   `;
 }
+
+/**
+ * Vendor expanded card handling detailed profile information.
+ * @param {Object} data - Datos combinados de las tablas usuarios y zonas
+ */
+export function createVendorCardExpanded(data = {}) {
+  const {
+    id_usuario = 0,
+    nombre_razon_social = 'Sin nombre',
+    apellido = '',
+    email = 'Sin correo electrónico',
+    telefono_contacto = 'Sin teléfono',
+    puntuacion_promedio = 0,
+    fecha_registro = '',
+    zona = 'Sin zona',
+    codigo_postal = '',
+    rol_usuario = 'productor'
+  } = data;
+
+  const fullName = apellido ? `${nombre_razon_social} ${apellido}` : nombre_razon_social;
+  const initial = (nombre_razon_social || '?')[0].toUpperCase();
+  const color = AVATAR_COLORS[id_usuario % AVATAR_COLORS.length] || '#1B853F';
+  
+  const joinedDate = fecha_registro ? fecha_registro.split(' ')[0] : 'Desconocida';
+  const zonaStr = codigo_postal ? `${zona}, C.P. ${codigo_postal}` : zona;
+
+  return `
+    <article class="card border-0 rounded-4 w-100 shadow-sm overflow-hidden vendor-card--expanded" data-id="${id_usuario}">
+      <div class="card-body p-4 p-md-5">
+        
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm flex-shrink-0" 
+               style="background-color: ${color}; width: 70px; height: 70px; font-size: 2rem; font-weight: bold;">
+            ${initial}
+          </div>
+          <div class="overflow-hidden">
+            <h3 class="h4 mb-1 fw-bold text-dark text-truncate" title="${fullName}">${fullName}</h3>
+            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 text-capitalize px-2 py-1">
+              ${rol_usuario}
+            </span>
+          </div>
+        </div>
+        
+        <div class="vendor-rating mb-4 fs-5 text-warning">
+          ${renderStars(puntuacion_promedio)}
+        </div>
+        
+        <div class="row g-3 mb-4 text-secondary" style="font-size: 0.95rem;">
+          <div class="col-6">
+            <div class="fw-semibold text-dark mb-1">📞 Teléfono</div>
+            <div class="text-truncate" title="${telefono_contacto}">${telefono_contacto}</div>
+          </div>
+          <div class="col-6">
+            <div class="fw-semibold text-dark mb-1">📧 Email</div>
+            <div class="text-truncate" title="${email}">${email}</div>
+          </div>
+          <div class="col-6">
+            <div class="fw-semibold text-dark mb-1">${LOCATION_ICON} Zona</div>
+            <div class="text-truncate" title="${zonaStr}">${zonaStr}</div>
+          </div>
+          <div class="col-6">
+            <div class="fw-semibold text-dark mb-1">📅 Registro</div>
+            <div>${joinedDate}</div>
+          </div>
+        </div>
+        
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn text-white w-100 fw-semibold rounded-3 vendor-cta-btn" data-id="${id_usuario}" 
+                  style="background-color: var(--color-teal);">
+            Ver productos
+          </button>
+        </div>
+
+      </div>
+    </article>
+  `;
+}

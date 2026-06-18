@@ -5,11 +5,12 @@
 // GET  ?id_usuario=N&rol=productor       → perfil productor (stats + valoraciones)
 // GET  ?action=zonas                     → lista de zonas operativas activas
 //
-// PUT  {id_usuario, nombre, apellido?,
-//       telefono, id_zona, email?}       → actualiza datos editables del perfil
-//
 // PUT  {action:'password',
 //       id_usuario, password}            → cambia contraseña (se hashea en backend)
+//
+// POST {action:'update',                 → ACTUALIZADO A POST PARA ACEPTAR IMÁGENES ($_FILES)
+//       id_usuario, nombre, apellido?,
+//       telefono, id_zona, email?, foto?}→ actualiza datos editables del perfil
 //
 // POST {action:'valoracion',
 //       id_entrega, id_evaluador,
@@ -63,30 +64,12 @@ function handleGet(PerfilDomain $domain): void
 function handlePut(PerfilDomain $domain): void
 {
     $body   = Router::body();
-    $action = $body['action'] ?? 'update';
+    $action = $body['action'] ?? '';
 
     match ($action) {
         'password' => cambiarPassword($domain, $body),
-        default    => actualizarPerfil($domain, $body),
+        default    => json_error('Acción no reconocida en PUT.', 400),
     };
-}
-
-function actualizarPerfil(PerfilDomain $domain, array $body): void
-{
-    Router::requireFields(['id_usuario', 'nombre', 'telefono', 'id_zona'], $body);
-
-    $ok = $domain->updatePerfil(
-        idUsuario: (int)    $body['id_usuario'],
-        nombre:             trim($body['nombre']),
-        apellido:           isset($body['apellido']) ? trim($body['apellido']) : null,
-        telefono:           trim($body['telefono']),
-        idZona:    (int)    $body['id_zona'],
-        email:              isset($body['email'])    ? trim($body['email'])    : null,
-    );
-
-    $ok
-        ? json_ok()
-        : json_error('No se pudo actualizar el perfil.', 500);
 }
 
 function cambiarPassword(PerfilDomain $domain, array $body): void
@@ -110,13 +93,66 @@ function cambiarPassword(PerfilDomain $domain, array $body): void
 
 function handlePost(PerfilDomain $domain): void
 {
-    $body   = Router::body();
+    // OJO: Como usamos FormData en el cliente (multipart/form-data), 
+    // Router::body() podría no funcionar igual si solo lee php://input. 
+    // Es más seguro usar $_POST directamente para multipart.
+    $body   = $_POST; 
     $action = $body['action'] ?? '';
 
     match ($action) {
+        'update'     => actualizarPerfil($domain, $body),
         'valoracion' => registrarValoracion($domain, $body),
-        default      => json_error('Acción no reconocida.', 400),
+        default      => json_error('Acción no reconocida en POST.', 400),
     };
+}
+
+// ── NUEVO FLUJO ACTUALIZAR PERFIL CON FOTO ──
+function actualizarPerfil(PerfilDomain $domain, array $body): void
+{
+    try {
+        Router::requireFields(['id_usuario', 'nombre', 'telefono', 'id_zona'], $body);
+
+        $fotoNombre = null;
+        
+        // Procesamiento de la imagen si se envió una
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
+            $fotoNombre = uniqid('perfil_') . '.' . $ext;
+            
+            $destino = __DIR__ . '/../../public/assets/images/users/' . $fotoNombre; 
+            
+            // BLINDAJE: Crear la estructura de carpetas si no existe
+            $directorio = dirname($destino);
+            if (!is_dir($directorio)) {
+                mkdir($directorio, 0777, true);
+            }
+            
+            if (!move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
+                 json_error('Error al guardar la imagen físicamente en el servidor.', 500);
+                 return;
+            }
+        }
+
+        $ok = $domain->updatePerfil(
+            idUsuario: (int)    $body['id_usuario'],
+            nombre:             trim($body['nombre']),
+            apellido:           isset($body['apellido']) && $body['apellido'] !== '' ? trim($body['apellido']) : null,
+            telefono:           trim($body['telefono']),
+            idZona:    (int)    $body['id_zona'],
+            email:              isset($body['email']) && $body['email'] !== '' ? trim($body['email']) : null,
+            foto_perfil:        $fotoNombre
+        );
+
+        if ($ok) {
+            json_ok(['foto_perfil' => $fotoNombre], 200);
+        } else {
+            json_error('No se pudo actualizar el perfil en la base de datos.', 500);
+        }
+
+    } catch (\Throwable $e) {
+        // ATRAPAMOS CUALQUIER ERROR FATAL Y LO DEVOLVEMOS COMO JSON
+        json_error('Error Crítico: ' . $e->getMessage(), 500);
+    }
 }
 
 function registrarValoracion(PerfilDomain $domain, array $body): void

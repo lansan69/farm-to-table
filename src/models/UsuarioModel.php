@@ -54,13 +54,51 @@ class UsuarioModel extends BaseModel
         return (int) $stmt->fetchColumn() > 0;
     }
 
+    public function reportarUsuario(
+        int $id_reporta,
+        int $id_reportado,
+        string $situacion,
+        ?int $chat_id
+    ): int {
+        $stmt = $this->db->prepare(
+            'INSERT INTO reportes (id_usuario_reporta, id_usuario_reportado, situacion, chat_id)
+         VALUES (?, ?, ?, ?)'
+        );
+        $stmt->execute([$id_reporta, $id_reportado, $situacion, $chat_id]);
+
+        return (int) $this->db->lastInsertId();
+    }
+
+    /**
+     * Obtiene el historial de reportes con nombres legibles de los usuarios involucrados.
+     */
+    public function getReportes(): array
+    {
+        $sql = 'SELECT r.id, 
+                       r.id_usuario_reporta, 
+                       r.id_usuario_reportado, 
+                       r.situacion, 
+                       r.fecha_reporte, 
+                       r.chat_id,
+                       CONCAT(u_rep.nombre_razon_social, " ", COALESCE(u_rep.apellido, "")) AS nombre_reporta,
+                       CONCAT(u_to.nombre_razon_social, " ", COALESCE(u_to.apellido, ""))  AS nombre_reportado
+                FROM reportes r
+                LEFT JOIN usuarios u_rep ON u_rep.id_usuario = r.id_usuario_reporta
+                LEFT JOIN usuarios u_to  ON u_to.id_usuario  = r.id_usuario_reportado
+                ORDER BY r.fecha_reporte DESC';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     public function create(
-        int     $idZona,
-        string  $nombre,
-        string  $rol,
-        string  $telefono,
-        string  $hash,
-        ?string $email    = null,
+        int $idZona,
+        string $nombre,
+        string $rol,
+        string $telefono,
+        string $hash,
+        ?string $email = null,
         ?string $apellido = null
     ): int {
         $stmt = $this->db->prepare(
@@ -72,13 +110,13 @@ class UsuarioModel extends BaseModel
     }
 
     public function createWithGoogle(
-        int     $idZona,
-        string  $nombre,
-        string  $apellido,
+        int $idZona,
+        string $nombre,
+        string $apellido,
         ?string $email,
-        string  $telefono,
-        string  $googleId,
-        string  $rol
+        string $telefono,
+        string $googleId,
+        string $rol
     ): int {
         $hash = password_hash(bin2hex(random_bytes(16)), PASSWORD_BCRYPT);
         $stmt = $this->db->prepare(
@@ -89,12 +127,31 @@ class UsuarioModel extends BaseModel
         return (int) $this->db->lastInsertId();
     }
 
-    public function update(int $id, string $nombre, ?string $apellido, string $telefono, int $idZona, ?string $email = null): bool
-    {
-        $stmt = $this->db->prepare(
-            'UPDATE usuarios SET nombre_razon_social = ?, apellido = ?, telefono_contacto = ?, id_zona = ?, email = ? WHERE id_usuario = ?'
-        );
-        return $stmt->execute([$nombre, $apellido, $telefono, $idZona, $email, $id]);
+public function update(
+        int $id, 
+        string $nombre, 
+        ?string $apellido, 
+        string $telefono, 
+        int $idZona, 
+        ?string $email = null,
+        ?string $foto_perfil = null
+    ): bool {
+        // Construimos la consulta base
+        $sql = 'UPDATE usuarios SET nombre_razon_social = ?, apellido = ?, telefono_contacto = ?, id_zona = ?, email = ?';
+        $params = [$nombre, $apellido, $telefono, $idZona, $email];
+
+        // Si se envió una foto nueva, la agregamos al UPDATE
+        if ($foto_perfil !== null) {
+            $sql .= ', foto = ?';
+            $params[] = $foto_perfil;
+        }
+
+        // Cerramos la consulta con el WHERE
+        $sql .= ' WHERE id_usuario = ?';
+        $params[] = $id;
+
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($params);
     }
 
     public function updatePassword(int $id, string $hash): bool
@@ -124,23 +181,23 @@ class UsuarioModel extends BaseModel
      */
     public function findAll(?string $nombre = null, ?string $correo = null, ?string $rol = null): array
     {
-        $where  = [];
+        $where = [];
         $params = [];
 
         if ($nombre !== null && $nombre !== '') {
-            $where[]  = '(u.nombre_razon_social LIKE ? OR u.apellido LIKE ?)';
-            $term     = '%' . $nombre . '%';
+            $where[] = '(u.nombre_razon_social LIKE ? OR u.apellido LIKE ?)';
+            $term = '%' . $nombre . '%';
             $params[] = $term;
             $params[] = $term;
         }
 
         if ($correo !== null && $correo !== '') {
-            $where[]  = 'u.email LIKE ?';
+            $where[] = 'u.email LIKE ?';
             $params[] = '%' . $correo . '%';
         }
 
         if ($rol !== null && $rol !== '') {
-            $where[]  = 'u.rol_usuario = ?';
+            $where[] = 'u.rol_usuario = ?';
             $params[] = $rol;
         }
 
@@ -170,6 +227,7 @@ class UsuarioModel extends BaseModel
         $stmt = $this->db->prepare(
             'SELECT u.id_usuario,
                     u.puntuacion_promedio,
+                    u.foto,
                     COUNT(DISTINCT nc.id_negociacion)                                                                   AS total_negociaciones,
                     COUNT(DISTINCT CASE WHEN nc.estado_negociacion = "aceptada" THEN nc.id_negociacion END)             AS negociaciones_aceptadas,
                     COUNT(DISTINCT CASE WHEN nc.estado_negociacion = "pendiente" THEN nc.id_negociacion END)            AS negociaciones_pendientes
@@ -187,6 +245,7 @@ class UsuarioModel extends BaseModel
         $stmt = $this->db->prepare(
             'SELECT u.id_usuario,
                     u.puntuacion_promedio,
+                    u.foto,
                     COUNT(DISTINCT le.id_lote)                                                                          AS total_lotes,
                     COUNT(DISTINCT CASE WHEN le.estado_lote = "disponible"    THEN le.id_lote END)                     AS lotes_disponibles,
                     COUNT(DISTINCT CASE WHEN le.estado_lote = "en_negociacion" THEN le.id_lote END)                    AS lotes_en_negociacion,

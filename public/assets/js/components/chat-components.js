@@ -26,10 +26,18 @@ export function createContactCard(contact) {
   const badge = contact.unread
     ? `<span class="contact-card__badge">${contact.unread}</span>`
     : '';
+
+  const avatarContent = contact.fotoLote
+    ? `<img src="../assets/images/lotes/${contact.fotoLote}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`
+    : contact.name[0].toUpperCase();
+
+  const avatarStyle = contact.fotoLote
+    ? `background: transparent;`
+    : `background: ${contact.color};`;
   return `
     <div class="contact-card" data-id="${contact.id}">
-      <div class="contact-card__avatar" style="background:${contact.color}">
-        ${contact.name[0].toUpperCase()}
+      <div class="contact-card__avatar" style="avatarStyle">
+          ${avatarContent}
       </div>
       <div class="contact-card__body">
         <div class="contact-card__top">
@@ -61,11 +69,20 @@ export function createChatHeader(contact) {
   const closedBadge = contact.closed
     ? `<span class="chat-header__closed-badge">Negociación finalizada</span>`
     : '';
+
+  const avatarContent = contact.fotoLote
+    ? `<img src="../assets/images/lotes/${contact.fotoLote}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`
+    : contact.name[0].toUpperCase();
+
+  const avatarStyle = contact.fotoLote
+    ? `background: transparent;`
+    : `background: ${contact.color};`;
+
   return `
     <div class="chat-header">
       <div class="chat-header__left">
-        <div class="chat-header__avatar" style="background:${contact.color}">
-          ${contact.name[0].toUpperCase()}
+        <div class="chat-header__avatar" style="${avatarStyle}">
+          ${avatarContent}
         </div>
         <div class="chat-header__info">
           <span class="chat-header__name">${contact.name}</span>

@@ -128,14 +128,14 @@
 }
 
 /* Edit button */
-.negoc-btn {
+.perfil-btn {
     border: none;
     cursor: pointer;
     font-weight: 600;
     transition: background 0.18s, transform 0.1s;
 }
 
-.negoc-btn--msg {
+.perfil-btn--msg {
     background: var(--green-dark);
     color: #fff;
     border-radius: 10px;
@@ -147,7 +147,7 @@
     margin-top: 8px;
 }
 
-.negoc-btn--msg:hover {
+.perfil-btn--msg:hover {
     background: var(--green-mid);
     transform: translateY(-1px);
 }
@@ -331,7 +331,7 @@
     fill: none;
 }
 
-.negoc-btn--modificar {
+.perfil-btn--modificar {
     background: var(--green-dark);
     color: #fff;
     border-radius: var(--radius-btn);
@@ -340,7 +340,7 @@
     white-space: nowrap;
 }
 
-.negoc-btn--modificar:hover {
+.perfil-btn--modificar:hover {
     background: var(--green-mid);
 }
 

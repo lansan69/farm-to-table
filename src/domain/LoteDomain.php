@@ -113,6 +113,45 @@ public function publicarLote(
             return ['success' => false, 'message' => $msg];
         }
     }
+
+public function actualizarLote(
+        int     $idLote,
+        int     $idProductor,
+        string  $nombre,
+        int     $idCategoria,
+        float   $cantidad,
+        float   $precio,
+        string  $fechaCosecha,
+        ?string $descripcion = null,
+        ?string $foto = null,
+        ?int    $idProducto = null
+    ): array {
+        $db = Database::getInstance()->getConnection();
+        $db->beginTransaction();
+        try {
+            // Solo ejecutamos la edición, no reasignamos el $idLote
+            $this->loteModel->edit(
+                idLote:       $idLote,
+                idProductor:  $idProductor,
+                nombre:       $nombre,
+                idCategoria:  $idCategoria,
+                cantidad:     $cantidad,
+                precio:       $precio,
+                fechaCosecha: $fechaCosecha,
+                descripcion:  $descripcion,
+                foto:         $foto,
+                idProducto:   $idProducto
+            );
+
+            $db->commit();
+            // Devolvemos el mismo $idLote que nos pasaron por parámetro
+            return ['success' => true, 'id_lote' => $idLote];
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            $msg = defined('DEBUG') && DEBUG ? $e->getMessage() : 'Error al actualizar el lote.';
+            return ['success' => false, 'message' => $msg];
+        }
+    }
     /**
      * Cambia el estado de un lote. Solo el productor dueño puede modificarlo.
      */

@@ -19,9 +19,29 @@ class UsuarioDomain
     public function getUsuarios(
         ?string $nombre = null,
         ?string $correo = null,
-        ?string $rol    = null
+        ?string $rol = null
     ): array {
         return $this->usuarioModel->findAll($nombre, $correo, $rol);
+    }
+
+    public function reportarUsuario(
+        int $id_reporta,
+        int $id_reportado,
+        string $situacion,
+        ?int $chat_id
+    ): int {
+        return $this->usuarioModel->reportarUsuario(
+            $id_reporta,
+            $id_reportado,
+            $situacion,
+            $chat_id
+        );
+    }
+
+    public function obtenerHistorialReportes(): array
+    {
+        // Puedes agregar validaciones de rol aquí si solo el admin debería verlos
+        return $this->usuarioModel->getReportes();
     }
 
     /**
@@ -30,7 +50,8 @@ class UsuarioDomain
     public function getUsuario(int $idUsuario): ?array
     {
         $usuario = $this->usuarioModel->findByIdFromView($idUsuario);
-        if ($usuario === null) return null;
+        if ($usuario === null)
+            return null;
 
         // Strip sensitive fields before returning
         unset($usuario['hash_contrasena'], $usuario['google_id']);

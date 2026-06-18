@@ -6,13 +6,14 @@ class FavoritoModel extends BaseModel
     /**
      * All favorited lots for a user, enriched with product/vendor info from v_lotes_card.
      */
-    public function findByUsuario(int $idUsuario): array
+public function findByUsuario(int $idUsuario): array
     {
         $stmt = $this->db->prepare(
             'SELECT f.id_lote, f.created_at,
                     v.nombre_producto, v.nombre_categoria, v.nombre_productor,
                     v.cantidad_kg, v.precio_recuperacion_sugerido, v.estado_lote,
-                    v.calificacion_producto, v.id_categoria, v.zona
+                    v.calificacion_producto, v.id_categoria, v.zona,
+                    v.foto -- Se añadió la columna foto necesaria para la interfaz
              FROM favoritos f
              JOIN v_lotes_card v ON v.id_lote = f.id_lote
              WHERE f.id_usuario = ?

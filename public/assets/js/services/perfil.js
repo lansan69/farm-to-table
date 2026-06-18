@@ -13,11 +13,28 @@ export const PerfilService = {
     return Http.get('perfil.php', { action: 'zonas' });
   },
 
-  update({ id_usuario, nombre, apellido = null, telefono, id_zona, email = null }) {
-    const body = { id_usuario, nombre, telefono, id_zona };
-    if (apellido !== null && apellido !== '') body.apellido = apellido;
-    if (email)    body.email    = email;
-    return Http.put('perfil.php', body);
+  update({ id_usuario, nombre, apellido = null, telefono, id_zona, email = null, foto = null }) {
+    const formData = new FormData();
+    
+    // Agregamos un flag 'action' para que tu backend sepa que es un update en caso de que 
+    // estés usando el mismo endpoint (POST) para crear y actualizar.
+    formData.append('action', 'update');
+    formData.append('id_usuario', id_usuario);
+    formData.append('nombre', nombre);
+    formData.append('telefono', telefono);
+    formData.append('id_zona', id_zona);
+
+    if (apellido !== null && apellido !== '') {
+      formData.append('apellido', apellido);
+    }
+    if (email) {
+      formData.append('email', email);
+    }
+    if (foto) {
+      formData.append('foto', foto);
+    }
+
+    return Http.post('perfil.php', formData);
   },
 
   updatePassword({ id_usuario, password }) {

@@ -7,35 +7,72 @@ class ChatModel extends BaseModel
      * All chats where $userId appears as either usuario_a or usuario_b,
      * enriched with the contact's name, last message, and negotiation status.
      */
-    public function findByUsuario(int $userId): array
-    {
-        $stmt = $this->db->prepare(
-            'SELECT
-               c.id                  AS chat_id,
-               c.usuario_a,
-               c.usuario_b,
-               c.id_negociacion,
-               IF(c.usuario_a = ?, \'a\', \'b\') AS my_role,
-               u.nombre_razon_social  AS contact_name,
-               u.apellido             AS contact_apellido,
-               m.body                 AS last_message,
-               m.fecha_enviado        AS last_message_time,
-               COALESCE(v.estado_negociacion, \'pendiente\') AS estado_negociacion
-             FROM chats c
-             JOIN usuarios u ON u.id_usuario = IF(c.usuario_a = ?, c.usuario_b, c.usuario_a)
-             LEFT JOIN mensajes m ON m.id = (
-               SELECT id FROM mensajes
-               WHERE chat_id = c.id
-               ORDER BY fecha_enviado DESC
-               LIMIT 1
-             )
-             LEFT JOIN v_negociaciones_detalle v ON v.id_negociacion = c.id_negociacion
-             WHERE c.usuario_a = ? OR c.usuario_b = ?
-             ORDER BY COALESCE(m.fecha_enviado, c.created_at) DESC'
-        );
-        $stmt->execute([$userId, $userId, $userId, $userId]);
-        return $stmt->fetchAll();
-    }
+public function findByUsuario(int $userId): array
+{
+    $stmt = $this->db->prepare(
+        'SELECT
+            c.id AS chat_id,
+            c.usuario_a,
+            c.usuario_b,
+            c.id_negociacion,
+            IF(c.usuario_a = ?, \'a\', \'b\') AS my_role,
+            u.nombre_razon_social AS contact_name,
+            u.apellido AS contact_apellido,
+            m.body AS last_message,
+            m.fecha_enviado AS last_message_time,
+            -- Campos extendidos de la negociación y lote
+            v.estado_negociacion,
+            v.fecha_creacion AS fecha_negociacion,
+            v.id_lote,
+            v.cantidad_kg,
+            v.precio_recuperacion_sugerido,
+            v.estado_lote,
+            v.foto AS foto_lote,
+            v.nombre_producto,
+            v.ultima_oferta,
+            v.ultimo_emisor_id,
+            v.id_vendedor,
+            v.nombre_vendedor,
+            v.id_comprador,
+            v.nombre_comprador
+         FROM chats c
+         JOIN usuarios u ON u.id_usuario = IF(c.usuario_a = ?, c.usuario_b, c.usuario_a)
+         LEFT JOIN mensajes m ON m.id = (
+            SELECT id FROM mensajes
+            WHERE chat_id = c.id
+            ORDER BY fecha_enviado DESC
+            LIMIT 1
+         )
+         -- Join con la consulta extendida que proporcionaste
+         LEFT JOIN (
+            SELECT 
+                nc.id_negociacion,
+                nc.estado_negociacion,
+                nc.fecha_creacion,
+                le.id_lote,
+                le.cantidad_kg,
+                le.precio_recuperacion_sugerido,
+                le.estado_lote,
+                le.foto,
+                COALESCE(cp.nombre_producto, le.nombre_producto) AS nombre_producto,
+                (SELECT do2.monto_propuesto FROM railway.detalles_ofertas do2 WHERE do2.id_negociacion = nc.id_negociacion ORDER BY do2.fecha_envio DESC LIMIT 1) AS ultima_oferta,
+                (SELECT do2.id_usuario_emisor FROM railway.detalles_ofertas do2 WHERE do2.id_negociacion = nc.id_negociacion ORDER BY do2.fecha_envio DESC LIMIT 1) AS ultimo_emisor_id,
+                vend.id_usuario AS id_vendedor,
+                vend.nombre_razon_social AS nombre_vendedor,
+                comp.id_usuario AS id_comprador,
+                comp.nombre_razon_social AS nombre_comprador
+            FROM railway.negociaciones_contraoferta nc
+            JOIN railway.lotes_excedentes le ON le.id_lote = nc.id_lote
+            LEFT JOIN railway.catalogo_productos cp ON cp.id_producto = le.id_producto
+            JOIN railway.usuarios vend ON vend.id_usuario = le.id_productor
+            JOIN railway.usuarios comp ON comp.id_usuario = nc.id_comprador
+         ) v ON v.id_negociacion = c.id_negociacion
+         WHERE c.usuario_a = ? OR c.usuario_b = ?
+         ORDER BY COALESCE(m.fecha_enviado, c.created_at) DESC'
+    );
+    $stmt->execute([$userId, $userId, $userId, $userId]);
+    return $stmt->fetchAll();
+}
 
     /**
      * All messages of a chat ordered chronologically.

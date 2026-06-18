@@ -84,6 +84,24 @@ export async function init(container) {
 
   searchSlot.innerHTML = createSearchBar('Buscar productos...');
   const searchInput = searchSlot.querySelector('.chat-search-bar__input');
+  searchInput.parentElement.style.position = 'relative';
+
+  const clearBtn = document.createElement('button');
+  clearBtn.innerHTML = '✕';
+  Object.assign(clearBtn.style, {
+    position: 'absolute',
+    right: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'transparent',
+    border: 'none',
+    color: '#999',
+    cursor: 'pointer',
+    display: 'none',
+    fontSize: '16px',
+    padding: '4px'
+  });
+  searchInput.parentElement.appendChild(clearBtn);
 
   let currentCatId = 0;
   let searchTerm   = '';
@@ -128,7 +146,16 @@ export async function init(container) {
   // ── Search input ───────────────────────────────────────────────────────
   searchInput.addEventListener('input', e => {
     searchTerm = e.target.value;
+    clearBtn.style.display = searchTerm.length > 0 ? 'block' : 'none';
     renderProducts();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchTerm = '';
+    clearBtn.style.display = 'none';
+    renderProducts();
+    searchInput.focus();
   });
 
   // ── Edit modal ─────────────────────────────────────────────────────────

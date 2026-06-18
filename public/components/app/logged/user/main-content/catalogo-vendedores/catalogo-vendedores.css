@@ -114,6 +114,7 @@
 /* ── Vendor card ──────────────────────────────────────────────────────────────── */
 
 .vendor-card {
+  cursor: pointer;
   background: #fff;
   border-radius: 14px;
   overflow: hidden;

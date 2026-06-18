@@ -82,15 +82,24 @@ class PerfilDomain
     /**
      * Actualiza los datos editables del perfil.
      */
-    public function updatePerfil(
+public function updatePerfil(
         int     $idUsuario,
         string  $nombre,
         ?string $apellido,
         string  $telefono,
         int     $idZona,
-        ?string $email = null
+        ?string $email = null,
+        ?string $foto_perfil = null
     ): bool {
-        return $this->usuarioModel->update($idUsuario, $nombre, $apellido, $telefono, $idZona, $email);
+        return $this->usuarioModel->update(
+            $idUsuario, 
+            $nombre, 
+            $apellido, 
+            $telefono, 
+            $idZona, 
+            $email, 
+            $foto_perfil
+        );
     }
 
     /**
