@@ -1,4 +1,4 @@
-import { userCache }              from '../../user.js';
+import { userCache, updateNegociaciones }              from '../../user.js';
 import { NegociacionesService }    from '../../../../../../assets/js/services/negociaciones.js';
 import { ChatsService }            from '../../../../../../assets/js/services/chats.js';
 import { createNegociacionCard }   from '../../../../../../assets/js/components/negociacion-components.js';
@@ -205,6 +205,7 @@ export async function init(container) {
           console.error('Error guardando oferta:', err);
         } finally {
           editBtn.disabled = false;
+          updateNegociaciones();
         }
         return;
       }
