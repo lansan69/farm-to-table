@@ -30,6 +30,7 @@ function updateCardEstado(card, estado) {
 
 export function init(container) {
   const userId      = farmerCache.userId;
+  console.log(farmerCache);
   const grid        = container.querySelector('#negocGrid');
   const searchSlot  = container.querySelector('#contraofertas-search');
   const filtersWrap = container.querySelector('.filters-wrap');
@@ -44,10 +45,37 @@ export function init(container) {
 
   searchSlot.innerHTML = createSearchBar('Buscar producto o comprador…');
   const searchInput = searchSlot.querySelector('.chat-search-bar__input');
+  searchInput.parentElement.style.position = 'relative';
+
+  const clearBtn = document.createElement('button');
+  clearBtn.innerHTML = '✕';
+  Object.assign(clearBtn.style, {
+    position: 'absolute',
+    right: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'transparent',
+    border: 'none',
+    color: '#999',
+    cursor: 'pointer',
+    display: 'none',
+    fontSize: '16px',
+    padding: '4px'
+  });
+  searchInput.parentElement.appendChild(clearBtn);
 
   searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value.toLowerCase().trim();
+    clearBtn.style.display = e.target.value.length > 0 ? 'block' : 'none';
     renderGrid();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    clearBtn.style.display = 'none';
+    renderGrid();
+    searchInput.focus();
   });
 
   // ── Hamburger toggle ────────────────────────────────────────────────────────
@@ -122,6 +150,7 @@ export function init(container) {
       estado:         n.estado_negociacion,
       comentario:     n.ultimo_comentario || '',
       mode:           'productor',
+      foto:           n.foto || null
     })).join('');
   }
 

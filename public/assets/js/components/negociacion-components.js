@@ -24,36 +24,39 @@ const ESTADO_MODS = {
  * @param {{ id, idLote, nombre, vendedor, zona, precioOfertado, precioReal, estado }} neg
  */
 export function createNegociacionCard({
-  id          = 0,
-  idLote      = 0,
-  nombre      = '',
-  vendedor    = '',
-  zona        = '',
-  precioOfertado = 0,
-  precioReal     = 0,
-  estado      = 'pendiente',
-  comentario  = '',
-  mode        = 'comprador',   // 'comprador' | 'productor'
+  id = 0, idLote = 0, nombre = '', vendedor = '', zona = '', 
+  precioOfertado = 0, precioReal = 0, estado = 'pendiente', 
+  comentario = '', mode = 'comprador', foto = null // <-- Recibimos foto
 }) {
-  const initial    = (nombre || '?')[0].toUpperCase();
-  const color      = AVATAR_COLORS[idLote % AVATAR_COLORS.length];
-  const estadoLbl  = ESTADO_LABELS[estado] ?? estado;
-  const estadoMod  = ESTADO_MODS[estado]   ?? '';
-  const fmt        = (n) => `$${Number(n).toFixed(2)}`;
+  const initial = (nombre || '?')[0].toUpperCase();
+  const color   = AVATAR_COLORS[idLote % AVATAR_COLORS.length];
+  
+  // LÓGICA DE AVATAR: Si hay foto, usamos <img>, si no, la inicial
+  const avatarContent = foto 
+    ? `<img src="../assets/images/lotes/${foto}" style="width:100%; height:100%; object-fit:cover;" />`
+    : `<span class="negoc-avatar__letter">${initial}</span>`;
+  
+  const avatarStyle = foto 
+    ? `background-color: transparent;` 
+    : `background-color: ${color};`;
+
+  const estadoLbl = ESTADO_LABELS[estado] ?? estado;
+  const estadoMod = ESTADO_MODS[estado]   ?? '';
+  const fmt       = (n) => `$${Number(n).toFixed(2)}`;
   const isTerminal = ['aceptada', 'rechazada'].includes(estado);
   const dis        = isTerminal ? 'disabled' : '';
 
   const actionsHtml = mode === 'productor'
-    ? `<button class="negoc-btn negoc-btn--msg"    data-id="${id}" ${dis}>Enviar mensaje</button>
+    ? `<button class="negoc-btn negoc-btn--msg"     data-id="${id}" ${dis}>Enviar mensaje</button>
        <button class="negoc-btn negoc-btn--reject"  data-id="${id}" ${dis}>Rechazar</button>
        <button class="negoc-btn negoc-btn--accept"  data-id="${id}" ${dis}>Aceptar</button>`
-    : `<button class="negoc-btn negoc-btn--msg"    data-id="${id}" ${dis}>Enviar mensaje</button>
-       <button class="negoc-btn negoc-btn--edit"   data-id="${id}" ${dis}>Modificar oferta</button>`;
+    : `<button class="negoc-btn negoc-btn--msg"     data-id="${id}" ${dis}>Enviar mensaje</button>
+       <button class="negoc-btn negoc-btn--edit"    data-id="${id}" ${dis}>Modificar oferta</button>`;
 
   return `
     <article class="negoc-card" data-id="${id}">
-      <div class="negoc-avatar-cont" style="background-color:${color}">
-        <span class="negoc-avatar__letter">${initial}</span>
+      <div class="negoc-avatar-cont" style="${avatarStyle}">
+        ${avatarContent}
       </div>
       <div class="negoc-content">
         <h3 class="negoc-name">${nombre}</h3>

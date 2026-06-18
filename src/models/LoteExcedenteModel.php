@@ -6,7 +6,7 @@ class LoteExcedenteModel extends BaseModel
     public function findAllDisponibles(): array
     {
         return $this->db
-            ->query('SELECT * FROM v_lotes_disponibles ORDER BY fecha_publicacion DESC')
+            ->query("SELECT * FROM v_lotes_disponibles WHERE estado_lote != 'eliminado' ORDER BY fecha_publicacion DESC")
             ->fetchAll();
     }
 
@@ -74,23 +74,72 @@ class LoteExcedenteModel extends BaseModel
             ->fetchAll();
     }
 
-public function create(
-        int     $idProductor,
-        string  $nombre,
-        int     $idCategoria,
-        float   $cantidad,
-        float   $precio,
-        string  $fechaCosecha,
+    public function edit(
+        int $idLote,
+        int $idProductor,
+        string $nombre,
+        int $idCategoria,
+        float $cantidad,
+        float $precio,
+        string $fechaCosecha,
         ?string $descripcion = null,
         ?string $foto = null,
-        ?int    $idProducto = null
+        ?int $idProducto = null
+    ): bool {
+
+        // 1. Armamos la consulta base con los campos obligatorios de texto
+        $sql = 'UPDATE lotes_excedentes SET 
+                    nombre_producto = ?, 
+                    id_categoria = ?, 
+                    cantidad_kg = ?, 
+                    precio_recuperacion_sugerido = ?, 
+                    fecha_cosecha = ?, 
+                    descripcion_producto = ?,
+                    id_producto = ?';
+
+        $params = [
+            $nombre,
+            $idCategoria,
+            $cantidad,
+            $precio,
+            $fechaCosecha,
+            $descripcion,
+            $idProducto
+        ];
+
+        // 2. Si hay una foto nueva, la añadimos dinámicamente a la actualización
+        if ($foto !== null) {
+            $sql .= ', foto = ?';
+            $params[] = $foto;
+        }
+
+        $sql .= ' WHERE id_lote = ? AND id_productor = ?';
+        $params[] = $idLote;
+        $params[] = $idProductor;
+
+        $stmt = $this->db->prepare($sql);
+
+        // Devolvemos true o false dependiendo de si la consulta se ejecutó bien
+        return $stmt->execute($params);
+    }
+
+    public function create(
+        int $idProductor,
+        string $nombre,
+        int $idCategoria,
+        float $cantidad,
+        float $precio,
+        string $fechaCosecha,
+        ?string $descripcion = null,
+        ?string $foto = null,
+        ?int $idProducto = null
     ): int {
         $stmt = $this->db->prepare(
             'INSERT INTO lotes_excedentes
                 (id_productor, nombre_producto, id_categoria, cantidad_kg, precio_recuperacion_sugerido, fecha_cosecha, descripcion_producto, foto, id_producto)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
-        
+
         $stmt->execute([
             $idProductor,
             $nombre,
@@ -102,7 +151,7 @@ public function create(
             $foto,
             $idProducto
         ]);
-        
+
         return (int) $this->db->lastInsertId();
     }
 

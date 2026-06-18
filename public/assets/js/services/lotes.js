@@ -41,7 +41,13 @@ export const LotesService = {
 subirLote(formData) {
     // Se envía directamente el FormData.
     // Importante: tu clase Http.post NO debe hacer JSON.stringify si detecta que es un FormData
-    return Http.post('lotes.php', formData);
+    return Http.post('lotes.php?action=publicar', formData);
+  },
+  
+actualizarLote(formData) {
+    // Se envía directamente el FormData.
+    // Importante: tu clase Http.post NO debe hacer JSON.stringify si detecta que es un FormData
+    return Http.post('lotes.php?action=editar', formData);
   },
 
   /**

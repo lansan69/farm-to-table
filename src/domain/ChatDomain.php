@@ -50,6 +50,15 @@ class ChatDomain
     public function findOrCreate(int $a, int $b, int $idNegociacion): int
     {
         $existing = $this->model->findByNegociacion($idNegociacion);
-        return $existing ?? $this->model->create($a, $b, $idNegociacion);
+        if ($existing !== null) return $existing;
+
+        try {
+            return $this->model->create($a, $b, $idNegociacion);
+        } catch (\PDOException $e) {
+            // Race condition: another request created it first
+            $existing = $this->model->findByNegociacion($idNegociacion);
+            if ($existing !== null) return $existing;
+            throw $e;
+        }
     }
 }

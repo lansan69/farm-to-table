@@ -1,4 +1,4 @@
-import { userCache, updateData }              from '../../user.js';
+import { userCache, updateFavoritos }              from '../../user.js';
 import { createSearchBar }         from '../../../../../../assets/js/components/chat-components.js';
 import { createProductCard, createProductCardExpanded } from '../../../../../../assets/js/components/marketplace-components.js';
 import { FavoritosService }        from '../../../../../../assets/js/services/favoritos.js';
@@ -69,7 +69,7 @@ function injectModal() {
 }
 
 export async function init(container) {
-  console.log(userCache.lotes);
+  const searchFromProductor = localStorage.getItem("productorSearchString");
   const userId       = userCache.userId;
   const searchSlot   = container.querySelector('#market-search');
   const productsGrid = container.querySelector('#productsGrid');
@@ -79,10 +79,50 @@ export async function init(container) {
 
   searchSlot.innerHTML = createSearchBar('Buscar productos...');
   const searchInput = searchSlot.querySelector('.chat-search-bar__input');
+  searchInput.parentElement.style.position = 'relative';
+
+  const clearBtn = document.createElement('button');
+  clearBtn.innerHTML = '✕';
+  Object.assign(clearBtn.style, {
+    position: 'absolute',
+    right: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'transparent',
+    border: 'none',
+    color: '#999',
+    cursor: 'pointer',
+    display: 'none', // Oculto por defecto
+    fontSize: '16px',
+    padding: '4px'
+  });
+  searchInput.parentElement.appendChild(clearBtn);
 
   let favSet       = new Set();
   let currentCatId = 0;
   let searchTerm   = '';
+
+if (searchFromProductor) {
+    searchInput.value = searchFromProductor;
+    clearBtn.style.display = 'block'; // Mostramos la "X" si ya hay texto
+    localStorage.removeItem("productorSearchString"); 
+  }
+
+// Escuchamos el input para filtrar y mostrar/ocultar la "X"
+  searchInput.addEventListener('input', e => {
+    searchTerm = e.target.value;
+    clearBtn.style.display = searchTerm.length > 0 ? 'block' : 'none';
+    renderProducts();
+  });
+
+  // Evento para limpiar el input
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchTerm = '';
+    clearBtn.style.display = 'none';
+    renderProducts();
+    searchInput.focus(); // Devolvemos el foco al buscador
+  });
 
   // ── Populate from cache ─────────────────────────────────────────────────
   userCache.favoritos.forEach(f => favSet.add(f.id_lote));
@@ -137,14 +177,13 @@ export async function init(container) {
     
     if (nowFav) {
       favSet.add(lotId);
-      toastSuccess('Agregado a favoritos.');
     } else {
       favSet.delete(lotId);
     }
 
     try {
-      updateData();
       await FavoritosService.toggleFavorito(userId, lotId);
+     updateFavoritos();
     } catch (err) {
       btn.classList.toggle('active');
       if (nowFav) favSet.delete(lotId); else favSet.add(lotId);

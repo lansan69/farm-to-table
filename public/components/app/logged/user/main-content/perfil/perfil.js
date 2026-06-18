@@ -1,4 +1,4 @@
-import { userCache }    from '../../user.js';
+import { userCache, updatePerfil}    from '../../user.js';
 import { navigate }     from '../../../../../../assets/js/app.js';
 import { PerfilService } from '../../../../../../assets/js/services/perfil.js';
 import { toastGoodbye, toastSuccess, toastError } from '../../../../../../assets/js/toast.js';
@@ -14,6 +14,19 @@ const ROL_LABEL = {
 function renderPerfil(container) {
   const perfil = userCache.perfil;
   if (!perfil) return;
+
+  const avatarImg = container.querySelector('.sidebar-info__avatar img');
+  const fotoSrc = perfil.foto 
+    ? `../assets/images/users/${perfil.foto}` 
+    : '../assets/images/users/default-avatar.svg';
+
+  if (avatarImg) {
+    avatarImg.src = fotoSrc;
+  } else {
+    // Si no existe el <img>, reemplazamos el SVG inicial por un <img>
+    const avatarContainer = container.querySelector('.sidebar-info__avatar');
+    avatarContainer.innerHTML = `<img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+  }
 
   const set = (id, val) => {
     const el = container.querySelector(id);
@@ -45,9 +58,9 @@ function renderPerfil(container) {
   });
 
   // Stats
-  set('#stat-total',      perfil.total_negociaciones);
-  set('#stat-aceptadas',  perfil.negociaciones_aceptadas);
-  set('#stat-pendientes', perfil.negociaciones_pendientes);
+  set('#stat-total',      perfil.total_perfiliaciones);
+  set('#stat-aceptadas',  perfil.perfiliaciones_aceptadas);
+  set('#stat-pendientes', perfil.perfiliaciones_pendientes);
 
   // Valoraciones / actividad
   const activityList = container.querySelector('#activity-list');
@@ -77,6 +90,11 @@ function injectEditModal(zonas) {
      </option>`
   ).join('');
 
+  // Ruta por defecto si no hay foto previa (ajústala a tu estructura de directorios)
+  const fotoActual = perfil.foto 
+    ? `../assets/images/users/${perfil.foto}` 
+    : '../assets/images/users/default-avatar.svg';
+
   const modal = document.createElement('div');
   modal.id        = 'perfil-edit-modal';
   modal.className = 'modal fade';
@@ -89,6 +107,16 @@ function injectEditModal(zonas) {
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;padding:24px;">
+          
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <label class="perfil-modal-label" style="align-self:flex-start;">Fotografía</label>
+            <div style="position:relative; width:100px; height:100px; border-radius:50%; overflow:hidden; background:#f0f0f0; cursor:pointer;" onclick="document.getElementById('edit-foto').click()">
+              <img id="perfil-preview" src="${fotoActual}" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.5); color:white; text-align:center; font-size:11px; padding:2px 0;">Cambiar</div>
+            </div>
+            <input id="edit-foto" type="file" accept="image/*" style="display:none;" />
+          </div>
+
           <div>
             <label class="perfil-modal-label">Nombre</label>
             <input id="edit-nombre"   class="perfil-modal-input" type="text"
@@ -132,7 +160,7 @@ export function init(container) {
   let zonas    = null;   // lazy-loaded on first edit click
   let bsModal  = null;
 
-  // ── Editar información ──────────────────────────────────────────────────
+// ── Editar información ──────────────────────────────────────────────────
   window.handleEditarPerfil = async () => {
     if (!zonas) {
       try   { zonas = await PerfilService.getZonas(); }
@@ -142,12 +170,23 @@ export function init(container) {
     const modalEl = injectEditModal(zonas);
     bsModal = new bootstrap.Modal(modalEl);
 
+    // Actualizar previsualización de la imagen al seleccionar un archivo
+    const fotoInput = modalEl.querySelector('#edit-foto');
+    const preview = modalEl.querySelector('#perfil-preview');
+    fotoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+      }
+    });
+
     modalEl.querySelector('#perfil-guardar-btn').addEventListener('click', async () => {
       const nombre   = modalEl.querySelector('#edit-nombre').value.trim();
       const apellido = modalEl.querySelector('#edit-apellido').value.trim();
       const email    = modalEl.querySelector('#edit-email').value.trim();
       const telefono = modalEl.querySelector('#edit-telefono').value.trim();
       const idZona   = parseInt(modalEl.querySelector('#edit-zona').value);
+      const fotoFile = fotoInput.files[0]; // Capturamos el archivo de la imagen
 
       if (!nombre || !telefono || !idZona) {
         toastError('Nombre, teléfono y zona son obligatorios.');
@@ -166,9 +205,10 @@ export function init(container) {
           email:      email    || null,
           telefono,
           id_zona:    idZona,
+          foto:       fotoFile || null // Inyectamos la imagen
         });
 
-        // Keep cache in sync so navigating away and back shows fresh data
+        // Actualizar caché para que la UI refleje el cambio instantáneamente
         const zona = zonas.find(z => z.id_zona == idZona);
         Object.assign(userCache.perfil, {
           nombre_razon_social: nombre,
@@ -180,7 +220,13 @@ export function init(container) {
           codigo_postal:       zona?.codigo_postal      ?? userCache.perfil.codigo_postal,
         });
 
+        // Si se subió una foto nueva, actualizamos temporalmente con un ObjectURL para la sesión actual
+        if (fotoFile) {
+          userCache.perfil.foto_perfil = URL.createObjectURL(fotoFile);
+        }
+
         bsModal.hide();
+        await updatePerfil();
         renderPerfil(container);
         toastSuccess('Información actualizada correctamente.');
       } catch (err) {
@@ -206,7 +252,7 @@ export function init(container) {
       return;
     }
 
-    const btn = container.querySelector('.negoc-btn--modificar');
+    const btn = container.querySelector('.perfil-btn--modificar');
     if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
 
     try {

@@ -13,7 +13,13 @@ class Router
     {
         static $cache = null;
         if ($cache === null) {
-            $cache = json_decode(file_get_contents('php://input'), true) ?? [];
+            // Si es multipart/form-data, PHP llena $_POST automáticamente.
+            if (!empty($_POST)) {
+                $cache = $_POST;
+            } else {
+                // Si no, asumimos que es una API JSON y leemos el input crudo.
+                $cache = json_decode(file_get_contents('php://input'), true) ?? [];
+            }
         }
         return $cache;
     }

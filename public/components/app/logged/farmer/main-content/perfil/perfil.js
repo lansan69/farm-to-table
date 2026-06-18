@@ -1,7 +1,13 @@
-import { farmerCache }  from '../../farmer.js';
+import { farmerCache, updatePerfil }  from '../../farmer.js';
 import { navigate }      from '../../../../../../assets/js/app.js';
 import { PerfilService } from '../../../../../../assets/js/services/perfil.js';
 import { toastGoodbye, toastSuccess, toastError } from '../../../../../../assets/js/toast.js';
+
+const ROL_LABEL = {
+  productor:    'Productor',
+  organizacion: 'Organización',
+  admin:        'Administrador',
+};
 
 // ── Star helpers ──────────────────────────────────────────────────────────────
 
@@ -18,73 +24,75 @@ function buildStars(rating) {
 // ── Render sidebar + rating card ──────────────────────────────────────────────
 
 function renderPerfil(container) {
-  const perfil   = farmerCache.perfil;
-  const vendedor = farmerCache.vendedor;
+  const perfil = farmerCache.perfil;
+  if (!perfil) return;
+
+  console.log("rendering perfil", perfil);
+
+  // 1. Definimos la fuente correctamente basándonos en tu console.log (propiedad 'foto')
+  const fotoSrc = perfil.foto 
+    ? `../assets/images/users/${perfil.foto}` 
+    : '../assets/images/users/default-avatar.svg';
+
+  // 2. Buscamos el contenedor y la imagen
+  const avatarContainer = container.querySelector('.sidebar-info__avatar');
+  let avatarImg = avatarContainer.querySelector('img');
+
+  if (avatarImg) {
+    // Si ya existe la etiqueta, solo actualizamos el src
+    avatarImg.src = fotoSrc;
+  } else {
+    // Si es la primera vez, reemplazamos el SVG inicial por el <img>
+    avatarContainer.innerHTML = `<img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+  }
 
   const set = (id, val) => {
     const el = container.querySelector(id);
     if (el) el.textContent = val ?? '—';
   };
 
-  if (perfil) {
-    const nombreCompleto = [perfil.nombre_razon_social, perfil.apellido]
-      .filter(Boolean).join(' ');
+  const nombreCompleto = [perfil.nombre_razon_social, perfil.apellido]
+    .filter(Boolean).join(' ');
 
-    set('#sidebar-name',     nombreCompleto || null);
-    set('#sidebar-role',     'Productor');
-    set('#sidebar-email',    perfil.email);
-    set('#sidebar-phone',    perfil.telefono_contacto);
-    set('#sidebar-location', perfil.nombre_delegacion
-      ? `${perfil.nombre_delegacion}${perfil.codigo_postal ? ` (${perfil.codigo_postal})` : ''}`
-      : null
-    );
-    set('#sidebar-since', perfil.fecha_registro
-      ? new Date(perfil.fecha_registro).toLocaleDateString('es-MX', { year: 'numeric', month: 'long' })
-      : null
-    );
+  set('#sidebar-name',     nombreCompleto || null);
+  set('#sidebar-role',     ROL_LABEL[perfil.rol_usuario] ?? perfil.rol_usuario);
+  set('#sidebar-email',    perfil.email);
+  set('#sidebar-phone',    perfil.telefono_contacto);
+  set('#sidebar-location', perfil.nombre_delegacion
+    ? `${perfil.nombre_delegacion}${perfil.codigo_postal ? ` (${perfil.codigo_postal})` : ''}`
+    : null
+  );
+  set('#sidebar-since', perfil.fecha_registro
+    ? new Date(perfil.fecha_registro).toLocaleDateString('es-MX', { year: 'numeric', month: 'long' })
+    : null
+  );
 
-    // Valoraciones / actividad
-    const activityList = container.querySelector('#activity-list');
-    if (activityList) {
-      const valoraciones = perfil.valoraciones ?? [];
-      activityList.innerHTML = valoraciones.length
-        ? valoraciones.map(v => `
-            <div class="activity-row">
-              <span class="activity-desc">${v.comentarios ?? 'Sin comentario'}</span>
-              <span class="activity-date">${v.fecha_valoracion
-                ? new Date(v.fecha_valoracion).toLocaleDateString('es-MX') : ''}</span>
-              <span class="activity-status">${'★'.repeat(v.estrellas ?? 0)}</span>
-            </div>`).join('')
-        : '<p class="activity-empty" style="color:var(--gray-muted);font-size:.85rem;margin:0">Sin actividad reciente.</p>';
-    }
-  }
-
-  // Account type — farmer is always productor
+  // Account type — lock to the user's real role, disable the other option
+  const roleType = perfil.rol_usuario === 'productor' ? 'productor' : 'usuario';
   container.querySelectorAll('.account-type-option').forEach(el => {
-    const isActive = el.id === 'opt-productor';
+    const isActive = el.id === `opt-${roleType}`;
     el.classList.toggle('active',   isActive);
     el.classList.toggle('disabled', !isActive);
   });
 
-  // Rating card
-  const ratingBlock = container.querySelector('#vendedor-rating-block');
-  if (ratingBlock) {
-    if (vendedor) {
-      const rating  = parseFloat(vendedor.puntuacion_promedio) || 0;
-      const product = vendedor.producto_principal || '—';
-      ratingBlock.innerHTML = `
-        <div class="rating-stars">${buildStars(rating)}</div>
-        <div class="rating-value">${rating.toFixed(1)} <span class="rating-max">/ 5.0</span></div>
-        <div class="rating-lotes">
-          <span class="lote-stat"><strong>${vendedor.lotes_disponibles ?? 0}</strong> disponibles</span>
-          <span class="lote-stat lote-stat--sep">·</span>
-          <span class="lote-stat"><strong>${vendedor.lotes_cerrados ?? 0}</strong> cerrados</span>
-          <span class="lote-stat lote-stat--sep">·</span>
-          <span class="lote-stat">producto: <strong>${product}</strong></span>
-        </div>`;
-    } else {
-      ratingBlock.innerHTML = '<p style="color:var(--gray-muted);font-size:.85rem;margin:0">Sin datos de vendedor disponibles.</p>';
-    }
+  // Stats
+  set('#stat-total',      perfil.total_perfiliaciones);
+  set('#stat-aceptadas',  perfil.perfiliaciones_aceptadas);
+  set('#stat-pendientes', perfil.perfiliaciones_pendientes);
+
+  // Valoraciones / actividad
+  const activityList = container.querySelector('#activity-list');
+  if (activityList) {
+    const valoraciones = perfil.valoraciones ?? [];
+    activityList.innerHTML = valoraciones.length
+      ? valoraciones.map(v => `
+          <div class="activity-row">
+            <span class="activity-desc">${v.comentarios ?? 'Sin comentario'}</span>
+            <span class="activity-date">${v.fecha_valoracion
+              ? new Date(v.fecha_valoracion).toLocaleDateString('es-MX') : ''}</span>
+            <span class="activity-status">${'★'.repeat(v.estrellas ?? 0)}</span>
+          </div>`).join('')
+      : '<p class="activity-empty" style="color:var(--gray-muted);font-size:.85rem;margin:0">Sin actividad reciente.</p>';
   }
 }
 
@@ -93,12 +101,17 @@ function renderPerfil(container) {
 function injectEditModal(zonas) {
   document.getElementById('perfil-edit-modal')?.remove();
 
-  const perfil  = farmerCache.perfil ?? {};
+  const perfil = farmerCache.perfil ?? {};
   const options = zonas.map(z =>
     `<option value="${z.id_zona}" ${z.id_zona == perfil.id_zona ? 'selected' : ''}>
        ${z.nombre_delegacion} (${z.codigo_postal})
      </option>`
   ).join('');
+
+  // Ruta por defecto si no hay foto previa (ajústala a tu estructura de directorios)
+  const fotoActual = perfil.foto 
+    ? `../assets/images/users/${perfil.foto}` 
+    : '../assets/images/users/default-avatar.svg';
 
   const modal = document.createElement('div');
   modal.id        = 'perfil-edit-modal';
@@ -112,10 +125,20 @@ function injectEditModal(zonas) {
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;padding:24px;">
+          
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <label class="perfil-modal-label" style="align-self:flex-start;">Fotografía</label>
+            <div style="position:relative; width:100px; height:100px; border-radius:50%; overflow:hidden; background:#f0f0f0; cursor:pointer;" onclick="document.getElementById('edit-foto').click()">
+              <img id="perfil-preview" src="${fotoActual}" style="width:100%; height:100%; object-fit:cover;" />
+              <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.5); color:white; text-align:center; font-size:11px; padding:2px 0;">Cambiar</div>
+            </div>
+            <input id="edit-foto" type="file" accept="image/*" style="display:none;" />
+          </div>
+
           <div>
-            <label class="perfil-modal-label">Nombre / Razón social</label>
+            <label class="perfil-modal-label">Nombre</label>
             <input id="edit-nombre"   class="perfil-modal-input" type="text"
-                   value="${perfil.nombre_razon_social ?? ''}" placeholder="Nombre o razón social" />
+                   value="${perfil.nombre_razon_social ?? ''}" placeholder="Nombre" />
           </div>
           <div>
             <label class="perfil-modal-label">Apellido</label>
@@ -155,21 +178,36 @@ export function init(container) {
   let zonas   = null;
   let bsModal = null;
 
-  window.handleEditarPerfil = async () => {
+window.handleEditarPerfil = async () => {
     if (!zonas) {
-      try   { zonas = await PerfilService.getZonas(); }
+      try { zonas = await PerfilService.getZonas(); }
       catch { zonas = []; }
     }
 
     const modalEl = injectEditModal(zonas);
     bsModal = new bootstrap.Modal(modalEl);
 
-    modalEl.querySelector('#perfil-guardar-btn').addEventListener('click', async () => {
+    // 1. Adjuntamos el evento de cambio de imagen correctamente
+    const fotoInput = modalEl.querySelector('#edit-foto');
+    const preview = modalEl.querySelector('#perfil-preview');
+
+    fotoInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          preview.src = event.target.result; // Previsualización usando FileReader
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+  modalEl.querySelector('#perfil-guardar-btn').addEventListener('click', async () => {
       const nombre   = modalEl.querySelector('#edit-nombre').value.trim();
       const apellido = modalEl.querySelector('#edit-apellido').value.trim();
       const email    = modalEl.querySelector('#edit-email').value.trim();
       const telefono = modalEl.querySelector('#edit-telefono').value.trim();
       const idZona   = parseInt(modalEl.querySelector('#edit-zona').value);
+      const fotoFile = fotoInput.files[0]; // Capturamos el archivo de la imagen
 
       if (!nombre || !telefono || !idZona) {
         toastError('Nombre, teléfono y zona son obligatorios.');
@@ -188,8 +226,10 @@ export function init(container) {
           email:      email    || null,
           telefono,
           id_zona:    idZona,
+          foto:       fotoFile || null // Inyectamos la imagen
         });
 
+        // Actualizar caché para que la UI refleje el cambio instantáneamente
         const zona = zonas.find(z => z.id_zona == idZona);
         Object.assign(farmerCache.perfil, {
           nombre_razon_social: nombre,
@@ -197,11 +237,17 @@ export function init(container) {
           email:               email    || null,
           telefono_contacto:   telefono,
           id_zona:             idZona,
-          nombre_delegacion:   zona?.nombre_delegacion ?? farmerCache.perfil.nombre_delegacion,
-          codigo_postal:       zona?.codigo_postal     ?? farmerCache.perfil.codigo_postal,
+          nombre_delegacion:   zona?.nombre_delegacion  ?? farmerCache.perfil.nombre_delegacion,
+          codigo_postal:       zona?.codigo_postal      ?? farmerCache.perfil.codigo_postal,
         });
 
+        // Si se subió una foto nueva, actualizamos temporalmente con un ObjectURL para la sesión actual
+        if (fotoFile) {
+          farmerCache.perfil.foto_perfil = URL.createObjectURL(fotoFile);
+        }
+
         bsModal.hide();
+        await updatePerfil();
         renderPerfil(container);
         toastSuccess('Información actualizada correctamente.');
       } catch (err) {
